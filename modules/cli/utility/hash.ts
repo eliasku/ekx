@@ -1,4 +1,4 @@
-// if you modify seed value, you should also modify it in `@ekx/std` package: `ek/hash.h`
+// if you modify seed value, you should also modify it in `ekx::std` package: `ek/hash.h`
 const seed = 0x811C9DC5;
 
 // FNV-1a hash

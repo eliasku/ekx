@@ -10,6 +10,14 @@
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eliasku/ekx.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eliasku/ekx/issues",
+    "email": "eliasku.games@gmail.com"
+  },
   "scripts": {
     "build": "ts-node ci/build.ts",
     "build-native": "ts-node ci/build-native.ts",
@@ -27,12 +35,12 @@
     "@types/decompress": "^4.2.4",
     "@types/gettext-parser": "^4.0.2",
     "@types/mustache": "^4.2.2",
-    "@types/node": "^18.14.5",
+    "@types/node": "^18.14.6",
     "@types/plist": "^3.0.2",
     "@types/xmldoc": "^1.1.6",
     "colors": "^1.4.0",
     "decompress": "^4.2.1",
-    "esbuild": "^0.17.10",
+    "esbuild": "^0.17.11",
     "gettext-parser": "^6.0.0",
     "glob": "^9.2.1",
     "mustache": "^4.2.0",

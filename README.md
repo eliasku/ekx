@@ -1,12 +1,12 @@
 ## Toy game engine
 
 <p align="center">
-<a href="https://github.com/highduck/ekx">
+<a href="https://github.com/eliasku/ekx">
 <img width="256" height="256" src="logo.png" alt="EKX">
 </a>
 </p>
 
-[![Build](https://github.com/highduck/ekx/actions/workflows/build.yml/badge.svg)](https://github.com/highduck/ekx/actions/workflows/build.yml)
+[![Build](https://github.com/eliasku/ekx/actions/workflows/build.yml/badge.svg)](https://github.com/eliasku/ekx/actions/workflows/build.yml)
 
 ## Showcase
 
