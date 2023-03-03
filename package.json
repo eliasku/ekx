@@ -1,7 +1,7 @@
 {
-  "name": "@ekx/ekx",
+  "name": "ekx",
   "description": "Toy game engine",
-  "version": "1.0.17",
+  "version": "0.0.1",
   "license": "ISC",
   "type": "module",
   "bin": {

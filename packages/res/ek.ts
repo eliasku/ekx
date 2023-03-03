@@ -2,7 +2,7 @@ import {Project} from "../../modules/cli/project.js";
 
 export async function setup(project: Project) {
     project.addModule({
-        name: "@ekx/res",
+        name: "res",
         cpp: "src",
         cpp_include: "include",
         web: {

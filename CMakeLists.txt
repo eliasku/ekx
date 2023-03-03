@@ -18,7 +18,6 @@ endif ()
 include(packages/unit/cmake/code-coverage.cmake)
 
 add_library(${PROJECT_NAME} INTERFACE)
-add_library(ekx::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 add_subdirectory(external)
 
