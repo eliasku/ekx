@@ -1,0 +1,153 @@
+name: Build
+
+on:
+  push:
+    # auto-update branches checked by created PR
+    branches-ignore:
+      - 'update/*'
+    paths-ignore:
+      - '.changeset/**'
+
+  # only test check PR to master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build-cmake:
+    name: Build CMake targets
+    runs-on: ${{ matrix.os.os }}
+    strategy:
+      matrix:
+        os:
+          - { os: ubuntu-latest,  shell: bash }
+          - { os: macos-latest,   shell: bash }
+          # temporary disable windows build (too slow)
+          # - { os: windows-latest, shell: msys2 }
+    defaults:
+      run:
+        shell: '${{ matrix.os.shell }} {0}'
+    env:
+      CC: clang
+      CXX: clang++
+      USE_CCACHE: 1
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - uses: msys2/setup-msys2@v2
+        if: runner.os == 'Windows'
+        with:
+          path-type: inherit
+          msystem: clang64
+          release: false
+          install: >-
+            mingw-w64-clang-x86_64-winpthreads-git
+            mingw-w64-clang-x86_64-clang
+            mingw-w64-clang-x86_64-gcc
+
+      - name: Setup OpenGL (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install libglu1-mesa-dev mesa-common-dev xorg-dev libasound-dev
+
+      - name: Setup Ninja
+        uses: eliasku/gha-setup-ninja@master
+
+      - name: Install CCache
+        uses: eliasku/install-ccache-action@master
+
+      - name: Setup CCache
+        uses: eliasku/ccache-action@main
+        with:
+          key: ${{ runner.os }}
+
+      - name: Versions
+        run: |
+          node --version
+          npm --version
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Test external utilities
+        run: npm run test-external-utils
+
+      - name: Build JS
+        run: npm run build
+
+      - name: Build Native
+        run: npm run build-native
+
+      # llvm-profdata / llvm-cov
+      - name: Setup LLVM and Clang (Linux only)
+        uses: KyleMayes/install-llvm-action@v1
+        if: runner.os == 'Linux'
+        with:
+          version: "15"
+          ubuntu-version: "18.04"
+          env: true
+
+      - name: Coverage Native
+        run: npm run build-native-coverage
+
+  release:
+    if: ${{ github.ref == 'refs/heads/master' }}
+    # bypass build check to make
+    # needs: build-cmake
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Versions
+        run: |
+          node --version
+          npm --version
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Create Release Pull Request or Publish to NPM
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          # This expects you to have a script called release which does a build for your packages and calls changeset publish
+          publish: npm run release
+          version: npm run version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+
+  typecheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install
+        run: npm ci
+
+      - name: Compile TypeScript
+        run: npm run typecheck

@@ -1,0 +1,25 @@
+.idea/
+.vscode/
+cmake-build-*/
+
+# npm dependencies
+node_modules/
+
+# samples generated resources
+generated/
+build/
+export/
+cache/
+
+RECOVER_*.fla
+
+# packages ignores
+packages/auph/web/dist/
+
+packages/texture-loader/js/
+
+plugins/firebase/web/dist/
+plugins/firebase/web/lib/
+
+tools/bin/
+

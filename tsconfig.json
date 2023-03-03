@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "NodeNext",
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "removeComments": false,
+    "preserveConstEnums": false,
+    "sourceMap": false,
+    "outDir": "cache/builds/ts",
+    "noEmit": true,
+    "lib": [
+      "ESNext",
+      "DOM"
+    ]
+  },
+  "ts-node": {
+    "transpileOnly": true,
+    "skipIgnore": true,
+    "esm": true,
+    "swc": true,
+    "compilerOptions": {
+      "moduleResolution": "Node"
+    }
+  }
+}
