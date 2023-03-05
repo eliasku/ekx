@@ -1,6 +1,6 @@
 #include "RenderElement.hpp"
 
-#include "../ImageSet.hpp"
+#include "../image_set.h"
 #include "../xfl/renderer/Scanner.hpp"
 #include "../xfl/renderer/CairoRenderer.hpp"
 #include "../xfl/renderer/CairoHelpers.hpp"
@@ -10,9 +10,9 @@
 
 namespace ek::xfl {
 
-SpriteData renderMultiSample(rect_t bounds,
-                             const Array<RenderCommandsBatch>& batches,
-                             const RenderElementOptions& options) {
+sprite_data_t renderMultiSample(rect_t bounds,
+                                const Array<RenderCommandsBatch>& batches,
+                                const RenderElementOptions& options) {
     // x4 super-sampling
     const double upscale = 4.0;
 
@@ -81,7 +81,8 @@ SpriteData renderMultiSample(rect_t bounds,
         bitmap_swizzle_xwzy(&bitmap);
     }
 
-    SpriteData data;
+    sprite_data_t data = {0};
+    data.padding = 1;
     data.rc = rc;
     // TODO: recti_wh(w, h)
     data.source = {{0, 0, w, h}};
@@ -90,9 +91,9 @@ SpriteData renderMultiSample(rect_t bounds,
     return data;
 }
 
-SpriteData renderLowQuality(rect_t bounds,
-                            const Array<RenderCommandsBatch>& batches,
-                            const RenderElementOptions& options) {
+sprite_data_t renderLowQuality(rect_t bounds,
+                               const Array<RenderCommandsBatch>& batches,
+                               const RenderElementOptions& options) {
     const double scale = options.scale;
     const bool fixed = options.width > 0 && options.height > 0;
 
@@ -140,7 +141,8 @@ SpriteData renderLowQuality(rect_t bounds,
         bitmap_swizzle_xwzy(&bitmap);
     }
 
-    SpriteData data;
+    sprite_data_t data = {0};
+    data.padding = 1;
     data.rc = rc;
     // TODO: recti_wh
     data.source = {{0, 0, w, h}};
@@ -160,21 +162,24 @@ bool checkContainsOnlyBitmapOperations(const Array<RenderCommandsBatch>& batches
     return true;
 }
 
-SpriteData renderElementBatches(rect_t bounds,
-                                const Array<RenderCommandsBatch>& batches,
-                                const RenderElementOptions& options) {
+sprite_data_t renderElementBatches(rect_t bounds,
+                                   const Array<RenderCommandsBatch>& batches,
+                                   const RenderElementOptions& options) {
     if (checkContainsOnlyBitmapOperations(batches)) {
         return renderLowQuality(bounds, batches, options);
     }
     return renderMultiSample(bounds, batches, options);
 }
 
-SpriteData renderElement(const Doc& doc, const Element& el, const RenderElementOptions& options) {
+sprite_data_t renderElement(const Doc& doc, const Element& el, const RenderElementOptions& options) {
     Scanner scanner{};
     scanner.draw(doc, el);
 
     auto spr = renderElementBatches(aabb2_get_rect(scanner.bounds), scanner.batches, options);
-    spr.name = el.item.name;
+
+    // copy string
+    arr_init_from((void**) &spr.name, 1, el.item.name.c_str(), el.item.name.size() + 1);
+
     return spr;
 }
 

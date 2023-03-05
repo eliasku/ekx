@@ -21,11 +21,18 @@ export async function execute(bin: string, args: string[], options?: ExecuteOpti
     const env: Record<string, string | undefined> = process.env;
     const cwd = options?.workingDir ?? process.cwd();
     logger.log("run:", cmd.join(" "));
-    const stdio = (options?.verbose ?? UtilityConfig.verbose) ? "inherit" : "ignore";
+    const printOutput = options?.verbose ?? UtilityConfig.verbose;
+    const stdio = printOutput ? "inherit" : "ignore";
     const status = await run({
         cmd, cwd, env,
         stdio: stdio,
     });
+    if (status.data && printOutput) {
+        process.stdout.write(status.data);
+    }
+    if (status.error && printOutput) {
+        process.stdout.write(status.error);
+    }
     if (status.success) {
         return status.code;
     }

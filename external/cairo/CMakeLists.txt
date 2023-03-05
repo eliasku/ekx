@@ -3,7 +3,7 @@ project(cairo C)
 
 add_library(${PROJECT_NAME} STATIC
         src/cairo.c
-        src/cairo-atomic.c
+#        src/cairo-atomic.c
         src/cairo-error.c
         src/cairo-font-face.c
         src/cairo-font-options.c
@@ -71,7 +71,7 @@ add_library(${PROJECT_NAME} STATIC
         src/cairo-rectangle.c
         src/cairo-traps.c
         src/cairo-traps-compositor.c
-        src/cairo-scaled-font-subsets.c
+#        src/cairo-scaled-font-subsets.c
         src/cairo-device.c
         src/cairo-mutex.c
         src/cairo-surface-snapshot.c
@@ -126,7 +126,7 @@ add_library(${PROJECT_NAME} STATIC
         src/pixman-region16.c
         src/pixman-region32.c
         src/pixman-solid-fill.c
-        src/pixman-timer.c
+#        src/pixman-timer.c
         src/pixman-trap.c
         src/pixman-utils.c
         )
@@ -136,6 +136,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC src)
 set_target_properties(${PROJECT_NAME} PROPERTIES C_STANDARD 99)
 target_compile_options(${PROJECT_NAME} PRIVATE
         -Wno-int-to-pointer-cast
+        -Wno-enum-conversion
+        -Wno-shift-negative-value
         )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")

@@ -1,6 +1,8 @@
-#include "ImageSet.hpp"
+#include "image_set.h"
+#include <ek/buf.h>
+#include <ek/print.h>
 #include <ek/assert.h>
-
+#include <ek/hash.h>
 #include <miniz.h>
 
 #ifndef STB_IMAGE_WRITE_IMPLEMENTATION
@@ -12,10 +14,10 @@ unsigned char* iwcompress(unsigned char* data, int data_len, int* out_len, int q
     // uber compression
     quality = 10;
     mz_ulong buflen = mz_compressBound(data_len);
-    auto* buf = (unsigned char*) malloc(buflen);
+    uint8_t* buf = (unsigned char*) malloc(buflen);
     if (mz_compress2(buf, &buflen, data, data_len, quality)) {
         free(buf);
-        return nullptr;
+        return 0;
     }
     *out_len = (int) buflen;
     return buf;
@@ -53,8 +55,8 @@ void ek_bitmap_save_png(const bitmap_t* bitmap, const char* path, bool alpha) {
         stbi_write_png(path, w, h, 4, bitmap->pixels, 4 * w);
     } else {
         const size_t pixels_count = w * h;
-        auto* buffer = (uint8_t*) malloc(pixels_count * 3);
-        auto* buffer_rgb = buffer;
+        uint8_t* buffer = (uint8_t*) malloc(pixels_count * 3);
+        uint8_t* buffer_rgb = buffer;
         const uint8_t* buffer_rgba = (const uint8_t*) bitmap->pixels;
 
         for (size_t i = 0; i < pixels_count; ++i) {
@@ -79,11 +81,11 @@ void ek_bitmap_save_jpg(const bitmap_t* bitmap, const char* path, bool alpha) {
     const uint8_t* buffer_rgba = (uint8_t*) bitmap->pixels;
 
     if (alpha) {
-        auto* buffer_rgb = (uint8_t*) malloc(pixels_count * 3);
-        auto* buffer_alpha = (uint8_t*) malloc(pixels_count);
+        uint8_t* buffer_rgb = (uint8_t*) malloc(pixels_count * 3);
+        uint8_t* buffer_alpha = (uint8_t*) malloc(pixels_count);
 
-        auto* rgb = buffer_rgb;
-        auto* alphaMask = buffer_alpha;
+        uint8_t* rgb = buffer_rgb;
+        uint8_t* alphaMask = buffer_alpha;
         for (size_t i = 0; i < pixels_count; ++i) {
             rgb[0] = buffer_rgba[0];
             rgb[1] = buffer_rgba[1];
@@ -104,8 +106,8 @@ void ek_bitmap_save_jpg(const bitmap_t* bitmap, const char* path, bool alpha) {
         free(buffer_rgb);
         free(buffer_alpha);
     } else {
-        auto* buffer = (uint8_t*) malloc(pixels_count * 3);
-        auto* buffer_rgb = buffer;
+        uint8_t* buffer = (uint8_t*) malloc(pixels_count * 3);
+        uint8_t* buffer_rgb = buffer;
 
         for (size_t i = 0; i < pixels_count; ++i) {
             buffer_rgb[0] = buffer_rgba[0];
@@ -121,31 +123,35 @@ void ek_bitmap_save_jpg(const bitmap_t* bitmap, const char* path, bool alpha) {
     }
 }
 
-void save(ImageSet* images, const char* output) {
+void save(image_set_t* images, const char* output) {
     char path[1024];
     snprintf(path, sizeof path, "%s/images.txt", output);
     FILE* f = fopen(path, "wb");
     int idx = 0;
 
-    for (Resolution& resolution: images->resolutions) {
+    for (uint32_t i = 0; i < images->resolutions_num; ++i) {
+        image_set_res_t* res = images->resolutions + i;
         uint32_t numImages = 0;
-        for (auto& image: resolution.sprites) {
-            if (image.bitmap.pixels) {
+        for (uint32_t image_index = 0, images_num = ek_buf_length(res->sprites); image_index < images_num; ++image_index) {
+            sprite_data_t* image = res->sprites + image_index;
+            if (image->bitmap.pixels) {
                 ++numImages;
             }
         }
         fprintf(f, "%u\n", numImages);
-        for (auto& image: resolution.sprites) {
-            if (image.bitmap.pixels) {
+        for (uint32_t image_index = 0, images_num = ek_buf_length(res->sprites); image_index < images_num; ++image_index) {
+            sprite_data_t* image = res->sprites + image_index;
+            if (image->bitmap.pixels) {
                 snprintf(path, sizeof path, "%s/%d.bmp", output, idx++);
                 const char* imagePath = path;
-                fprintf(f, "%s\n%s\n%f %f %f %f %u %u\n",
-                        image.name.c_str(),
+                fprintf(f, "%u\n%s\n%s\n%f %f %f %f %u %u\n",
+                        H(image->name),
+                        image->name,
                         imagePath,
-                        image.rc.x, image.rc.y, image.rc.w, image.rc.h,
-                        image.padding, 0);
+                        image->rc.x, image->rc.y, image->rc.w, image->rc.h,
+                        image->padding, 0);
                 {
-                    bitmap_t bitmap = image.bitmap;
+                    bitmap_t bitmap = image->bitmap;
                     // require RGBA non-premultiplied alpha
                     bitmap_unpremultiply(&bitmap);
                     stbi_write_bmp(imagePath, bitmap.w, bitmap.h, 4, bitmap.pixels);

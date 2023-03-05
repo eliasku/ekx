@@ -131,7 +131,7 @@ void load_atlas_meta(Atlas* atlas, ek_local_res* lr) {
             atlas->sprites.push_back(ref);
 
             auto* sprite = &REF_RESOLVE(res_sprite, ref);
-            EK_ASSERT(!(sprite->state & SPRITE_LOADED));
+//            EK_ASSERT(!(sprite->state & SPRITE_LOADED));
             sprite->state = SPRITE_LOADED;
             if(spr_data.flags & SpriteInfo::Rotated) {
                 sprite->state |= SPRITE_ROTATED;

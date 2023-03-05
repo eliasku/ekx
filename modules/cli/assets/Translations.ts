@@ -13,7 +13,6 @@ export class TranslationsAsset extends Asset {
     static typeName = "translations";
 
     readonly languages = new Map<string, string>();
-    readonly convertedData = new Map<string, ArrayBuffer>();
 
     constructor(readonly desc: TranslationsDesc) {
         super(desc, TranslationsAsset.typeName);

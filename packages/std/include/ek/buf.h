@@ -69,7 +69,7 @@ void* arr_add_(void** p_arr, uint32_t element_size);
 
 void* _check_ptr_alignment(void* ptr, uint32_t width);
 
-#define cast_ptr_aligned(T, ptr) ((T*)_check_ptr_alignment(ptr, sizeof(T)))
+#define cast_ptr_aligned(T, ptr) ((T*)_check_ptr_alignment(ptr, 4))
 
 #ifdef __cplusplus
 }

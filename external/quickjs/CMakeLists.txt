@@ -19,6 +19,7 @@ add_library(ekx::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_compile_options(${PROJECT_NAME} PRIVATE
         -fno-strict-aliasing
         -Wstrict-aliasing=2
+        -Wno-unused-parameter
         )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")

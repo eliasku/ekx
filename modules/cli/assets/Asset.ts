@@ -85,9 +85,12 @@ export class AssetBuilderContext {
 
     async populate() {
         let total = 0;
+        logger.log(`assets base path is ${this.basePath}`);
         if (isDir(this.basePath)) {
             const bp = fs.realpathSync(this.basePath);
-            const scripts = expandGlobSync(path.join(bp, "**/assets.{js,ts}"));
+            const pattern = path.join(bp, "**/assets.{js,ts}");
+            logger.log(`search asset scripts ${pattern}`);
+            const scripts = expandGlobSync(pattern);
             for (const script of scripts) {
                 const ctx = await import(script.path);
                 if (ctx.on_populate) {
@@ -95,6 +98,9 @@ export class AssetBuilderContext {
                     ++total;
                 }
             }
+        }
+        else {
+            logger.warn(`assets base path is not a directory: ${this.basePath}`);
         }
         if (total === 0) {
             logger.warn(`Asset scripts not found (${this.basePath}) ⬇ \n`);

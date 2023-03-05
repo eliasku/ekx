@@ -1,5 +1,4 @@
 import * as path from "path";
-import {XmlDocument} from "xmldoc";
 import {Asset, AssetDesc} from "./Asset.js";
 import {bmfont} from "./helpers/bmfont.js";
 import {MultiResAtlasAsset} from "./Atlas.js";
@@ -21,10 +20,6 @@ export class BitmapFontAsset extends Asset {
 
     constructor(readonly desc: BMFontDesc) {
         super(desc, BitmapFontAsset.typeName);
-    //     desc.font_xml = desc.font_xml ?? `<font fontSize="${desc.font_size ?? 24}" mirrorCase="${!!desc.mirror_case}">
-    //     <codeRange from="0x0020" to="0x007F"/>
-    // </font>`;
-    //     desc.filters_xml = `<filters/>`;
     }
 
     resolveInputs(): number {
@@ -56,16 +51,6 @@ ${atlasAsset.desc.name}
 ${codeRanges.map(cr => cr.from + " " + cr.to).join("\n")}
 ${resolutions.map(r=> ""+r.scale).join("\n")}
 `;
-//         from="0x0020" to="0x007F"
-//         const xml = new XmlDocument(`<bmfont path="${path.resolve(this.owner.basePath, this.desc.filepath)}" name="${this.desc.name}"
-//  outputSprites="${imagesOutput}"
-//   outputFont="${outputFont}">
-// ${this.desc.filters_xml!}
-// ${this.desc.font_xml!}
-// <atlas name="${atlasAsset.desc.name}">
-//     ${atlasAsset.desc.resolutions!.map(r => "<resolution scale=\"" + r.scale + "\"/>").join("\n")}
-// </atlas>
-// </bmfont>`);
         writeTextFileSync(configPath, config);
 
         // prepare required folder for images collection

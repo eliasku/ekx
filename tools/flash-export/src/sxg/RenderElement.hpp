@@ -1,6 +1,6 @@
 #pragma once
 
-struct SpriteData;
+struct sprite_data_t;
 
 namespace ek::xfl {
 
@@ -16,6 +16,6 @@ struct RenderElementOptions {
     bool trim = false;
 };
 
-SpriteData renderElement(const Doc& doc, const Element& el, const RenderElementOptions& options);
+sprite_data_t renderElement(const Doc& doc, const Element& el, const RenderElementOptions& options);
 
 }

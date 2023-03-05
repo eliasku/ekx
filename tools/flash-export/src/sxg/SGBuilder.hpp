@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ExportItem.hpp"
-#include "../ImageSet.hpp"
+#include "../image_set.h"
 #include <unordered_map>
 
 namespace ek::xfl {
@@ -35,7 +35,7 @@ public:
 
     void build_library();
 
-    void build_sprites(ImageSet& toImageSet) const;
+    void build_sprites(image_set_t* toImageSet) const;
 
     void process(const Element& el, ExportItem* parent, processing_bag_t* bag = nullptr);
 
@@ -53,7 +53,7 @@ public:
 
     void process_shape(const Element& el, ExportItem* parent, processing_bag_t* bag = nullptr);
 
-    void render(const ExportItem& item, ImageSet& toImageSet) const;
+    void render(const ExportItem& item, image_set_t* toImageSet) const;
 
     [[nodiscard]]
     SGFile export_library();
@@ -61,7 +61,7 @@ public:
     ExportItem* addElementToDrawingLayer(ExportItem* item, const Element& el);
 
 private:
-    [[nodiscard]] bool isInLinkages(const string_hash_t id) const;
+    [[nodiscard]] bool isInLinkages(string_hash_t id) const;
 
     void processTimeline(const Element& Element, ExportItem* PItem);
 };

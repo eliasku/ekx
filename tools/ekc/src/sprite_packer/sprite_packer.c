@@ -91,12 +91,17 @@ int exportAtlas(const char* filepath) {
                     sprite_data_t sprite = {0};
                     uint32_t padding = 0;
                     uint32_t flags = 0;
+                    string_hash_t sprite_name_hash = 0;
+                    fscanf(f, "%u\n", &sprite_name_hash);
                     freadline(f, sprite_name, sizeof sprite_name);
                     freadline(f, image_path, sizeof image_path);
                     fscanf(f, "%f %f %f %f %u %u\n", &sprite.rc.x, &sprite.rc.y, &sprite.rc.w, &sprite.rc.h,
                            &padding, &flags);
                     // TODO: print to the global Hash table
                     sprite.name = H(sprite_name);
+                    if(sprite.name != sprite_name_hash) {
+                        log_error("hash-name mismatch \"%s\"(%u) | calculated: %u", sprite_name, sprite_name_hash, sprite.name);
+                    }
                     sprite.padding = padding;
                     sprite.flags = flags;
                     sprite.bitmap = load_bitmap32(image_path);

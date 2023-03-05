@@ -1,5 +1,4 @@
 import * as path from "path";
-import {XmlDocument} from "xmldoc";
 import {Asset, AssetDesc} from "./Asset.js";
 import {isDir, isFile, removePathExtension} from "../utils.js";
 import {flashExport} from "./helpers/flashExport.js";
@@ -36,19 +35,24 @@ export class FlashAsset extends Asset {
     async build() {
         const targetAtlas = this.desc.atlas ?? "main";
         ensureDirSync(path.join(this.owner.cache, this.desc.name!));
-        const configPath = path.join(this.owner.cache, this.desc.name!, "_flash_export_config.xml");
+        const configPath = path.join(this.owner.cache, this.desc.name!, "flash_export_config.txt");
         const sgOutput = path.join(this.owner.output, this.desc.name + ".sg");
         const imagesOutput = path.join(this.owner.cache, this.desc.name!, targetAtlas);
         const atlasAsset = this.owner.find(MultiResAtlasAsset.typeName, targetAtlas) as MultiResAtlasAsset | undefined;
         if (atlasAsset) {
-            const resolutionNodes = atlasAsset.desc.resolutions!.map(r => `<resolution scale="${r.scale}"/>`);
-            const xml = new XmlDocument(`<flash path="${path.resolve(this.owner.basePath, this.desc.filepath)}" name="${this.desc.name}"
- output="${sgOutput}" outputImages="${imagesOutput}" >
-<atlas name="${atlasAsset.desc.name}">
-    ${resolutionNodes.join("\n")}
-</atlas>
-</flash>`);
-            writeTextFileSync(configPath, xml.toString());
+            // path <path>
+            // output_path <output>
+            // output_images_path <outputImages>
+            // resoulutions_num %u
+            // resolution_scale %f
+            // ...
+            const exportConfig = `${path.resolve(this.owner.basePath, this.desc.filepath)}
+${sgOutput}
+${imagesOutput}
+${atlasAsset.desc.resolutions?.length ?? 0}
+${atlasAsset.desc.resolutions?.map(r => `${r.scale}`)?.join("\n")}
+`;
+            writeTextFileSync(configPath, exportConfig);
             ensureDirSync(imagesOutput);
             await flashExport(configPath);
             atlasAsset.inputs.push(path.join(imagesOutput, "images.txt"));

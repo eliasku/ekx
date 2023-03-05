@@ -488,23 +488,26 @@ void SGBuilder::process(const Element& el, ExportItem* parent, processing_bag_t*
 
 /*** rendering ***/
 
-void SGBuilder::render(const ExportItem& item, ImageSet& toImageSet) const {
+void SGBuilder::render(const ExportItem& item, image_set_t* toImageSet) const {
     const Element& el = *item.ref;
     const auto spriteID = el.item.name;
     RenderElementOptions options;
-    for (auto& resolution: toImageSet.resolutions) {
+    for (auto& resolution: toImageSet->resolutions) {
         options.scale = std::min(
                 item.max_abs_scale,
                 resolution.scale * std::min(1.0f, item.estimated_scale)
         );
-        auto res = renderElement(doc, el, options);
-        res.name = spriteID;
+        sprite_data_t res = renderElement(doc, el, options);
+
+        // copy string: res.name = spriteID.c_str();
+        arr_init_from((void**) &res.name, 1, spriteID.c_str(), spriteID.size() + 1);
+
         res.trim = rect_is_empty(item.node.scaleGrid);
-        resolution.sprites.push_back(res);
+        arr_push(&resolution.sprites, sprite_data_t, res);
     }
 }
 
-void SGBuilder::build_sprites(ImageSet& toImageSet) const {
+void SGBuilder::build_sprites(image_set_t* toImageSet) const {
     for (auto* item: library.children) {
         if (item->renderThis) {
             item->node.sprite = H(item->ref->item.name.c_str());

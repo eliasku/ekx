@@ -548,6 +548,7 @@ void apply_bitmap_filters(const bitmap_filter_t* filters, uint32_t n, float scal
 
 void save_font_bitmaps(const char* font_name, const image_set_t* images, const char* output) {
     char path[1024];
+    char sprite_name[1024];
     snprintf(path, sizeof path, "%s/images.txt", output);
     FILE* f = fopen(path, "wb");
     int idx = 0;
@@ -567,8 +568,10 @@ void save_font_bitmaps(const char* font_name, const image_set_t* images, const c
             if (image->bitmap.pixels) {
                 snprintf(path, sizeof path, "%s/%d.bmp", output, idx++);
                 const char* imagePath = path;
-                fprintf(f, "%s%u\n%s\n%f %f %f %f %u %u\n",
-                        font_name, image->glyph_index,
+                ek_snprintf(sprite_name, sizeof sprite_name, "%s%u", font_name, image->glyph_index);
+                fprintf(f, "%u\n%s\n%s\n%f %f %f %f %u %u\n",
+                        H(sprite_name),
+                        sprite_name,
                         imagePath,
                         image->rc.x, image->rc.y, image->rc.w, image->rc.h,
                         image->padding, 0);

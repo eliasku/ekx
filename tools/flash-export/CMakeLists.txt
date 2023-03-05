@@ -2,9 +2,10 @@ cmake_minimum_required(VERSION 3.19)
 project(flash-export)
 
 add_executable(${PROJECT_NAME}
-        src/flash_export.cpp
+        src/flash_export_main.c
+        src/commands.cpp
 
-        src/ImageSet.cpp
+        src/image_set.c
 
         # XFL Builder
         src/sxg/SGBuilder.cpp
