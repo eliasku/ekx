@@ -4,35 +4,42 @@
 #include <ek/ds/Array.hpp>
 #include <ek/ds/String.hpp>
 #include <ek/gfx.h>
-#include <ek/format/Model3D.hpp>
+#include <ek/format/model3d.h>
 
 namespace ek {
 
 struct StaticMesh {
-    Model3D origin;
+    model3d_t origin;
     sg_buffer vb;
     sg_buffer ib;
     int indices_count;
 
-    explicit StaticMesh(const Model3D& model) : origin{model} {
+    explicit StaticMesh(model3d_t model) : origin{model} {
         sg_buffer_desc desc{};
         desc.usage = SG_USAGE_IMMUTABLE;
         desc.type = SG_BUFFERTYPE_VERTEXBUFFER;
-        desc.data.ptr = model.vertices.data();
-        desc.data.size = model.vertices.size() * sizeof(ModelVertex3D);
+        desc.data.ptr = model.vertices;
+        desc.data.size = ek_buf_length(model.vertices) * sizeof(model3d_vertex_t);
         vb = sg_make_buffer(&desc);
         EK_ASSERT(vb.id != 0);
 
+        uint32_t num_indices = ek_buf_length(model.indices);
         desc.usage = SG_USAGE_IMMUTABLE;
         desc.type = SG_BUFFERTYPE_INDEXBUFFER;
         //desc.size = model.indices.size() * sizeof(uint16_t);
-        desc.data.ptr = model.indices.data();
-        desc.data.size = model.indices.size() * sizeof(uint16_t);
+        desc.data.ptr = model.indices;
+        desc.data.size = num_indices * sizeof(uint16_t);
         ib = sg_make_buffer(&desc);
         EK_ASSERT(ib.id != 0);
 
-        indices_count = (int)model.indices.size();
+        indices_count = (int)num_indices;
     }
+
+//    ~StaticMesh() {
+//        ek_buf_reset(&origin.vertices);
+//        ek_buf_reset(&origin.indices);
+            // TODO: dispose buffers,
+//    }
 };
 
 struct MeshRenderer /* Component */ {

@@ -57,16 +57,16 @@ get_shadow_map_box(const mat4_t& camera_projection, const mat4_t& camera_view, c
 
 sg_layout_desc getVertex3DLayout() {
     sg_layout_desc layout{};
-    layout.buffers[0].stride = sizeof(ModelVertex3D);
-    layout.attrs[0].offset = offsetof(ModelVertex3D, position);
+    layout.buffers[0].stride = sizeof(model3d_vertex_t);
+    layout.attrs[0].offset = offsetof(model3d_vertex_t, position);
     layout.attrs[0].format = SG_VERTEXFORMAT_FLOAT3;
-    layout.attrs[1].offset = offsetof(ModelVertex3D, normal);
+    layout.attrs[1].offset = offsetof(model3d_vertex_t, normal);
     layout.attrs[1].format = SG_VERTEXFORMAT_FLOAT3;
-    layout.attrs[2].offset = offsetof(ModelVertex3D, uv);
+    layout.attrs[2].offset = offsetof(model3d_vertex_t, uv);
     layout.attrs[2].format = SG_VERTEXFORMAT_FLOAT2;
-    layout.attrs[3].offset = offsetof(ModelVertex3D, color);
+    layout.attrs[3].offset = offsetof(model3d_vertex_t, color);
     layout.attrs[3].format = SG_VERTEXFORMAT_UBYTE4N;
-    layout.attrs[4].offset = offsetof(ModelVertex3D, color2);
+    layout.attrs[4].offset = offsetof(model3d_vertex_t, color2);
     layout.attrs[4].format = SG_VERTEXFORMAT_UBYTE4N;
     return layout;
 }

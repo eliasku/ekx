@@ -11,12 +11,12 @@
 // texture loading
 #include <ek/texture_loader.h>
 
-#include <ek/format/ImageData.hpp>
+#include <ek/format/image_data.h>
 #include <ek/scenex/SceneFactory.hpp>
 #include <ek/format/SGFile.hpp>
 #include <ek/scenex/2d/Atlas.hpp>
 #include <ek/scenex/3d/StaticMesh.hpp>
-#include <ek/format/Model3D.hpp>
+#include <ek/format/model3d.h>
 
 #include <ek/scenex/text/Font.hpp>
 #include <ek/scenex/text/TrueTypeFont.hpp>
@@ -24,7 +24,6 @@
 
 #include <utility>
 #include <ek/scenex/2d/DynamicAtlas.hpp>
-#include <ek/ds/Array.hpp>
 
 #include <ekx/app/localization.h>
 
@@ -292,7 +291,7 @@ public:
         if (data_.type == IMAGE_DATA_CUBE_MAP) {
             loader->isCubeMap = true;
             loader->premultiplyAlpha = false;
-            loader->formatMask = data_.formatMask;
+            loader->formatMask = data_.format_mask;
         }
         ek_texture_loader_load(loader);
         state = AssetState::Loading;
@@ -414,10 +413,18 @@ public:
                 [](ek_local_res* lr) {
                     ModelAsset* this_ = (ModelAsset*) lr->userdata;
                     if (ek_local_res_success(lr)) {
+                        model3d_t model = {0};
                         input_memory_stream input{lr->buffer, lr->length};
                         IO io{input};
-                        Model3D model;
-                        io(model);
+                        uint32_t vertices_count = 0;
+                        uint32_t indices_count = 0;
+                        io(vertices_count);
+                        ek_buf_set_size((void**)&model.vertices, sizeof(model3d_vertex_t), vertices_count, vertices_count);
+                        io.span(model.vertices, vertices_count * sizeof(model3d_vertex_t));
+                        io(indices_count);
+                        ek_buf_set_size((void**)&model.indices, sizeof(uint16_t), indices_count, indices_count);
+                        io.span(model.indices, indices_count * sizeof(uint16_t));
+
                         RES_NAME_RESOLVE(res_mesh3d, H(this_->name_.c_str())) = new StaticMesh(model);
                         ek_local_res_close(lr);
                     } else {
@@ -542,7 +549,12 @@ Asset* unpack_asset(const void* data, uint32_t size) {
     } else if (type == H("texture")) {
         string_hash_t name;
         image_data_t texData;
-        io(name, texData);
+        io(name);
+        io(texData.type, texData.format_mask);
+        io(texData.images_num);
+        for(uint32_t i = 0; i < texData.images_num; ++i) {
+            io.span(texData.images[i].str, sizeof(image_path_t));
+        }
         return new ImageAsset(name, texData);
     } else if (type == H("strings")) {
         String name;

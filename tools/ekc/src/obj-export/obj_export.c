@@ -3,14 +3,9 @@
 
 #include <ek/log.h>
 #include <ek/math.h>
+#include <ek/format/model3d.h>
 
-typedef struct {
-    vec3_t position;
-    vec3_t normal;
-    vec2_t uv;
-    color_t color;
-    color_t color2;
-} vertex3d_t;
+typedef model3d_vertex_t vertex3d_t;
 
 int convertObjModel(const char* input, const char* output) {
     fastObjMesh* mesh = fast_obj_read(input);
