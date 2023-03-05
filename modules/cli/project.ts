@@ -122,7 +122,7 @@ export class Project {
     }
 
     async loadModule(configPath: string) {
-        if(!fs.existsSync(configPath)) {
+        if (!fs.existsSync(configPath)) {
             logger.error("File not found:", configPath);
         }
         configPath = fs.realpathSync(configPath);
@@ -138,7 +138,7 @@ export class Project {
                 const prev = this.__dirname;
                 this.__dirname = path.dirname(configPath);
                 {
-                    const task:Promise<any>|any = configurator(this) ?? true;
+                    const task: Promise<any> | any = configurator(this) ?? true;
                     if (task instanceof Promise) {
                         this.projects[configPath] = await task ?? true;
                     } else {
@@ -200,7 +200,12 @@ export class Project {
         {
             const i = this.args.indexOf("--bump");
             if (i >= 0) {
-                this.options.bumpVersion = SemVer.parseBump(this.args[i + 1], BumpVersionFlag.BuildNumber);
+                let bumpMode = this.args[i + 1];
+                if (!bumpMode || (bumpMode !== "minor" && bumpMode !== "major" && bumpMode !== "patch")) {
+                    // by default
+                    bumpMode = "patch";
+                }
+                this.options.bumpVersion = SemVer.parseBump(bumpMode, BumpVersionFlag.BuildNumber);
             }
         }
         {
