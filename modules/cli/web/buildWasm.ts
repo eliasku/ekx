@@ -148,9 +148,7 @@ function renderCMakeFile(ctx: Project, buildType: string): string {
         ALLOW_UNIMPLEMENTED_SYSCALLS: 0
     };
 
-    // if (buildType === "Release") {
-    //     cmakeTarget.linkOptions.push("--closure 1");
-    // }
+    // disable transpiling to ES5
     cmakeTarget.linkOptions.push("--closure 0");
 
     for (const opt of Object.keys(emOptions)) {
