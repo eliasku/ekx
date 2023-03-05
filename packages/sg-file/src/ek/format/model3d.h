@@ -28,7 +28,7 @@ model3d_t create_plane(vec3_t position, vec2_t size, color_t color);
 }
 #endif
 
-#endif
+#endif // EK_FORMAT_MODEL_3D_H
 
 #ifdef EK_FORMAT_MODEL_3D_IMPLEMENT
 #include <ek/buf.h>
@@ -147,4 +147,4 @@ extern "C" model3d_t create_plane(const vec3_t position, const vec2_t size, colo
 
     return result;
 }
-#endif
+#endif // EK_FORMAT_MODEL_3D_IMPLEMENT

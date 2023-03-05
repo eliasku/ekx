@@ -1,13 +1,13 @@
 export const LocalStorageLib = {
-    web_ls_set_f64: (pKey:number, value:number):boolean => {
+    web_ls_set_f64: function (pKey: number, value: number): boolean {
         const ls = window.localStorage;
         if (ls && pKey) {
-            ls.setItem(UTF8ToString(pKey), ""+value);
+            ls.setItem(UTF8ToString(pKey), "" + value);
             return true;
         }
         return false;
     },
-    web_ls_get_f64: (pKey:number, pValue:number):boolean => {
+    web_ls_get_f64: function (pKey: number, pValue: number): boolean {
         const ls = window.localStorage;
         if (ls && pKey) {
             const item = ls.getItem(UTF8ToString(pKey));
@@ -29,7 +29,7 @@ export const LocalStorageLib = {
      * @param pValue - NULL-terminated c-string, if 0 - delete key,
      * @returns - true if operation is completed, false if not supported or invalid arguments
      */
-    web_ls_set: (pKey:number, pValue:number):boolean => {
+    web_ls_set: function (pKey: number, pValue: number): boolean {
         const ls = window.localStorage;
         if (ls && pKey) {
             const key = UTF8ToString(pKey);
@@ -51,7 +51,7 @@ export const LocalStorageLib = {
      * @param pOutStringLen - result string length (bytes written to buffer EXCLUDING null-terminator byte)
      * @returns - true if key is valid and exists in storage, false otherwise
      */
-    web_ls_get: (pKey:number, pDest:number, maxLength:number, pOutStringLen:number):boolean => {
+    web_ls_get: function (pKey: number, pDest: number, maxLength: number, pOutStringLen: number): boolean {
         const ls = window.localStorage;
         if (ls && pKey) {
             const value = ls.getItem(UTF8ToString(pKey));

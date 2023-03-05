@@ -1,8 +1,8 @@
-declare const __ekfs_onComplete:(id: number, _: number, _len: number) => void;
+declare const __ekfs_onComplete: (id: number, _: number, _len: number) => void;
 
 export const LocalResLib = {
     // LOCAL RESOURCES
-    ek_fetch_open: (pURL: number) => {
+    ek_fetch_open: function (pURL: number): number {
         const getNext = () => {
             const next = table.length;
             for (let i = 1; i < next; ++i) {
@@ -22,7 +22,7 @@ export const LocalResLib = {
         }
         return id;
     },
-    ek_fetch_load: (id: number) => {
+    ek_fetch_load: function (id: number): number {
         const table = (window as any).EK_FETCH_OBJECTS;
         if (!table) {
             return 1;
@@ -48,7 +48,7 @@ export const LocalResLib = {
         });
         return 0;
     },
-    ek_fetch_close: (id: number):number => {
+    ek_fetch_close: function (id: number): number {
         const table = (window as any).EK_FETCH_OBJECTS;
         if (table && table[id]) {
             table[id] = null;
@@ -63,7 +63,7 @@ export const LocalResLib = {
      * @param toRead - bytes to read from loaded buffer
      * @param offset - source buffer offset from start
      */
-    ek_fetch_read: (id: number, pBuffer: number, toRead: number, offset: number) => {
+    ek_fetch_read: function (id: number, pBuffer: number, toRead: number, offset: number): number {
         const table = (window as any).EK_FETCH_OBJECTS;
         if (!table) {
             return 0;

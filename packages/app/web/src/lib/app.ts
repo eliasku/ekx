@@ -8,7 +8,7 @@ declare const _ek_app_js__on_mouse: (type: number, button: number, x: number, y:
 declare const _ek_app_js__on_wheel: (x: number, y: number) => boolean;
 
 export const AppLib = {
-    ek_app_js_set_mouse_cursor: (cursor: number): void => {
+    ek_app_js_set_mouse_cursor: function (cursor: number): void {
        const PARENT = 0;
        const ARROW = 1;
        const BUTTON = 2;
@@ -30,7 +30,7 @@ export const AppLib = {
 
     ek_app_js_init__deps: ['$GL'],
 
-    ek_app_js_init: (flags: number) => {
+    ek_app_js_init: function(flags: number) {
         const BUTTONS: number[] = [0, 2, 1, 2, 2];
 
         const TYPES: Record<string, number> = {
@@ -281,17 +281,17 @@ export const AppLib = {
 
         return true;
     },
-    ek_app_js_run: (): void => {
+    ek_app_js_run: function (): void {
         const loop = (time: number) => {
             requestAnimationFrame(loop);
             _ek_app_js__loop(time / 1000.0);
         };
         loop(-1.0);
     },
-    ek_app_js_close: (): void => {
+    ek_app_js_close: function (): void {
         window.close();
     },
-    ek_app_js_lang: (dest: number, maxLength: number): void => {
+    ek_app_js_lang: function(dest: number, maxLength: number): void {
         const lang = window.navigator.language;
         if (lang) {
             stringToUTF8(lang, dest, maxLength);
@@ -299,7 +299,7 @@ export const AppLib = {
             HEAPU8[dest] = 0;
         }
     },
-    ek_app_js_navigate: (pURL: number): number => {
+    ek_app_js_navigate: function(pURL: number): number {
         try {
             window.open(UTF8ToString(pURL), "_blank");
             return 0;
@@ -307,7 +307,7 @@ export const AppLib = {
         }
         return 1;
     },
-    ek_app_js_share: (pContent: number): number => {
+    ek_app_js_share: function (pContent: number): number {
         if (navigator.share) {
             navigator.share({
                 // title: "",

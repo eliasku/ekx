@@ -66,7 +66,7 @@ const genId = (): number => {
 
 export const getTextureLoader = (id: number): Loader | null => {
     const obj = loaders[id & iMask];
-    return obj?.id === id ? obj : null;
+    return (obj && obj.id === id) ? obj : null;
 };
 
 export const destroyTextureLoader = (id: number):number => {

@@ -3,7 +3,7 @@ import {build as buildCMake} from "../../cmake/mod.js";
 import {CMakeGenerateProject, CMakeGenerateTarget, cmakeLists} from "../../cmake/generate.js";
 import {isDir} from "../utils.js";
 import {Project} from "../project.js";
-import {callInDirSync, writeTextFileSync} from "../../utils/utils.js";
+import {callInDirSync, ensureDirSync, writeTextFileSync} from "../../utils/utils.js";
 import * as path from "path";
 import * as fs from "fs";
 
@@ -105,7 +105,7 @@ function renderCMakeFile(ctx: Project, buildType: string): string {
 
     const emOptions: any = {
         ASSERTIONS: buildType === "Debug" ? 2 : 0,
-        DEMANGLE_SUPPORT: buildType === "Debug" ? 1 : 0,
+        // DEMANGLE_SUPPORT: buildType === "Debug" ? 1 : 0,
         SAFE_HEAP: buildType === "Debug" ? 1 : 0,
         // SAFE_HEAP_LOG: buildType === "Debug" ? 1 : 0,
 
@@ -118,6 +118,7 @@ function renderCMakeFile(ctx: Project, buildType: string): string {
         MINIMAL_RUNTIME: 1,
         MODULARIZE: 1,
         EXPORT_ES6: 1,
+        STACK_SIZE: "5MB",
         //EXPORT_NAME: "createModule",
         // }
 
@@ -163,9 +164,7 @@ export async function buildWasm(ctx: Project, buildType: string) {
     const dest_dir = path.resolve(process.cwd(), "export");
     const output_path = path.join(dest_dir, platform_proj_name);
 
-    if (!isDir(output_path)) {
-        fs.mkdirSync(output_path, {recursive: true});
-    }
+    ensureDirSync(output_path);
 
     const cmakeFile = callInDirSync(output_path, () => renderCMakeFile(ctx, buildType));
     writeTextFileSync(path.join(output_path, "CMakeLists.txt"), cmakeFile);

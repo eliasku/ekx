@@ -155,7 +155,7 @@ export function voice(buffer: AuphBuffer,
 
     const ctx = getAudioContextObject();
     if (!ctx || ctx.state !== "running") {
-        setError(Message.InvalidMixerState, ctx?.state);
+        setError(Message.InvalidMixerState, ctx ? ctx.state : undefined);
         return 0;
     }
     const bufferObj = _getBufferObj(buffer);
