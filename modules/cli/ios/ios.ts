@@ -1,10 +1,4 @@
-import {
-    copyFolderRecursiveSync,
-    deleteFolderRecursive,
-    execute2,
-    isDir,
-    replaceInFile
-} from "../utils.js";
+import {copyFolderRecursiveSync, execute2, isDir, replaceInFile} from "../utils.js";
 import plist from "plist";
 import * as path from "path";
 import * as fs from "fs";
@@ -13,7 +7,7 @@ import {Project} from "../project.js";
 import {collectCppFlags, collectObjects, collectStrings} from "../collectSources.js";
 import {logger} from "../logger.js";
 import {buildAppIconAsync} from "../appicon/appicon.js";
-import {readTextFileSync, callInDir, writeTextFileSync} from "../../utils/utils.js";
+import {callInDir, readTextFileSync, rm, writeTextFileSync} from "../../utils/utils.js";
 
 const iosPlatforms = ["apple", "ios"];
 
@@ -25,7 +19,7 @@ interface AppStoreCredentials {
 }
 
 function mod_plist(ctx: Project, filepath: string) {
-    const dict:any = plist.parse(readTextFileSync(filepath));
+    const dict: any = plist.parse(readTextFileSync(filepath));
     dict["CFBundleDisplayName"] = ctx.title;
     dict["CFBundleShortVersionString"] = ctx.version.name();
     dict["CFBundleVersion"] = "" + ctx.version.buildNumber();
@@ -92,14 +86,14 @@ export async function export_ios(ctx: Project): Promise<void> {
 
     if (isDir(dest_path)) {
         logger.info("Remove XCode project", dest_path);
-        deleteFolderRecursive(dest_path);
+        await rm(dest_path);
         logger.assert(!isDir(dest_path));
     }
 
     copyFolderRecursiveSync(path.join(ctx.sdk.templates, "template-ios"), dest_path);
 
     const base_path = "../..";
-    await callInDir(dest_path, async ()=>{
+    await callInDir(dest_path, async () => {
         const embeddedAssetsDir = "assets";
         copyFolderRecursiveSync(path.join(base_path, ctx.getAssetsOutput()), embeddedAssetsDir);
         copyFolderRecursiveSync(path.join(base_path, "export/ios/AppIcon.appiconset"),

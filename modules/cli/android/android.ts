@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as fs from "fs";
-import {deleteFolderRecursive, execute2, isDir, isFile, replaceAll, replaceInFile,} from "../utils.js";
+import {execute2, isDir, isFile, replaceAll, replaceInFile,} from "../utils.js";
 import {buildAssetPackAsync} from "../assets.js";
 import {
     collectCppFlags,
@@ -14,7 +14,7 @@ import {CMakeGenerateProject, CMakeGenerateTarget, cmakeLists} from "../../cmake
 import {logger} from "../logger.js";
 import {AndroidProjGen, openAndroidStudioProject} from "../../android-proj/index.js";
 import {buildAppIconAsync} from "../appicon/appicon.js";
-import {ensureDirSync, readTextFileSync, run, callInDirSync, writeTextFileSync} from "../../utils/utils.js";
+import {callInDirSync, ensureDirSync, readTextFileSync, rm, run, writeTextFileSync} from "../../utils/utils.js";
 
 const platforms = ["android"];
 
@@ -215,7 +215,7 @@ export async function export_android(ctx: Project): Promise<void> {
 
     if (isDir(projectPath)) {
         logger.info("Remove old project", projectPath);
-        deleteFolderRecursive(projectPath);
+        await rm(projectPath);
     }
 
     // resolve absolute path to configs

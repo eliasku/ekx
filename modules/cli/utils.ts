@@ -137,28 +137,6 @@ export function copyFolderRecursiveSync(source: string, target: string) {
     }
 }
 
-export function deleteFolderRecursive(p: string) {
-    if (fs.existsSync(p)) {
-        const list = fs.readdirSync(p, {withFileTypes: true});
-        for (const file of list) {
-            const curPath = path.join(p, file.name);
-            if (file.isDirectory()) { // recurse
-                deleteFolderRecursive(curPath);
-            } else { // delete file
-                fs.rmSync(curPath);
-            }
-        }
-        fs.rmSync(p);
-    }
-}
-
-//
-// export async function rimrafAsync(pattern: string, options?: rimraf.Options): Promise<void> {
-//     for await (const file of fs.expandGlob(pattern, {root: __dirname})) {
-//         await Deno.remove(file.path);
-//     }
-// }
-
 export function removePathExtension(p: string): string {
     const ext = path.extname(p);
     if (ext.length > 0) {
