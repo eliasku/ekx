@@ -1,17 +1,17 @@
 {
   "compilerOptions": {
-    "module": "esnext",
-    "target": "es5",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "Node",
     "sourceMap": true,
     "strict": true,
     "outDir": "./dist/module",
     "declarationDir": "./dist/types",
     "declaration": true,
     "noEmitOnError": true,
-    "allowSyntheticDefaultImports": true,
+//    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "downlevelIteration": true,
+//    "downlevelIteration": true,
     "skipLibCheck": true,
     "lib": [
       "DOM",
@@ -19,6 +19,6 @@
     ]
   },
   "include": [
-    "./src/**/*.ts"
+    "./**/*.ts"
   ]
 }

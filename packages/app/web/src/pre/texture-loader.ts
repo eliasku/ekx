@@ -1,7 +1,4 @@
-export const enum Flags {
-    PremultiplyAlpha = 1,
-    CubeMap = 2
-}
+import {Flags, LoadRequest} from "../shared/texture-loader";
 
 const webpData = "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
 let webpSupport = false;
@@ -16,36 +13,48 @@ const iMask = 0x000FFFF;
 const vMask = 0xFFF0000;
 const vIncr = 0x0010000;
 
-class Loader {
-    id = 0;
-    total = 0;
-    loaded = 0;
-    progress = 0;
-    w = 0;
-    h = 0;
-    images: HTMLImageElement[] = [];
-    texture: null | WebGLTexture = null;
-    textureID: number = 0;
-    gl: null | WebGLRenderingContext = null;
-    flags = 0;
+interface Loader {
+    id:number;
+    total:number;
+    loaded:number;
+    progress:number;
+    w:number;
+    h:number;
+    images: HTMLImageElement[];
+    texture: null | WebGLTexture;
+    textureID: number;
+    gl: null | WebGLRenderingContext;
+    flags:number;
 }
+
+const newLoader = (id:number) => ({
+    id,
+    total: 0,
+    loaded: 0,
+    progress: 0,
+    w: 0,
+    h: 0,
+    images: [],
+    texture: null,
+    textureID: 0,
+    gl: null,
+    flags: 0,
+});
 
 const loaders: Loader[] = [null as any as Loader];
 let nextFree = 1;
 
-function getPoolObjectAt(i: number) {
+const getPoolObjectAt = (i: number) => {
     let obj = loaders[i];
     if (obj === undefined) {
-        obj = new Loader();
         // we add new element to the end of array
         // next free index will be index + 1
-        obj.id = i + 1;
-        loaders[i] = obj;
+        loaders[i] = obj = newLoader(i + 1);
     }
     return obj;
-}
+};
 
-function genId() {
+const genId = (): number => {
     const index = nextFree;
     const obj = getPoolObjectAt(index);
     let id = obj.id;
@@ -53,24 +62,15 @@ function genId() {
     id = index | (id & vMask);
     obj.id = id;
     return id;
-}
+};
 
-export interface LoadRequest {
-    basePath?: string;
-    urls: string[];
-    version?: string;
-    flags: Flags;
-    gl?: WebGLRenderingContext;
-    formatMask: number;
-}
-
-export function get(id: number): Loader | null {
+export const getTextureLoader = (id: number): Loader | null => {
     const obj = loaders[id & iMask];
-    return (obj && obj.id === id) ? obj : null;
-}
+    return obj?.id === id ? obj : null;
+};
 
-export function destroy(id: number) {
-    const obj = get(id);
+export const destroyTextureLoader = (id: number):number => {
+    const obj = getTextureLoader(id);
     if (obj) {
         if(obj.images) {
             for (let i = 0; i < obj.images.length; ++i) {
@@ -90,7 +90,7 @@ export function destroy(id: number) {
         return 0;
     }
     return 1;
-}
+};
 
 interface EmscriptenTexture extends WebGLTexture {
     name: number;
@@ -108,7 +108,7 @@ interface EmscriptenGL {
 
 declare const GL: EmscriptenGL;
 
-export function load(request: LoadRequest): number {
+export const loadTexture = (request: LoadRequest): number => {
     const id = genId();
     const loader = loaders[id & iMask];
     loader.loaded = 0;
@@ -139,7 +139,7 @@ export function load(request: LoadRequest): number {
             let img = new Image();
             loader.images[i] = img;
             img.onload = () => {
-                const obj = get(id);
+                const obj = getTextureLoader(id);
                 if (obj) {
                     ++obj.loaded;
                     obj.progress = (100 * (obj.loaded / obj.total)) | 0;
@@ -204,4 +204,4 @@ export function load(request: LoadRequest): number {
     }
 
     return id;
-}
+};

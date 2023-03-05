@@ -29,10 +29,8 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
         PUBLIC ekx::graphics
         PUBLIC ekx::audio
-        PUBLIC ekx::local-storage
-        PUBLIC ekx::texture-loader
+        PUBLIC ekx::app
         PUBLIC ekx::sg-file
-        PUBLIC ekx::res
         PUBLIC ekx::ecs
         )
 

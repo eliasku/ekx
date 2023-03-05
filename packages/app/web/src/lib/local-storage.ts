@@ -1,18 +1,18 @@
-mergeInto(LibraryManager.library, {
-    web_ls_set_f64: function (pKey, value) {
-        var ls = window.localStorage;
+export const LocalStorageLib = {
+    web_ls_set_f64: (pKey:number, value:number):boolean => {
+        const ls = window.localStorage;
         if (ls && pKey) {
-            ls.setItem(UTF8ToString(pKey), value);
+            ls.setItem(UTF8ToString(pKey), ""+value);
             return true;
         }
         return false;
     },
-    web_ls_get_f64: function (pKey, pValue) {
-        var ls = window.localStorage;
+    web_ls_get_f64: (pKey:number, pValue:number):boolean => {
+        const ls = window.localStorage;
         if (ls && pKey) {
-            var item = ls.getItem(UTF8ToString(pKey));
+            const item = ls.getItem(UTF8ToString(pKey));
             if (item != null) {
-                var value = parseFloat(item);
+                const value = parseFloat(item);
                 if (value != null) {
                     if (pValue) {
                         HEAPF64[pValue >>> 3] = value;
@@ -27,12 +27,12 @@ mergeInto(LibraryManager.library, {
      *
      * @param pKey - NULL-terminated c-string
      * @param pValue - NULL-terminated c-string, if 0 - delete key,
-     * @returns {boolean} - true if operation is completed, false if not supported or invalid arguments
+     * @returns - true if operation is completed, false if not supported or invalid arguments
      */
-    web_ls_set: function (pKey, pValue) {
-        var ls = window.localStorage;
+    web_ls_set: (pKey:number, pValue:number):boolean => {
+        const ls = window.localStorage;
         if (ls && pKey) {
-            var key = UTF8ToString(pKey);
+            const key = UTF8ToString(pKey);
             if (pValue) {
                 ls.setItem(key, UTF8ToString(pValue));
             } else {
@@ -49,14 +49,14 @@ mergeInto(LibraryManager.library, {
      * @param pDest - Buffer to write the value (or 0 if you don't need read the value)
      * @param maxLength - Max buffer length
      * @param pOutStringLen - result string length (bytes written to buffer EXCLUDING null-terminator byte)
-     * @returns {boolean} - true if key is valid and exists in storage, false otherwise
+     * @returns - true if key is valid and exists in storage, false otherwise
      */
-    web_ls_get: function (pKey, pDest, maxLength, pOutStringLen) {
-        var ls = window.localStorage;
+    web_ls_get: (pKey:number, pDest:number, maxLength:number, pOutStringLen:number):boolean => {
+        const ls = window.localStorage;
         if (ls && pKey) {
-            var value = ls.getItem(UTF8ToString(pKey));
+            const value = ls.getItem(UTF8ToString(pKey));
             if (value != null) {
-                var written = 0;
+                let written = 0;
                 if (pDest && maxLength > 0) {
                     written = stringToUTF8(value, pDest, maxLength);
                 }
@@ -67,5 +67,5 @@ mergeInto(LibraryManager.library, {
             }
         }
         return false;
-    }
-});
+    },
+};

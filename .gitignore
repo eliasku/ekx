@@ -5,21 +5,18 @@ cmake-build-*/
 # npm dependencies
 node_modules/
 
-# samples generated resources
-generated/
-build/
-export/
+# temporary build folders, downloads, etc..
 cache/
 
-RECOVER_*.fla
-
 # packages ignores
-packages/auph/web/dist/
-
-packages/texture-loader/js/
-
+packages/auph/js/
+packages/app/js/
 plugins/firebase/web/dist/
 plugins/firebase/web/lib/
 
-tools/bin/
+# examples build folders (TODO: use single folder)
+build/
+export/
 
+# flash files backup
+RECOVER_*.fla

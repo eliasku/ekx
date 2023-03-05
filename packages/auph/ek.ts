@@ -23,7 +23,7 @@ export async function setup(project: Project) {
             xcode_framework: "AVFoundation"
         },
         web: {
-            js_pre: "web/dist/emscripten"
+            js_pre: "js/pre"
         },
         windows: {},
         linux: {}

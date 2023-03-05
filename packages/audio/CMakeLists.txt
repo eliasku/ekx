@@ -11,7 +11,7 @@ add_library(ekx::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 
 target_link_libraries(${PROJECT_NAME}
-        PUBLIC ekx::core
+        PUBLIC ekx::std
         PUBLIC ekx::app
         PUBLIC auph
         )

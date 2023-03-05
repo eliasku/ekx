@@ -70,7 +70,7 @@
     "tools",
     "packages",
     "packages/auph/web/dist",
-    "packages/texture-loader/js",
+    "packages/app/js",
     "modules",
     "plugins",
     "plugins/firebase/web/dist",

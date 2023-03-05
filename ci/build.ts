@@ -3,8 +3,8 @@ import {UtilityConfig} from "../modules/cli/utils.js";
 import {logger} from "../modules/cli/logger.js";
 
 // run build files
-import "../packages/texture-loader/build.js";
-import "../packages/auph/build.js";
+import "../packages/app/web/build.js";
+import "../packages/auph/web/build.js";
 import "../packages/graphics/build.js";
 import "../plugins/firebase/build.js";
 
@@ -12,10 +12,10 @@ UtilityConfig.verbose = true;
 
 // check files are really exists
 const filesToVerify = [
-    "packages/texture-loader/js/lib/lib-texture-loader.js",
-    "packages/texture-loader/js/pre/texture-loader.js",
-    "packages/auph/web/dist/emscripten/auph.js",
-    "packages/auph/web/dist/emscripten/auph.js.map",
+    "packages/app/js/lib/app.js",
+    "packages/app/js/pre/app.js",
+    "packages/auph/js/pre/auph.js",
+    "packages/auph/js/pre/auph.js.map",
 ];
 
 let missFiles = 0;

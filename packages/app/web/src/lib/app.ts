@@ -1,10 +1,19 @@
-mergeInto(LibraryManager.library, {
-    ek_app_js_set_mouse_cursor: function (cursor) {
-        var PARENT = 0;
-        var ARROW = 1;
-        var BUTTON = 2;
-        var HELP = 3;
-        var map = [
+declare const _ek_app_js__loop: (ts: number) => void;
+declare const _ek_app_js__on_focus: (flags: number) => void;
+declare const _ek_app_js__on_key: (type: number, code: number, flags: number) => number;
+declare const _ek_app_js__on_resize: (drawable_width: number, drawable_height: number, dpr: number) => void;
+
+declare const _ek_app_js__on_touch: (type: number, id: number, x: number, y: number) => boolean;
+declare const _ek_app_js__on_mouse: (type: number, button: number, x: number, y: number) => boolean;
+declare const _ek_app_js__on_wheel: (x: number, y: number) => boolean;
+
+export const AppLib = {
+    ek_app_js_set_mouse_cursor: (cursor: number): void => {
+       const PARENT = 0;
+       const ARROW = 1;
+       const BUTTON = 2;
+       const HELP = 3;
+       const map:string[] = [
             "auto", // 0
             "default", // 1
             "pointer", // 2
@@ -12,7 +21,7 @@ mergeInto(LibraryManager.library, {
         ];
         cursor = cursor | 0;
         if (cursor >= 0 && cursor < map.length) {
-            var gameview = document.getElementById("gameview");
+            const gameview = document.getElementById("gameview");
             if (gameview) {
                 gameview.style.cursor = map[cursor];
             }
@@ -20,10 +29,11 @@ mergeInto(LibraryManager.library, {
     },
 
     ek_app_js_init__deps: ['$GL'],
-    ek_app_js_init: function (flags) {
-        var BUTTONS = [0, 2, 1, 2, 2];
 
-        var TYPES = {
+    ek_app_js_init: (flags: number) => {
+        const BUTTONS: number[] = [0, 2, 1, 2, 2];
+
+        const TYPES: Record<string, number> = {
             "keydown": 14,
             "keyup": 15,
             "keypress": 16,
@@ -37,7 +47,7 @@ mergeInto(LibraryManager.library, {
             "touchcancel": 7,
             "touchmove": 6,
         };
-        var KEY_CODES = {
+        const KEY_CODES: Record<string, number> = {
             "ArrowUp": 1,
             "ArrowDown": 2,
             "ArrowLeft": 3,
@@ -57,10 +67,10 @@ mergeInto(LibraryManager.library, {
             "KeyD": 24,
         };
 
-        var onKey = function (event) {
-            var type = TYPES[event.type];
+        const onKey = (event: KeyboardEvent) => {
+            const type = TYPES[event.type];
             if (type) {
-                var code = KEY_CODES[event.code];
+                const code = KEY_CODES[event.code];
                 if (code) {
                     if (_ek_app_js__on_key(type, code, 0)) {
                         event.preventDefault();
@@ -69,25 +79,25 @@ mergeInto(LibraryManager.library, {
             }
         };
 
-        var wnd = window;
+        const wnd = window;
         wnd.addEventListener("keypress", onKey, true);
         wnd.addEventListener("keydown", onKey, true);
         wnd.addEventListener("keyup", onKey, true);
 
-        var handleResize = function () {
-            var dpr = window.devicePixelRatio;
+        const handleResize = () => {
+            const dpr = window.devicePixelRatio;
 
-            var div = document.getElementById("gamecontainer");
-            var rc = div.getBoundingClientRect();
-            var css_w = rc.width;
-            var css_h = rc.height;
+            const div = document.getElementById("gamecontainer")!;
+            const rc = div.getBoundingClientRect();
+            const css_w = rc.width;
+            const css_h = rc.height;
 
             // TODO: configurable min aspect (70/100)
             // TODO: landscape and different modes, native letterbox
-            var w = css_w;
-            var h = css_h;
-            var offset_x = 0;
-            var offset_y = 0;
+            const w = css_w;
+            const h = css_h;
+            const offset_x = 0;
+            const offset_y = 0;
 
             // TODO:
             //if (webKeepCanvasAspectRatio) {
@@ -105,12 +115,12 @@ mergeInto(LibraryManager.library, {
             //}
             //}
 
-            var drawableWidth = (w * dpr) | 0;
-            var drawableHeight = (h * dpr) | 0;
+            const drawableWidth = (w * dpr) | 0;
+            const drawableHeight = (h * dpr) | 0;
 
             _ek_app_js__on_resize(drawableWidth, drawableHeight, dpr);
 
-            var gameview = document.getElementById("gameview");
+            const gameview = document.getElementById("gameview") as HTMLCanvasElement | null;
             if (gameview) {
                 if (gameview.width !== drawableWidth ||
                     gameview.height !== drawableHeight) {
@@ -127,37 +137,33 @@ mergeInto(LibraryManager.library, {
 
         // callback call after timeout after last call (if call again before timeout,
         // planned callback is cancelled and re-scheduled to be called after timeout)
-        function throttle(callback, millisecondsLimit) {
-            var timer = -1;
-            return function () {
+        const throttle = (callback: () => void, millisecondsLimit: number) => {
+            let timer: any = -1;
+            return () => {
                 if (timer >= 0) {
                     clearTimeout(timer);
                 }
-                timer = setTimeout(function () {
+                timer = setTimeout(() => {
                     timer = -1;
                     callback();
                 }, millisecondsLimit);
             }
-        }
+        };
 
         wnd.addEventListener("resize", throttle(handleResize, 100), true);
         handleResize();
 
-        /**
-         *
-         * @param e {TouchEvent}
-         */
-        var onTouch = function (e) {
-            var type = TYPES[e.type];
+        const onTouch = (e: TouchEvent) => {
+            const type = TYPES[e.type];
             if (type) {
                 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
-                var rect = e.target.getBoundingClientRect();
-                var cancelDefault = false;
-                for (var i = 0; i < e.changedTouches.length; ++i) {
+                const rect = (e.target as HTMLElement).getBoundingClientRect();
+                let cancelDefault = false;
+                for (let i = 0; i < e.changedTouches.length; ++i) {
                     const touch = e.changedTouches[i];
-                    var id = touch.identifier + 1;
-                    var x = touch.clientX - rect.left;
-                    var y = touch.clientY - rect.top;
+                    const id = touch.identifier + 1;
+                    const x = touch.clientX - rect.left;
+                    const y = touch.clientY - rect.top;
                     cancelDefault = cancelDefault || _ek_app_js__on_touch(type, id, x, y);
                 }
                 if (cancelDefault) {
@@ -165,43 +171,35 @@ mergeInto(LibraryManager.library, {
                 }
             }
         };
-
-        /**
-         *
-         * @param event {MouseEvent}
-         */
-        var onMouse = function (event) {
-            var type = TYPES[event.type];
+        const onMouse = (e: MouseEvent) => {
+            const type = TYPES[e.type];
             // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
-            var rect = event.target.getBoundingClientRect();
-            var x = event.clientX - rect.left;
-            var y = event.clientY - rect.top;
-            if (type && _ek_app_js__on_mouse(type, BUTTONS[event.button], x, y)) {
-                event.preventDefault();
+            const rect = (e.target as HTMLElement).getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            if (type && _ek_app_js__on_mouse(type, BUTTONS[e.button], x, y)) {
+                e.preventDefault();
             }
         };
 
-        /**
-         *
-         * @param event {WheelEvent}
-         */
-        var onWheel = function (event) {
-            if (_ek_app_js__on_wheel(event.deltaX, event.deltaY)) {
-                event.preventDefault();
+        const onWheel = (e: WheelEvent) => {
+            if (_ek_app_js__on_wheel(e.deltaX, e.deltaY)) {
+                e.preventDefault();
             }
         };
 
-        var nonPassiveOpt = false;
+        let nonPassiveOpt:false|{passive: false} = false;
         try {
-            window.addEventListener("test", null, Object.defineProperty({}, 'passive', {
-                get: function () {
+            const def = Object.defineProperty({}, 'passive', {
+                get: () => {
                     nonPassiveOpt = {passive: false};
-                }
-            }));
+                },
+            }) as AddEventListenerOptions;
+            window.addEventListener("test", ()=>{}, def);
         } catch (e) {
         }
         /** {CanvasElement} */
-        var canvas = document.getElementById("gameview");
+        const canvas = document.getElementById("gameview") as HTMLCanvasElement;
         canvas.addEventListener("mousedown", onMouse, nonPassiveOpt);
         canvas.addEventListener("mouseup", onMouse, nonPassiveOpt);
         canvas.addEventListener("mousemove", onMouse, nonPassiveOpt);
@@ -211,16 +209,16 @@ mergeInto(LibraryManager.library, {
         canvas.addEventListener("touchmove", onTouch, nonPassiveOpt);
         canvas.addEventListener("touchcancel", onTouch, nonPassiveOpt);
 
-        var webgl_list = ["webgl", "experimental-webgl"]; // 'webgl2'
-        var webgl_attributes = {
+        const webgl_list = ["webgl", "experimental-webgl"]; // 'webgl2'
+        const webgl_attributes: EmscriptenGLAttributes = {
             alpha: false,
             depth: !!(flags & 1),
             stencil: false,
-            antialias: false
+            antialias: false,
         };
-        var gl = undefined;
-        for (var i = 0; i < webgl_list.length; ++i) {
-            gl = canvas.getContext(webgl_list[i], webgl_attributes);
+        let gl: WebGLRenderingContext | undefined | null;
+        for (let i = 0; i < webgl_list.length; ++i) {
+            gl = canvas.getContext(webgl_list[i] as "webgl", webgl_attributes);
             if (gl) {
                 break;
             }
@@ -229,7 +227,7 @@ mergeInto(LibraryManager.library, {
             console.error("Failed to create WebGL context");
             return false;
         }
-        canvas.addEventListener("webglcontextlost", function (e) {
+        canvas.addEventListener("webglcontextlost", (e) => {
             alert("WebGL context lost. You will need to reload the page.");
             e.preventDefault();
         }, false);
@@ -237,7 +235,7 @@ mergeInto(LibraryManager.library, {
         webgl_attributes.majorVersion = 1;
         // extensions required for sokol by default
         webgl_attributes.enableExtensionsByDefault = true;
-        var handle = GL.registerContext(gl, webgl_attributes);
+        const handle = GL.registerContext(gl, webgl_attributes);
         if (!GL.makeContextCurrent(handle)) {
             console.error("Failed to set current WebGL context");
             return false;
@@ -245,33 +243,33 @@ mergeInto(LibraryManager.library, {
 
         // check visibility,
         // TODO: bind this with running loop and set after ready event
-        var hidden, visibilityChange;
+        let hidden: string | undefined;
+        let visibilityChange: string | undefined;
         if (typeof document.hidden !== "undefined") {
             // Opera 12.10 and Firefox 18 and later support
             hidden = "hidden";
             visibilityChange = "visibilitychange";
-        } else if (typeof document.msHidden !== "undefined") {
+        } else if (typeof (document as any).msHidden !== "undefined") {
             hidden = "msHidden";
             visibilityChange = "msvisibilitychange";
-        } else if (typeof document.webkitHidden !== "undefined") {
+        } else if (typeof (document as any).webkitHidden !== "undefined") {
             hidden = "webkitHidden";
             visibilityChange = "webkitvisibilitychange";
         }
 
         // Handle page visibility change
-        var focused = true;
-        var handleFocus = function(_) {
-            var flags = 0;
-            if(hidden !== undefined && !document[hidden]) {
+        const handleFocus = (_?: Event): void => {
+            let flags = 0;
+            if (hidden && !(document as any)[hidden]) {
                 flags |= 1;
             }
-            if(document.hasFocus()) {
+            if (document.hasFocus()) {
                 flags |= 2;
             }
             _ek_app_js__on_focus(flags);
         }
 
-        if (typeof document.addEventListener === "undefined" || hidden === undefined) {
+        if (typeof document.addEventListener === "undefined" || !visibilityChange) {
             console.warn("No Page Visibility API");
         } else {
             document.addEventListener(visibilityChange, handleFocus, false);
@@ -283,26 +281,25 @@ mergeInto(LibraryManager.library, {
 
         return true;
     },
-    ek_app_js_run: function () {
-        var loop = function (time) {
+    ek_app_js_run: (): void => {
+        const loop = (time: number) => {
             requestAnimationFrame(loop);
             _ek_app_js__loop(time / 1000.0);
         };
         loop(-1.0);
     },
-    ek_app_js_close: function () {
+    ek_app_js_close: (): void => {
         window.close();
     },
-    ek_app_js_lang: function(dest, maxLength) {
-        var lang = window.navigator.language;
+    ek_app_js_lang: (dest: number, maxLength: number): void => {
+        const lang = window.navigator.language;
         if (lang) {
             stringToUTF8(lang, dest, maxLength);
-        }
-        else {
+        } else {
             HEAPU8[dest] = 0;
         }
     },
-    ek_app_js_navigate: function (pURL) {
+    ek_app_js_navigate: (pURL: number): number => {
         try {
             window.open(UTF8ToString(pURL), "_blank");
             return 0;
@@ -310,7 +307,7 @@ mergeInto(LibraryManager.library, {
         }
         return 1;
     },
-    ek_app_js_share: function(pContent) {
+    ek_app_js_share: (pContent: number): number => {
         if (navigator.share) {
             navigator.share({
                 // title: "",
@@ -324,5 +321,5 @@ mergeInto(LibraryManager.library, {
             // not supported
             return 1;
         }
-    }
-});
+    },
+};

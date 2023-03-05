@@ -12,8 +12,6 @@ export async function setup(project: Project) {
     await project.importModule("../sg-file/ek.ts");
     await project.importModule("../graphics/ek.ts");
     await project.importModule("../audio/ek.ts");
-    await project.importModule("../local-storage/ek.ts");
-    await project.importModule("../texture-loader/ek.ts");
-    await project.importModule("../res/ek.ts");
+    await project.importModule("../app/ek.ts");
     await project.importModule("../ecs/ek.ts");
 }

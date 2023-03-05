@@ -1,5 +1,6 @@
 import {build} from "../modules/cmake/mod.js";
 import {UtilityConfig} from "../modules/cli/utils.js";
+import {resolveCachePath, resolveEkxPath} from "../modules/utils/dirs.js";
 
 UtilityConfig.verbose = true;
 
@@ -14,5 +15,8 @@ await build({
         EKX_INCLUDE_PLUGINS: "ON",
     },
     test: true,
-    debug: false
+    // set main EKX root dir for `CMakeFiles.txt`
+    workingDir: resolveEkxPath(),
+    // place build files in central cache folder
+    buildsFolder: resolveCachePath("builds/sdk/release"),
 });

@@ -30,9 +30,11 @@ export async function setup(project: Project) {
             ]
         },
         web: {
-            js: "src/web",
+            js: "js/lib",
+            js_pre: "js/pre",
             cpp_lib: ["GLESv2", "GL"]
         },
     });
-   await project.importModule("../std/ek.ts");
+    await project.importModule("../std/ek.ts");
+    await project.importModule("../../external/sokol/ek.ts");
 }

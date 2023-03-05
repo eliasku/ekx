@@ -37,6 +37,6 @@ endif ()
 
 if (EMSCRIPTEN)
     target_link_options(${PROJECT_NAME}
-            INTERFACE SHELL:--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/web/dist/emscripten/auph.js
+            INTERFACE SHELL:--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/js/pre/auph.js
             )
 endif ()

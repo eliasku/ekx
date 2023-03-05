@@ -49,8 +49,6 @@ void ek_app_js__on_focus(int flags);
 
 void ek_app_js__loop(double high_res_timestamp);
 
-
-
 #ifdef __cplusplus
 }
 #endif
