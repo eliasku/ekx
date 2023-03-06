@@ -44,7 +44,7 @@ jobs:
         run: npm run build
 
       - name: Build Android
-        run: ekx android bundle -V
+        run: ../../lib/cli/main.ts android bundle -V
         working-directory: ./examples/2-drawing
 
   build-web-example:
@@ -96,5 +96,5 @@ jobs:
         run: npm run build
 
       - name: Build
-        run: ekx web -V
+        run: ../../lib/cli/main.ts web -V
         working-directory: ./examples/2-drawing
