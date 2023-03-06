@@ -1,5 +1,5 @@
 import {Project} from "./project.js";
-import {AssetBuilder} from "./assets/AssetBuilder.js";
+import {AssetBuilder} from "../assets/AssetBuilder.js";
 import {rm} from "../utils/utils.js";
 
 // asset pack name

@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import {Project} from "../project.js";
+import {Project} from "../cli/project.js";
 import {Asset, AssetBuilderContext} from "./Asset.js";
 import {AudioAsset, AudioFile} from "./Audio.js";
 import {StaticFileDescription, StaticFileImporter} from "./StaticFileImporter.js";
@@ -12,7 +12,7 @@ import {MultiResAtlasAsset, MultiResAtlasImporterDesc} from "./Atlas.js";
 import {BitmapFontAsset, BMFontDesc} from "./BitmapFont.js";
 import {FlashAsset, FlashDesc} from "./Flash.js";
 import {TranslationsAsset, TranslationsDesc} from "./Translations.js";
-import {expandGlobSync} from "../../utils/utils.js";
+import {expandGlobSync} from "../utils/utils.js";
 
 export class AssetBuilder extends AssetBuilderContext {
 

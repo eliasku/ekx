@@ -3,8 +3,8 @@ import * as path from "path";
 import {compress, WebpConfig} from "./helpers/webp.js";
 import {Asset, AssetDesc} from "./Asset.js";
 import {spritePacker} from "./helpers/spritePacker.js";
-import {H} from "../utility/hash.js";
-import {ensureDirSync, expandGlobSync, writeTextFileSync} from "../../utils/utils.js";
+import {H} from "../cli/utility/hash.js";
+import {ensureDirSync, expandGlobSync, writeTextFileSync} from "../utils/utils.js";
 
 export interface MultiResAtlasImporterDesc extends AssetDesc {
     name: string; // required!

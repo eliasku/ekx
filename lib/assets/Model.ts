@@ -1,10 +1,10 @@
 import * as path from "path";
 import {Asset, AssetDesc} from "./Asset.js";
-import {removePathExtension} from "../utils.js";
+import {removePathExtension} from "../cli/utils.js";
 import {objExport} from "./helpers/objExport.js";
-import {H} from "../utility/hash.js";
+import {H} from "../cli/utility/hash.js";
 import {hashFile} from "./helpers/hash.js";
-import {ensureDirSync} from "../../utils/utils.js";
+import {ensureDirSync} from "../utils/utils.js";
 
 export interface ObjImporterDesc extends AssetDesc {
     filepath: string;

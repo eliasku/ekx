@@ -1,8 +1,8 @@
 import * as path from "path";
 import {Asset, AssetDesc} from "./Asset.js";
-import {H} from "../utility/hash.js";
+import {H} from "../cli/utility/hash.js";
 import {hashGlob} from "./helpers/hash.js";
-import {ensureDirSync, expandGlobSync} from "../../utils/utils.js";
+import {ensureDirSync, expandGlobSync} from "../utils/utils.js";
 import {msgfmt} from "./helpers/msgfmt.js";
 
 export interface TranslationsDesc extends AssetDesc {

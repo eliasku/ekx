@@ -2,9 +2,9 @@ import * as path from "path";
 import * as fs from "fs";
 import {Asset, AssetDesc} from "./Asset.js";
 import {compress, WebpConfig} from "./helpers/webp.js";
-import {H} from "../utility/hash.js";
+import {H} from "../cli/utility/hash.js";
 import {hashFile} from "./helpers/hash.js";
-import {ensureDirSync} from "../../utils/utils.js";
+import {ensureDirSync} from "../utils/utils.js";
 
 export const enum TextureDataType {
     Normal = "2d",

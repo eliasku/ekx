@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import {logger} from "../../logger.js";
+import {logger} from "../../cli/logger.js";
 
 const conversionBuffer = new ArrayBuffer(8);
 const conversionU8 = new Uint8Array(conversionBuffer);

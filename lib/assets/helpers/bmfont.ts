@@ -1,5 +1,5 @@
-import {execute} from "../../utils.js";
-import {getOrBuildUtility} from "../../utility/bin.js";
+import {execute} from "../../cli/utils.js";
+import {getOrBuildUtility} from "../../cli/utility/bin.js";
 
 export async function bmfont(configPath: string): Promise<number> {
     const bin = await getOrBuildUtility("ekc");

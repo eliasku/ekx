@@ -1,11 +1,11 @@
 import * as path from "path";
 import * as fs from "fs";
 import {Asset, AssetDesc} from "./Asset.js";
-import {removePathExtension} from "../utils.js";
-import {H} from "../utility/hash.js";
+import {removePathExtension} from "../cli/utils.js";
+import {H} from "../cli/utility/hash.js";
 import {hashFile} from "./helpers/hash.js";
-import {logger} from "../logger.js";
-import {ensureDirSync} from "../../utils/utils.js";
+import {logger} from "../cli/logger.js";
+import {ensureDirSync} from "../utils/utils.js";
 
 export interface TTFImporterDesc extends AssetDesc {
     filepath: string;

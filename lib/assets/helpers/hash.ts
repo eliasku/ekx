@@ -1,8 +1,8 @@
 import * as path from "path";
 import * as fs from "fs";
-import {H} from "../../utility/hash.js";
-import {isFile} from "../../utils.js";
-import {expandGlobSync} from "../../../utils/utils.js";
+import {H} from "../../cli/utility/hash.js";
+import {isFile} from "../../cli/utils.js";
+import {expandGlobSync} from "../../utils/utils.js";
 
 // if you modify seed value, you should also modify it in `ekx::std` package: `ek/hash.h`
 const seed = 0x811C9DC5;

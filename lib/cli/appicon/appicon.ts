@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as fs from "fs";
-import {renderFlashSymbol, RenderFlashSymbolOutputOptions} from "../assets/helpers/flashExport.js";
+import {renderFlashSymbol, RenderFlashSymbolOutputOptions} from "../../assets/helpers/flashExport.js";
 import {logger} from "../logger.js";
 import {isDir} from "../utils.js";
 import {ensureDirSync, getModuleDir, writeTextFileSync} from "../../utils/utils.js";

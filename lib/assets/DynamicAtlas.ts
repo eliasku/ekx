@@ -1,5 +1,5 @@
 import {Asset, AssetDesc} from "./Asset.js";
-import {H} from "../utility/hash.js";
+import {H} from "../cli/utility/hash.js";
 
 export interface DynamicAtlasDesc extends AssetDesc {
     name: string;

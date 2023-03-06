@@ -1,12 +1,12 @@
 import * as path from "path";
 import * as os from "os";
-import {execute} from "../../utils.js";
-import {logger} from "../../logger.js";
-import {tryResolveCachedBin} from "../../utility/bin.js";
-import {download} from "../../../utils/download.js";
-import {resolveCachePath} from "../../../utils/dirs.js";
+import {execute} from "../../cli/utils.js";
+import {logger} from "../../cli/logger.js";
+import {tryResolveCachedBin} from "../../cli/utility/bin.js";
+import {download} from "../../utils/download.js";
+import {resolveCachePath} from "../../utils/dirs.js";
 import {copyFileSync} from "fs";
-import {ensureDirSync} from "../../../utils/utils.js";
+import {ensureDirSync} from "../../utils/utils.js";
 import decompress from "decompress";
 
 export interface WebpConfig {

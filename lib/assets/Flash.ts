@@ -1,12 +1,12 @@
 import * as path from "path";
 import {Asset, AssetDesc} from "./Asset.js";
-import {isDir, isFile, removePathExtension} from "../utils.js";
+import {isDir, isFile, removePathExtension} from "../cli/utils.js";
 import {flashExport} from "./helpers/flashExport.js";
 import {MultiResAtlasAsset} from "./Atlas.js";
-import {H} from "../utility/hash.js";
-import {logger} from "../logger.js";
+import {H} from "../cli/utility/hash.js";
+import {logger} from "../cli/logger.js";
 import {hashFile, hashGlob} from "./helpers/hash.js";
-import {ensureDirSync, writeTextFileSync} from "../../utils/utils.js";
+import {ensureDirSync, writeTextFileSync} from "../utils/utils.js";
 
 export interface FlashDesc extends AssetDesc {
     filepath: string;

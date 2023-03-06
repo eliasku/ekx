@@ -1,7 +1,7 @@
 import * as path from "path";
-import {execute} from "../../utils.js";
-import {getOrBuildUtility} from "../../utility/bin.js";
-import {ensureDirSync} from "../../../utils/utils.js";
+import {execute} from "../../cli/utils.js";
+import {getOrBuildUtility} from "../../cli/utility/bin.js";
+import {ensureDirSync} from "../../utils/utils.js";
 
 export async function flashExport(configPath: string): Promise<number> {
     const bin = await getOrBuildUtility("flash-export");

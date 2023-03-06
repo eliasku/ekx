@@ -1,11 +1,11 @@
 import * as fs from "fs";
 import * as path from "path";
-import {isDir, isFile} from "../utils.js";
-import {logger} from "../logger.js";
+import {isDir, isFile} from "../cli/utils.js";
+import {logger} from "../cli/logger.js";
 import {BytesWriter} from "./helpers/BytesWriter.js";
-import {Project} from "../project.js";
-import {H} from "../utility/hash.js";
-import {ensureDirSync, expandGlobSync, readTextFileSync, writeTextFileSync} from "../../utils/utils.js";
+import {Project} from "../cli/project.js";
+import {H} from "../cli/utility/hash.js";
+import {ensureDirSync, expandGlobSync, readTextFileSync, writeTextFileSync} from "../utils/utils.js";
 
 export interface AssetDesc {
     name?: string; //

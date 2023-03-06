@@ -2,9 +2,9 @@ import * as path from "path";
 import {Asset, AssetDesc} from "./Asset.js";
 import {bmfont} from "./helpers/bmfont.js";
 import {MultiResAtlasAsset} from "./Atlas.js";
-import {H} from "../utility/hash.js";
+import {H} from "../cli/utility/hash.js";
 import {hashFile} from "./helpers/hash.js";
-import {ensureDirSync, writeTextFileSync} from "../../utils/utils.js";
+import {ensureDirSync, writeTextFileSync} from "../utils/utils.js";
 
 export interface BMFontDesc extends AssetDesc {
     filepath: string;

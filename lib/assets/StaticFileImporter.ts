@@ -2,7 +2,7 @@ import * as path from "path";
 import * as fs from "fs";
 import {Asset} from "./Asset.js";
 import {hashFile} from "./helpers/hash.js";
-import {ensureDirSync} from "../../utils/utils.js";
+import {ensureDirSync} from "../utils/utils.js";
 
 export class StaticFileDescription {
     filepath = "";
