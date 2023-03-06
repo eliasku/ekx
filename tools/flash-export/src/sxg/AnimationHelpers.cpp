@@ -11,9 +11,9 @@ inline float sign(float a) {
     return a > 0.0f ? 1.0f : (a < 0.0f ? -1.0f : 0.0f);
 }
 
-static SGKeyFrameTransform createKeyFrameTransform(const Element& el) {
+static sg_keyframe_transform createKeyFrameTransform(const Element& el) {
     const mat3x2_t m = el.transform.matrix;
-    SGKeyFrameTransform r;
+    sg_keyframe_transform r;
     r.position = vec2_transform(el.transformationPoint, m);
     r.scale = mat3x2_get_scale(m);
     r.skew = mat3x2_get_skew(m);
@@ -22,56 +22,56 @@ static SGKeyFrameTransform createKeyFrameTransform(const Element& el) {
     return r;
 }
 
-static void fixRotation(SGKeyFrameTransform& curr, const SGKeyFrameTransform& prev) {
-    if (prev.skew.x + MATH_PI < curr.skew.x) {
-        curr.skew.x -= MATH_TAU;
-    } else if (prev.skew.x - MATH_PI > curr.skew.x) {
-        curr.skew.x += MATH_TAU;
+static void fixRotation(sg_keyframe_transform* curr, const sg_keyframe_transform* prev) {
+    if (prev->skew.x + MATH_PI < curr->skew.x) {
+        curr->skew.x -= MATH_TAU;
+    } else if (prev->skew.x - MATH_PI > curr->skew.x) {
+        curr->skew.x += MATH_TAU;
     }
-    if (prev.skew.y + MATH_PI < curr.skew.y) {
-        curr.skew.y -= MATH_TAU;
-    } else if (prev.skew.y - MATH_PI > curr.skew.y) {
-        curr.skew.y += MATH_TAU;
+    if (prev->skew.y + MATH_PI < curr->skew.y) {
+        curr->skew.y -= MATH_TAU;
+    } else if (prev->skew.y - MATH_PI > curr->skew.y) {
+        curr->skew.y += MATH_TAU;
     }
 }
 
-static void addRotation(SGKeyFrameTransform& curr, const Frame& frame, const SGKeyFrameTransform& prev) {
-    double additionalRotation = 0;
+static void addRotation(sg_keyframe_transform* curr, const Frame& frame, const sg_keyframe_transform* prev) {
+    float additionalRotation = 0.0f;
     const auto rotate = frame.motionTweenRotate;
     const auto times = frame.motionTweenRotateTimes;
 // If a direction is specified, take it into account
     if (rotate != RotationDirection::none) {
         float direction = (rotate == RotationDirection::cw ? 1.0f : -1.0f);
 // negative scales affect rotation direction
-        direction *= sign(curr.scale.x) * sign(curr.scale.y);
+        direction *= sign(curr->scale.x) * sign(curr->scale.y);
 
-        while (direction < 0 && prev.skew.x < curr.skew.x) {
-            curr.skew.x -= MATH_TAU;
+        while (direction < 0 && prev->skew.x < curr->skew.x) {
+            curr->skew.x -= MATH_TAU;
         }
-        while (direction > 0 && prev.skew.x > curr.skew.x) {
-            curr.skew.x += MATH_TAU;
+        while (direction > 0 && prev->skew.x > curr->skew.x) {
+            curr->skew.x += MATH_TAU;
         }
-        while (direction < 0 && prev.skew.y < curr.skew.y) {
-            curr.skew.y -= MATH_TAU;
+        while (direction < 0 && prev->skew.y < curr->skew.y) {
+            curr->skew.y -= MATH_TAU;
         }
-        while (direction > 0 && prev.skew.y > curr.skew.y) {
-            curr.skew.y += MATH_TAU;
+        while (direction > 0 && prev->skew.y > curr->skew.y) {
+            curr->skew.y += MATH_TAU;
         }
 
-// additional rotations specified?
-        additionalRotation += 2.0 * MATH_PI * direction * times;
+        // additional rotations specified?
+        additionalRotation += times * 2.0f * MATH_PI * direction;
     }
 
-    curr.skew.x += additionalRotation;
-    curr.skew.y += additionalRotation;
+    curr->skew.x += additionalRotation;
+    curr->skew.y += additionalRotation;
 }
 
-SGKeyFrameTransform extractTweenDelta(const Frame& frame, const Element& el0, const Element& el1) {
+sg_keyframe_transform extractTweenDelta(const Frame& frame, const Element& el0, const Element& el1) {
     auto t0 = createKeyFrameTransform(el0);
     auto t1 = createKeyFrameTransform(el1);
-    fixRotation(t1, t0);
-    addRotation(t1, frame, t0);
-    return t1 - t0;
+    fixRotation(&t1, &t0);
+    addRotation(&t1, frame, &t0);
+    return sub_keyframe_transform(&t1, &t0);
 }
 
 SGMovieFrameData createFrameModel(const Frame& frame) {

@@ -15,16 +15,16 @@ export async function setup(project: Project) {
 
     project.android.application_id = "ilj.play.demo";
     project.android.package_id = "com.eliasku.iljdemo";
-    project.android.admob_app_id = "ca-app-pub-3931267664278058~6275600638";
-    project.android.game_services_id = "300613663654";
-    project.android.googleServicesConfigDir = secretPath;
-    project.android.signingConfigPath = path.join(secretPath, "google-play-signing.json");
-    project.android.serviceAccountKey = '../keys/_fastlane/api-5415425812860184091-52535-0303d398e1e6.json';
+    // project.android.admob_app_id = "ca-app-pub-3931267664278058~6275600638";
+    // project.android.game_services_id = "300613663654";
+    // project.android.googleServicesConfigDir = secretPath;
+    // project.android.signingConfigPath = path.join(secretPath, "google-play-signing.json");
+    // project.android.serviceAccountKey = '../keys/_fastlane/api-5415425812860184091-52535-0303d398e1e6.json';
 
     project.ios.application_id = "ilj.play.demo";
-    project.ios.admob_app_id = "ca-app-pub-3931267664278058~8636974437";
-    project.ios.googleServicesConfigDir = secretPath;
-    project.ios.appStoreCredentials = '../../keys/_fastlane/appstore.json';
+    // project.ios.admob_app_id = "ca-app-pub-3931267664278058~8636974437";
+    // project.ios.googleServicesConfigDir = secretPath;
+    // project.ios.appStoreCredentials = '../../keys/_fastlane/appstore.json';
 
     project.web.firebaseToken = "../../keys/_firebase/token.txt";
     project.web.applications = [

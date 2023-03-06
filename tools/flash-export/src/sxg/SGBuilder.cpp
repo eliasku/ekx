@@ -94,22 +94,20 @@ void process_transform(const Element& el, ExportItem& item) {
 void process_filters(const Element& el, ExportItem& item) {
     (void)(item);
     for (auto& filter: el.filters) {
-        SGFilter fd;
-        fd.type = SGFilterType::None;
+        sg_filter_t fd;
+        fd.type = SG_FILTER_NONE;
+        fd.quality = filter.quality;
         fd.color = color_vec4(filter.color);
         fd.blur = filter.blur;
-        fd.quality = filter.quality;
-
-        float a = to_radians(filter.angle);
-        fd.offset = filter.distance * vec2_cs(a);
+        fd.offset = filter.distance * vec2_cs(to_radians(filter.angle));
 
         if (filter.type == FilterType::drop_shadow) {
-            fd.type = SGFilterType::DropShadow;
+            fd.type = SG_FILTER_SHADOW;
         } else if (filter.type == FilterType::glow) {
-            fd.type = SGFilterType::Glow;
+            fd.type = SG_FILTER_GLOW;
         }
 
-        if (fd.type != SGFilterType::None) {
+        if (fd.type != SG_FILTER_NONE) {
             //item.node.filters.push_back(fd);
         }
     }
@@ -145,18 +143,17 @@ void processTextField(const Element& el, ExportItem& item, const Doc& doc) {
     tf.lineHeight = textRun.attributes.lineHeight;
     tf.lineSpacing = textRun.attributes.lineSpacing;
 
-    SGTextLayerData layer;
+    sg_text_layer layer = {};
     layer.color = color_vec4(textRun.attributes.color);
     tf.layers.push_back(layer);
 
     for (auto& filter: el.filters) {
         layer.color = color_vec4(filter.color);
-        layer.blurRadius = std::fmin(filter.blur.x, filter.blur.y);
-        layer.blurIterations = filter.quality;
-        layer.offset = {};
+        layer.blur_radius = MIN(filter.blur.x, filter.blur.y);
+        layer.blur_iterations = filter.quality;
+        layer.offset = vec2(0, 0);
         if (filter.type == FilterType::drop_shadow) {
-            const float a = to_radians(filter.angle);
-            layer.offset = filter.distance * vec2_cs(a);
+            layer.offset = filter.distance * vec2_cs(to_radians(filter.angle));
         }
         layer.strength = int(filter.strength);
         tf.layers.push_back(layer);
@@ -237,7 +234,7 @@ SGFile SGBuilder::export_library() {
 
     SGFile sg;
     for (auto& pair: linkages) {
-        sg.linkages.emplace_back(SGSceneInfo{H(pair.first.c_str()), H(pair.second.c_str())});
+        sg.linkages.emplace_back((sg_scene_info){H(pair.first.c_str()), H(pair.second.c_str())});
     }
     for (auto& info: doc.scenes) {
         sg.scenes.push_back(H(info.item.c_str()));
@@ -578,7 +575,8 @@ void SGBuilder::processTimeline(const Element& el, ExportItem* item) {
                 }
             }
             const auto k0 = createFrameModel(frame);
-            std::optional<SGKeyFrameTransform> delta;
+            sg_keyframe_transform delta = {0};
+            bool has_delta = false;
             if (k0.motion_type == 1
                 && !frame.elements.empty()
                 && (frameIndex + 1) < framesTotal) {
@@ -586,7 +584,8 @@ void SGBuilder::processTimeline(const Element& el, ExportItem* item) {
                 if (!nextFrame.elements.empty()) {
                     const auto& el0 = frame.elements.back();
                     const auto& el1 = nextFrame.elements[0];
-                    delta.emplace(extractTweenDelta(frame, el0, el1));
+                    delta = extractTweenDelta(frame, el0, el1);
+                    has_delta = true;
                 }
             }
             for (auto* target: targets.list) {
@@ -606,11 +605,11 @@ void SGBuilder::processTimeline(const Element& el, ExportItem* item) {
                     auto kf0 = createFrameModel(frame);
                     setupFrameFromElement(kf0, *target->ref);
                     targetLayer->frames.push_back(kf0);
-                    if (delta) {
+                    if (has_delta) {
                         SGMovieFrameData kf1{};
                         kf1.index = kf0.index + kf0.duration;
                         kf1.duration = 0;
-                        kf1.transform = kf0.transform + *delta;
+                        kf1.transform = add_keyframe_transform(&kf0.transform, &delta);
                         kf1.visible = false;
                         targetLayer->frames.push_back(kf1);
                     }

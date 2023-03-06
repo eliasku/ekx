@@ -84,6 +84,8 @@ color2_t color2_tint(color_t color, uint8_t intensity);
 
 color2f_t lerp_color2f(color2f_t a, color2f_t b, float t);
 color2f_t mul_color2f(color2f_t a, color2f_t b);
+color2f_t add_color2f(color2f_t a, color2f_t b);
+color2f_t sub_color2f(color2f_t a, color2f_t b);
 vec4_t color2f_transform(color2f_t mod, vec4_t color);
 
 color_t color_u32(uint32_t rgba);

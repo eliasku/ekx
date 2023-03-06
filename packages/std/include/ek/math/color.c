@@ -43,22 +43,22 @@ color_t color_hue(float hue_unorm) {
             RGB(0xFF0000),
     };
     const float t = 6 * saturate(hue_unorm);
-    const int index = (int)t;
+    const int index = (int) t;
     return lerp_color(table[index], table[index + 1], t - (float) index);
 }
 
 vec4_t colorf_hue(float hue_unorm) {
     static const vec4_t table[7] = {
-            (vec4_t){{1,0,0,1}},
-            (vec4_t){{1,1,0,1}},
-            (vec4_t){{0,1,0,1}},
-            (vec4_t){{0,1,1,1}},
-            (vec4_t){{0,0,1,1}},
-            (vec4_t){{1,0,1,1}},
-            (vec4_t){{1,0,0,1}},
+            (vec4_t) {{1, 0, 0, 1}},
+            (vec4_t) {{1, 1, 0, 1}},
+            (vec4_t) {{0, 1, 0, 1}},
+            (vec4_t) {{0, 1, 1, 1}},
+            (vec4_t) {{0, 0, 1, 1}},
+            (vec4_t) {{1, 0, 1, 1}},
+            (vec4_t) {{1, 0, 0, 1}},
     };
     const float t = 6 * saturate(hue_unorm);
-    const int index = (int)t;
+    const int index = (int) t;
     return lerp_vec4(table[index], table[index + 1], t - (float) index);
 }
 
@@ -77,7 +77,7 @@ static float hsv_calc_hue(float max, float delta, float r, float g, float b) {
         hue = 4.0f + (r - g) / delta;
     }
 
-    hue /= (float)6;
+    hue /= (float) 6;
     if (hue < 0.0f) {
         hue += 1.0f;
     }
@@ -91,7 +91,7 @@ color_t color_hsv(vec4_t hsv) {
     result.r = unorm8_f32(hsv_lerp_channel(hue_color.r, hsv.saturation, hsv.value));
     result.g = unorm8_f32(hsv_lerp_channel(hue_color.g, hsv.saturation, hsv.value));
     result.b = unorm8_f32(hsv_lerp_channel(hue_color.b, hsv.saturation, hsv.value));
-    result.a = (uint8_t)(hsv.a * 255.0f);
+    result.a = (uint8_t) (hsv.a * 255.0f);
     return result;
 }
 
@@ -100,8 +100,8 @@ vec4_t hsv_from_color(color_t color) {
     const uint8_t r = color.r;
     const uint8_t g = color.g;
     const uint8_t b = color.b;
-    const float min = (float)(MIN(r, MIN(g, b)));
-    const float max = (float)(MAX(r, MAX(g, b)));
+    const float min = (float) (MIN(r, MIN(g, b)));
+    const float max = (float) (MAX(r, MAX(g, b)));
     const float delta = max - min;
     result.value = max / 255.0f;
     if (max > 0.0f && delta > 0.0f) {
@@ -111,7 +111,7 @@ vec4_t hsv_from_color(color_t color) {
         result.saturation = 0.0f;
         result.hue = -1.0f;
     }
-    result.alpha = (float)color.a / 255.0f;
+    result.alpha = (float) color.a / 255.0f;
     return result;
 }
 
@@ -254,6 +254,20 @@ color2f_t mul_color2f(color2f_t a, color2f_t b) {
     color2f_t result;
     result.scale = mul_vec4(a.scale, b.scale);
     result.offset = add_vec4(a.offset, mul_vec4(a.scale, b.offset));
+    return result;
+}
+
+color2f_t add_color2f(color2f_t a, color2f_t b) {
+    color2f_t result;
+    result.scale = add_vec4(a.scale, b.scale);
+    result.offset = add_vec4(a.offset, b.offset);
+    return result;
+}
+
+color2f_t sub_color2f(color2f_t a, color2f_t b) {
+    color2f_t result;
+    result.scale = sub_vec4(a.scale, b.scale);
+    result.offset = sub_vec4(a.offset, b.offset);
     return result;
 }
 

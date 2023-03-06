@@ -43,8 +43,12 @@ struct easing_progress_t {
     }
 };
 
-SGKeyFrameTransform lerp(const SGKeyFrameTransform& begin,
-                         const SGKeyFrameTransform& end,
+float get_frame_local_time(const SGMovieFrameData* frame, float time) {
+    return (time - (float)frame->index) / (float)frame->duration;
+}
+
+sg_keyframe_transform lerp(const sg_keyframe_transform& begin,
+                         const sg_keyframe_transform& end,
                          const easing_progress_t& progress) {
     return {
             lerp_vec2(begin.position, end.position, progress.position),
@@ -80,7 +84,7 @@ easing_progress_t get_easing_progress(const float t, const Array<SGEasingData>& 
     return progress;
 }
 
-void apply_transform(entity_t e, const SGKeyFrameTransform& keyframe) {
+void apply_transform(entity_t e, const sg_keyframe_transform& keyframe) {
     auto& transform = ecs::add<Transform2D>(e);
     transform.setTransform(keyframe.position, keyframe.scale, keyframe.skew, keyframe.pivot);
     transform.color.scale = color_vec4(keyframe.color.scale);
@@ -97,7 +101,7 @@ void update_target(float time, entity_t e, const SGMovieLayerData& layer) {
     set_visible(e, k1.visible);
     if (k1.motion_type == 1 && (ki + 1) < layer.frames.size()) {
         const auto& k2 = layer.frames[ki + 1];
-        const float t = k1.getLocalTime(time);
+        const float t = get_frame_local_time(&k1, time);
         const auto progress = get_easing_progress(t, k1.easing);
         const auto keyframe = lerp(k1.transform, k2.transform, progress);
         apply_transform(e, keyframe);

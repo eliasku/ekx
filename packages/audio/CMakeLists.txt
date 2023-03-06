@@ -16,11 +16,7 @@ target_link_libraries(${PROJECT_NAME}
         PUBLIC auph
         )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-        C_STANDARD 11
-        CXX_STANDARD 17
-        CXX_STANDARD_REQUIRED YES
-        CXX_EXTENSIONS NO)
+set_target_properties(${PROJECT_NAME} PROPERTIES C_STANDARD 11)
 
 target_compile_options(${PROJECT_NAME} PRIVATE
         -g
@@ -34,18 +30,25 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
 
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "iOS")
 
-set_source_files_properties("src/ek_audio_auph.c" PROPERTIES
-        COMPILE_FLAGS "-x objective-c")
+    set_source_files_properties("src/ek_audio_auph.c" PROPERTIES
+            COMPILE_FLAGS "-x objective-c")
 
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
-set_source_files_properties("src/ek_audio_auph.c" PROPERTIES
-        COMPILE_FLAGS "-x objective-c")
+    set_source_files_properties("src/ek_audio_auph.c" PROPERTIES
+            COMPILE_FLAGS "-x objective-c")
 
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Android")
 
     set_source_files_properties("src/ek_audio_auph.c" PROPERTIES
-            COMPILE_FLAGS "-xc++ -std=c++17")
+            COMPILE_FLAGS "-xc++ -std=c++17"
+            )
+
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+            CXX_STANDARD 17
+            CXX_STANDARD_REQUIRED YES
+            CXX_EXTENSIONS NO
+            )
 
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 

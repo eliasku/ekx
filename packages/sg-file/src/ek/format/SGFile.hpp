@@ -6,36 +6,13 @@
 #include <ek/ds/String.hpp>
 #include <ek/serialize/serialize.hpp>
 
+#include "sg.h"
+
 namespace ek {
 
-enum class SGFilterType {
-    None,
-    DropShadow,
-    Glow
-};
-
-struct SGFilter {
-    SGFilterType type = SGFilterType::None;
-    uint32_t quality = 1;
-    color_t color = COLOR_WHITE;
-    vec2_t blur = {};
-    vec2_t offset = {};
-
-    template<typename S>
-    void serialize(IO<S>& io) {
-        io(type, quality, color, blur, offset);
-    }
-};
-
-struct SGTextLayerData {
-    color_t color = COLOR_WHITE;
-    vec2_t offset = {};
-    float blurRadius = 0.0f;
-    int blurIterations = 0;
-    int strength = 0;
-};
-
-template<> struct declared_as_pod_type<SGTextLayerData> : public std::true_type {};
+template<> struct declared_as_pod_type<sg_text_layer> : public std::true_type {};
+template<> struct declared_as_pod_type<sg_scene_info> : public std::true_type {};
+template<> struct declared_as_pod_type<sg_keyframe_transform> : public std::true_type {};
 
 struct SGDynamicTextData {
     String text;
@@ -46,7 +23,7 @@ struct SGDynamicTextData {
     float lineSpacing = 0.0f;
     float lineHeight = 0.0f;
 
-    PodArray<SGTextLayerData> layers;
+    PodArray<sg_text_layer> layers;
 
     bool wordWrap = false;
 
@@ -58,49 +35,16 @@ struct SGDynamicTextData {
 
 // TODO: it should be optimized with easing table store :)
 struct SGEasingData {
-    uint8_t attribute = 0;
     float ease = 0.0f;
     PodArray<vec2_t> curve{};
+    uint8_t attribute = 0;
 
     template<typename S>
     void serialize(IO<S>& io) {
-        io(attribute, ease, curve);
+        io(ease, curve, attribute);
 #ifndef NDEBUG
         EK_ASSERT(curve.size() <= 8);
 #endif
-    }
-};
-
-struct SGKeyFrameTransform {
-    vec2_t position;
-    vec2_t scale = vec2(1, 1);
-    vec2_t skew;
-    vec2_t pivot;
-    color2f_t color = color2f();
-
-    template<typename S>
-    void serialize(IO<S>& io) {
-        io(position, scale, skew, pivot, color);
-    }
-
-    SGKeyFrameTransform operator-(const SGKeyFrameTransform& v) const {
-        return {
-                position - v.position,
-                scale - v.scale,
-                skew - v.skew,
-                pivot - v.pivot,
-                color - v.color,
-        };
-    }
-
-    SGKeyFrameTransform operator+(const SGKeyFrameTransform& v) const {
-        return {
-                position + v.position,
-                scale + v.scale,
-                skew + v.skew,
-                pivot + v.pivot,
-                color + v.color,
-        };
     }
 };
 
@@ -111,7 +55,7 @@ struct SGMovieFrameData {
 
     Array<SGEasingData> easing{};
 
-    SGKeyFrameTransform transform;
+    sg_keyframe_transform transform;
 
     bool visible = true;
 
@@ -136,11 +80,6 @@ struct SGMovieFrameData {
             mask |= 1 << ease.attribute;
         }
 #endif
-    }
-
-    [[nodiscard]]
-    float getLocalTime(float time) const {
-        return (time - static_cast<float>(index)) / static_cast<float>(duration);
     }
 };
 
@@ -238,19 +177,11 @@ struct SGNodeData {
     }
 };
 
-struct SGSceneInfo {
-    // public export linkage name
-    string_hash_t name;
-    // internal symbol name
-    string_hash_t linkage;
-};
-
-template<> struct declared_as_pod_type<SGSceneInfo> : public std::true_type {};
 
 class SGFile {
 public:
     PodArray<string_hash_t> scenes;
-    PodArray<SGSceneInfo> linkages;
+    PodArray<sg_scene_info> linkages;
     Array<SGNodeData> library;
 
     template<typename S>

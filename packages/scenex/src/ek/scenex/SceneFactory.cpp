@@ -99,8 +99,8 @@ void apply(entity_t e, const SGNodeData* data) {
             auto& layer = dynamicText.layers[i];
             format.layers[i].color = layer.color;
             format.layers[i].offset = layer.offset;
-            format.layers[i].blurRadius = layer.blurRadius;
-            format.layers[i].blurIterations = layer.blurIterations;
+            format.layers[i].blurRadius = layer.blur_radius;
+            format.layers[i].blurIterations = layer.blur_iterations;
             format.layers[i].strength = layer.strength;
         }
 

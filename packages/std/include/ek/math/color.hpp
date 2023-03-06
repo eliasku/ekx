@@ -2,11 +2,11 @@
 #ifdef __cplusplus
 
 inline static color2f_t operator-(const color2f_t a, const color2f_t b) {
-    return {{a.scale - b.scale, a.offset - b.offset}};
+    return sub_color2f(a, b);
 }
 
 inline static color2f_t operator+(const color2f_t a, const color2f_t b) {
-    return {{a.scale + b.scale, a.offset + b.offset}};
+    return add_color2f(a, b);
 }
 
 inline static color2f_t operator*(const color2f_t a, const color2f_t b) {

@@ -8,8 +8,21 @@ export function getAndroidSdkRoot(): string | null {
 }
 
 export async function getJavaHome(version: string | number): Promise<string> {
-    const result = await run({cmd: ["/usr/libexec/java_home", "-v", version.toString()], stdio: "pipe", io: true});
-    return result.data ?? "";
+    let home = "";
+    if(os.platform() === "darwin") {
+        const result = await run({cmd: ["/usr/libexec/java_home", "-v", version.toString()], stdio: "pipe", io: true});
+        home = result.data ?? "";
+    }
+    else {
+        const result = await run({cmd: ["java", "-XshowSettings:properties", "-version"], stdio: "pipe", io: true});
+        if(result.data) {
+            home = result.data.match(/java\.home\s*=\s*(.*)$/g)?.[1] ?? "";
+        }
+    }
+    if(!home) {
+        logger.error("java.home not found");
+    }
+    return home;
 }
 
 function getAndroidStudioPath(): string {
