@@ -245,6 +245,7 @@ export async function configure(options: Required<BuildOptions>): Promise<void> 
         workingDir: options.workingDir,
         env: Object.assign({}, process.env, options.env)
     };
+    logger.debug("cmake configure: " + JSON.stringify(executionOptions.env, undefined,2));
     await executeAsync("cmake", args, executionOptions);
 }
 
@@ -266,6 +267,7 @@ export async function build_(options: Required<BuildOptions>): Promise<void> {
             buildArgs.push(target);
         }
     }
+    logger.debug("cmake build: " + JSON.stringify(executionOptions.env, undefined,2));
     await executeAsync("cmake", buildArgs, executionOptions);
 }
 

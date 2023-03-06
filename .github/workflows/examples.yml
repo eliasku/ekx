@@ -58,7 +58,7 @@ jobs:
       EM_CACHE_FOLDER: 'emsdk-cache'
       CC: clang
       CXX: clang++
-#      CCACHE: 1
+      CCACHE: 1
     steps:
       # setup native build tools
       - name: Setup system cache
