@@ -5,11 +5,8 @@ export async function setup(project: Project) {
         name: "auph",
         cpp_include: "include",
         android: {
-            cpp_include: [
-                "android/oboe/src",
-                "android/oboe/include"
-            ],
-            cpp_lib: ["android", "log", "OpenSLES"],
+            // from oboe dep
+            //cpp_lib: ["android", "log", "OpenSLES"],
             android_java: "android/java",
             android_permission: "android.permission.VIBRATE"
         },
@@ -30,4 +27,5 @@ export async function setup(project: Project) {
     });
 
     await project.importModule("../../external/headers/ek.ts");
+    await project.importModule("../../external/oboe/ek.ts");
 }

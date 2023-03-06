@@ -36,7 +36,7 @@ export class AndroidProjGen {
         "org.gradle.jvmargs": "-Xmx2048m -Dfile.encoding=UTF-8",
         //"org.gradle.parallel":true,
         "android.useAndroidX": true,
-        "android.enableJetifier": true
+        //"android.enableJetifier": true
     });
 
     async prepare() {

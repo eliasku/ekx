@@ -22,11 +22,8 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "iOS")
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Android")
-    target_include_directories(${PROJECT_NAME}
-            INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/android/oboe/include
-            INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/android/oboe/src
-            )
     target_link_libraries(${PROJECT_NAME}
+            INTERFACE oboe
             INTERFACE log
             INTERFACE android
             INTERFACE OpenSLES

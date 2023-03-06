@@ -111,7 +111,7 @@ public:
                 auph_oboe_reopen_and_start_stream(device);
             }
         } else {
-            AUPH_ALOGE("Error was %s", oboe::convertToText(error));
+            AUPH_ALOGE("Error was %i", error);
         }
     }
 
@@ -152,7 +152,7 @@ void auph_oboe_open_stream(auph_audio_device* device) {
 
     oboe::Result result = builder.openStream(&device->audioStream);
     if (result != oboe::Result::OK) {
-        AUPH_ALOGE("Failed to create stream. Error: %s", oboe::convertToText(result));
+        AUPH_ALOGE("Failed to create stream. Error: %i", result);
         device->audioStream = nullptr;
         return;
     }
@@ -171,8 +171,8 @@ bool auph_oboe_reopen_and_start_stream(auph_audio_device* device) {
     }
     const oboe::Result result = device->audioStream->requestStart();
     if (result != oboe::Result::OK) {
-        AUPH_ALOGE("Error starting playback stream after disconnection. Error: %s",
-                   oboe::convertToText(result));
+        AUPH_ALOGE("Error starting playback stream after disconnection. Error: %i",
+                   result);
         device->audioStream->close();
         device->audioStream = nullptr;
         return false;
@@ -190,7 +190,7 @@ bool auph_audio_device_start(auph_audio_device* device) {
     if (device->audioStream != nullptr) {
         oboe::Result result = device->audioStream->requestStart();
         if (result != oboe::Result::OK) {
-            AUPH_ALOGE("Error starting playback stream. Error: %s", oboe::convertToText(result));
+            AUPH_ALOGE("Error starting playback stream. Error: %i", result);
             device->audioStream->close();
             device->audioStream = nullptr;
             return false;

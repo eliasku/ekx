@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.19)
 project(app C)
 
 add_library(${PROJECT_NAME} STATIC
-        src/app.c
+        src/app/app.c
         src/local_storage/local_storage.c
         src/local_res/local_res.c
         src/texture_loader/texture_loader.c
@@ -66,7 +66,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "iOS")
             PRIVATE "-framework QuartzCore"
             )
     target_sources(${PROJECT_NAME} PRIVATE
-            src/apple/apple.m
+            src/apple/app_apple.m
             src/local_storage/local_storage.m
             )
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -78,7 +78,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
             PRIVATE "-framework QuartzCore"
             )
     target_sources(${PROJECT_NAME} PRIVATE
-            src/apple/apple.m
+            src/app/app_apple.m
             src/local_storage/local_storage.m
             )
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Android")

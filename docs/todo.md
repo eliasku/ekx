@@ -1,2 +1,2 @@
-- [ ] move `build` folder to `cache/builds` and rework sdk build flow
 - [ ] rename `modules` to `lib` since it's root and main utility to build stuff
+- [ ] rename `ci` to `scripts` or `dev-scripts`, it's contains scripts to work with sdk project
