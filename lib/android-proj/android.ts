@@ -9,17 +9,21 @@ export function getAndroidSdkRoot(): string | null {
 
 export async function getJavaHome(version: string | number): Promise<string> {
     let home = "";
-    if(os.platform() === "darwin") {
+    const plat = os.platform();
+    if (plat === "darwin") {
         const result = await run({cmd: ["/usr/libexec/java_home", "-v", version.toString()], stdio: "pipe", io: true});
         home = result.data ?? "";
-    }
-    else {
+    } else if (plat === "linux") {
+        // TODO: don't respect java version
         const result = await run({cmd: ["java", "-XshowSettings:properties", "-version"], stdio: "pipe", io: true});
-        if(result.data) {
-            home = result.data.match(/java\.home\s*=\s*(.*)$/g)?.[1] ?? "";
+        const output = result.data || result.error;
+        if (output) {
+            home = output.match(/java\.home\s*=\s*(.*)/i)?.[1] ?? "";
         }
     }
-    if(!home) {
+    if (home) {
+        logger.debug(`java.home found: ${home}`);
+    } else {
         logger.error("java.home not found");
     }
     return home;

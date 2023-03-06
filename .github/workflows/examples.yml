@@ -41,6 +41,7 @@ jobs:
         run: | 
           npm ci
           npm link
+          npm link ekx
 
       - name: Build JS
         run: npm run build
@@ -95,6 +96,7 @@ jobs:
         run: |
           npm ci
           npm link
+          npm link ekx
 
       - name: Build JS
         run: npm run build
