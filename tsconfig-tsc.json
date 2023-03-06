@@ -5,7 +5,7 @@
     "strict": true
   },
   "include": [
-    "modules/**/*.ts",
-    "ci/**/*.ts"
+    "lib/**/*.ts",
+    "scripts/**/*.ts"
   ]
 }

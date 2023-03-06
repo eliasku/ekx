@@ -1,5 +1,5 @@
-import {Project} from "../../modules/cli/project.js";
-import {logger} from "../../modules/cli/logger.js";
+import {Project} from "../../lib/cli/project.js";
+import {logger} from "../../lib/cli/logger.js";
 
 export async function setup(project: Project) {
     if (project.current_target === "android") {

@@ -1,5 +1,5 @@
 import * as path from "path";
-import {Project} from "ekx/modules/cli/project.js";
+import {Project} from "ekx/lib/cli/project.js";
 
 export async function setup(project: Project) {
     project.addModule({

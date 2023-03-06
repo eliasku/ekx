@@ -1,7 +1,7 @@
-import {getModuleDir} from "../../../modules/utils/utils.js";
+import {getModuleDir} from "../../../lib/utils/utils.js";
 import * as path from "path";
 import * as esbuild from "esbuild";
-import {logger} from "../../../modules/cli/logger.js";
+import {logger} from "../../../lib/cli/logger.js";
 
 const __dirname = getModuleDir(import.meta);
 

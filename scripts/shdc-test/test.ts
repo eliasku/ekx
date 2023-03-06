@@ -1,8 +1,8 @@
 import {join} from "path";
 import {existsSync} from "fs";
-import {shdc} from "../../modules/sokol-shdc.js";
-import {getModuleDir, rm} from "../../modules/utils/utils.js";
-import {UtilityConfig} from "../../modules/cli/utils.js";
+import {shdc} from "../../lib/sokol-shdc.js";
+import {getModuleDir, rm} from "../../lib/utils/utils.js";
+import {UtilityConfig} from "../../lib/cli/utils.js";
 
 UtilityConfig.verbose = true;
 

@@ -1,6 +1,6 @@
 import {existsSync} from "fs";
-import {UtilityConfig} from "../modules/cli/utils.js";
-import {logger} from "../modules/cli/logger.js";
+import {UtilityConfig} from "../lib/cli/utils.js";
+import {logger} from "../lib/cli/logger.js";
 
 // run build files
 import "../packages/app/web/build.js";

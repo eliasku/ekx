@@ -5,10 +5,10 @@ import {
     readTextFileSync,
     rm,
     writeTextFileSync
-} from "../../modules/utils/utils.js";
-import {downloadCheck, untar} from "../../modules/utils/download.js";
-import {resolveCachePath, resolveEkxPath} from "../../modules/utils/dirs.js";
-import {logger} from "../../modules/cli/logger.js";
+} from "../../lib/utils/utils.js";
+import {downloadCheck, untar} from "../../lib/utils/download.js";
+import {resolveCachePath, resolveEkxPath} from "../../lib/utils/dirs.js";
+import {logger} from "../../lib/cli/logger.js";
 import decompress from "decompress";
 
 const destDir = resolveEkxPath("external/cairo");

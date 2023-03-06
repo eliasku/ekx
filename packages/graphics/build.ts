@@ -1,6 +1,6 @@
-import {getModuleDir} from "../../modules/utils/utils.js";
-import {shdc} from "../../modules/sokol-shdc.js";
-import {logger} from "../../modules/cli/logger.js";
+import {getModuleDir} from "../../lib/utils/utils.js";
+import {shdc} from "../../lib/sokol-shdc.js";
+import {logger} from "../../lib/cli/logger.js";
 
 await shdc({
     input: "src/ek/canvas.glsl",

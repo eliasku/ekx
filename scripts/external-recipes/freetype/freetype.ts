@@ -1,9 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
-import {resolveCachePath, resolveEkxPath} from "../../../modules/utils/dirs.js";
-import {copyFolderRecursive, expandGlobSync, getModuleDir, rm} from "../../../modules/utils/utils.js";
-import {downloadCheck} from "../../../modules/utils/download.js";
-import {logger} from "../../../modules/cli/logger.js";
+import {resolveCachePath, resolveEkxPath} from "../../../lib/utils/dirs.js";
+import {copyFolderRecursive, expandGlobSync, getModuleDir, rm} from "../../../lib/utils/utils.js";
+import {downloadCheck} from "../../../lib/utils/download.js";
+import {logger} from "../../../lib/cli/logger.js";
 import decompress from "decompress";
 
 const destDir = resolveEkxPath("external/freetype");

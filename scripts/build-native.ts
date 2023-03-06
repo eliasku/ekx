@@ -1,6 +1,6 @@
-import {build} from "../modules/cmake/mod.js";
-import {UtilityConfig} from "../modules/cli/utils.js";
-import {resolveCachePath, resolveEkxPath} from "../modules/utils/dirs.js";
+import {build} from "../lib/cmake/mod.js";
+import {UtilityConfig} from "../lib/cli/utils.js";
+import {resolveCachePath, resolveEkxPath} from "../lib/utils/dirs.js";
 
 UtilityConfig.verbose = true;
 

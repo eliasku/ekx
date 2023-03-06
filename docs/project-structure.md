@@ -1,13 +1,13 @@
 ### `cache/`
 Temporary folder used for installed `ekx` package build files, downloads, "build on demand" binaries.
 
-### `ci/`
+### `scripts/`
 Development scripts required for maintaining the `ekx` only. Check build, run tests, update external source code. Folder is excluded from final package.
 
 ### `external/`
 External libraries source code.
 
-### `modules/`
+### `lib/`
 TypeScript source-code for `ekx` users. TS modules and CLI entry-point.
 
 ### `packages/`

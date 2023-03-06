@@ -1,16 +1,16 @@
-import {getModuleDir} from "../../modules/utils/utils.js";
+import {getModuleDir} from "../../lib/utils/utils.js";
 import * as path from "path";
 import * as esbuild from "esbuild";
-import {logger} from "../../modules/cli/logger.js";
+import {logger} from "../../lib/cli/logger.js";
 
 const __dirname = getModuleDir(import.meta);
 await esbuild.build({
     entryPoints: [path.resolve(__dirname, "web/firebase.js")],
     globalName: "firebase_js",
-    target: ["chrome58", "firefox57", "safari11", "edge16"],
+    target: "es2020",
     bundle: true,
     sourcemap: true,
-    outfile: path.join(__dirname, "web/dist/firebase.js")
+    outfile: path.join(__dirname, "js/script/firebase.js")
 }).catch(err => logger.error(err));
 
 await esbuild.build({
@@ -19,7 +19,7 @@ await esbuild.build({
     format: "esm",
     sourcemap: true,
     target: "node14",
-    outfile: path.join(__dirname, "web/lib/firebase_c.js")
+    outfile: path.join(__dirname, "js/lib/firebase.js")
 }).catch(err => logger.error(err));
 
 logger.info("firebase build completed");

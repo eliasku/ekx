@@ -1,8 +1,8 @@
 import * as path from "path";
-import {readTextFileSync, rm, writeTextFileSync} from "../../modules/utils/utils.js";
-import {downloadFiles} from "../../modules/utils/download.js";
-import {resolveEkxPath} from "../../modules/utils/dirs.js";
-import {logger} from "../../modules/cli/logger.js";
+import {readTextFileSync, rm, writeTextFileSync} from "../../lib/utils/utils.js";
+import {downloadFiles} from "../../lib/utils/download.js";
+import {resolveEkxPath} from "../../lib/utils/dirs.js";
+import {logger} from "../../lib/cli/logger.js";
 
 const destPath = resolveEkxPath("external/miniz");
 

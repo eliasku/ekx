@@ -1,5 +1,5 @@
-import {rm} from "../modules/utils/utils.js";
-import {UtilityConfig} from "../modules/cli/utils.js";
+import {rm} from "../lib/utils/utils.js";
+import {UtilityConfig} from "../lib/cli/utils.js";
 
 UtilityConfig.verbose = true;
 

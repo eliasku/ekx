@@ -1,7 +1,7 @@
 import * as path from "path";
-import {rm} from "../../modules/utils/utils.js";
-import {downloadFiles} from "../../modules/utils/download.js";
-import {resolveEkxPath} from "../../modules/utils/dirs.js";
+import {rm} from "../../lib/utils/utils.js";
+import {downloadFiles} from "../../lib/utils/download.js";
+import {resolveEkxPath} from "../../lib/utils/dirs.js";
 
 const destPath = resolveEkxPath("external/headers");
 

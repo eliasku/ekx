@@ -6,7 +6,7 @@
   "author": "Ilya Kuzmichev <eliasku.games@gmail.com> (https://eliasku-games.web.app)",
   "type": "module",
   "bin": {
-    "ekx": "./modules/cli/main.ts"
+    "ekx": "lib/cli/main.ts"
   },
   "publishConfig": {
     "access": "public"
@@ -20,13 +20,13 @@
     "email": "eliasku.games@gmail.com"
   },
   "scripts": {
-    "build": "ts-node ci/build.ts",
-    "build-native": "ts-node ci/build-native.ts",
-    "build-native-coverage": "ts-node ci/build-native-coverage.ts",
-    "build-external": "ts-node ci/build-external.ts",
-    "test-external-utils": "ts-node ci/shdc-test/test.ts",
+    "build": "ts-node scripts/build.ts",
+    "build-native": "ts-node scripts/build-native.ts",
+    "build-native-coverage": "ts-node scripts/build-native-coverage.ts",
+    "build-external": "ts-node scripts/build-external.ts",
+    "test-external-utils": "ts-node scripts/shdc-test/test.ts",
     "typecheck": "tsc -p tsconfig-tsc.json",
-    "clean": "ts-node ci/clean.ts",
+    "clean": "ts-node scripts/clean.ts",
     "update-lock": "rm -r node_modules && rm package-lock.json && npm i && git add package-lock.json",
     "release": "npm run build && changeset publish",
     "version": "changeset version && npm run update-lock"
@@ -69,12 +69,11 @@
     "CHANGELOG.md",
     "tools",
     "packages",
-    "packages/auph/web/dist",
+    "packages/auph/js",
     "packages/app/js",
-    "modules",
+    "lib",
     "plugins",
-    "plugins/firebase/web/dist",
-    "plugins/firebase/web/lib",
+    "plugins/firebase/js",
     "external"
   ]
 }

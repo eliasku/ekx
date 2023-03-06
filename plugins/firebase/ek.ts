@@ -1,7 +1,7 @@
 import * as path from "path";
 import {copyFileSync} from "fs";
-import {Project} from "../../modules/cli/project.js";
-import {logger} from "../../modules/cli/logger.js";
+import {Project} from "../../lib/cli/project.js";
+import {logger} from "../../lib/cli/logger.js";
 
 export async function setup(project: Project) {
     project.onProjectGenerated.push(() => {
@@ -100,8 +100,8 @@ project.objects[shell.get_id()] = shell
 app_target.add_build_phase(shell)`
         },
         web: {
-            js: "web/lib",
-            js_script: "web/dist/firebase.js"
+            js: "js/lib",
+            js_script: "js/script/firebase.js"
         }
     });
 

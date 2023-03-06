@@ -11,12 +11,11 @@ cache/
 # packages ignores
 packages/auph/js/
 packages/app/js/
-plugins/firebase/web/dist/
-plugins/firebase/web/lib/
+plugins/firebase/js/
 
 # examples build folders (TODO: use single folder)
-build/
-export/
+examples/*/build/
+examples/*/export/
 
 # flash files backup
 RECOVER_*.fla

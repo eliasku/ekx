@@ -1,4 +1,4 @@
-import {Project} from "../../modules/cli/project.js";
+import {Project} from "../../lib/cli/project.js";
 
 export function setup(project:Project) {
     project.addModule({
@@ -50,7 +50,7 @@ export function setup(project:Project) {
             "src/type1/type1.c",
             "src/type42/type42.c",
             "src/winfonts/winfnt.c",
-            "src/sdf/sdf.c"
+            "src/sdf/sdf.c",
         ]
     });
 }
