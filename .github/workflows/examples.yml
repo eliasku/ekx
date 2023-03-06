@@ -9,7 +9,7 @@ jobs:
     env:
       CC: clang
       CXX: clang++
-      CCACHE: 1
+#      CCACHE: 1
 
     steps:
       # strange but we cannot use ninja from NDK?
@@ -54,11 +54,11 @@ jobs:
     name: Build Web
     runs-on: ubuntu-latest
     env:
-      EM_VERSION: 3.1.8
+      EM_VERSION: 3.1.32
       EM_CACHE_FOLDER: 'emsdk-cache'
       CC: clang
       CXX: clang++
-      CCACHE: 1
+#      CCACHE: 1
     steps:
       # setup native build tools
       - name: Setup system cache
