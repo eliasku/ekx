@@ -41,15 +41,12 @@ jobs:
           "${GITHUB_WORKSPACE}/ninja-build/ninja" --version
           ninja --version
 
-      - name: Install
-        run: npm ci
-
-      - name: Build EKX package
-        run: npm run build
-
-      - name: Link EKX package
-        run: npm i
-        working-directory: ./examples/2-drawing
+      - name: Install EKX package
+        run: |
+          npm ci
+          npm run build
+          npm link
+          npm link ekx
 
       - name: Print versions
         run: |
@@ -114,15 +111,12 @@ jobs:
           chmod +x ninja-build/ninja
           ln -s "${GITHUB_WORKSPACE}/ninja-build/ninja" "/usr/local/bin/ninja"
 
-      - name: Setup EKX package
-        run: npm ci
-
-      - name: Build EKX package
-        run: npm run build
-
-      - name: Link EKX package
-        run: npm i
-        working-directory: ./examples/2-drawing
+      - name: Install EKX package
+        run: |
+          npm ci
+          npm run build
+          npm link
+          npm link ekx
 
       - name: Print versions
         run: |
