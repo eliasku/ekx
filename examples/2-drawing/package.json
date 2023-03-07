@@ -2,6 +2,6 @@
   "name": "ekx-example-drawing",
   "version": "0.0.1",
   "dependencies": {
-    "ekx": "link:../.."
+    "ekx": "file:../.."
   }
 }

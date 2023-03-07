@@ -130,7 +130,7 @@ export function collectPackages(dir: string) {
     return packages;
 }
 
-export function collectRoots(dir: string) {
+export function collectRoots(dir: string):{ pkg: any, dir: string }[] {
     const roots: { pkg: any, dir: string }[] = [];
     const pkg = readPkg(dir);
     if (pkg) {
