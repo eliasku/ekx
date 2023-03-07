@@ -95,6 +95,8 @@ jobs:
         with:
           version: ${{env.EM_VERSION}}
           actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
+          update: true
+          no-install: true
 
       - uses: actions/setup-node@v3
         with:
