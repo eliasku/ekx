@@ -39,14 +39,28 @@ jobs:
       - name: Checkout Project
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: | 
-          npm ci
-          npm link
-          npm link ekx
+      - name: Install
+        run: npm ci
 
-      - name: Build JS
+      - name: Build EKX package
         run: npm run build
+
+      - name: Link EKX package
+        run: npm i
+        working-directory: ./examples/2-drawing
+
+      - name: Print versions
+        run: |
+          ninja --version
+          cmake --version
+          echo $CC $CXX
+          java --version
+          ccache --version
+          node --version
+          npm --version
+          which ninja
+          which ekx
+        working-directory: ./examples/2-drawing
 
       - name: Build Android
         run: ekx android bundle -V
@@ -99,14 +113,28 @@ jobs:
       - name: Checkout Project
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: |
-          npm ci
-          npm link
-          npm link ekx
+      - name: Setup EKX package
+        run: npm ci
 
-      - name: Build JS
+      - name: Build EKX package
         run: npm run build
+
+      - name: Link EKX package
+        run: npm i
+        working-directory: ./examples/2-drawing
+
+      - name: Print versions
+        run: |
+          ninja --version
+          cmake --version
+          echo $CC $CXX
+          java --version
+          ccache --version
+          node --version
+          npm --version
+          which ninja
+          which ekx
+        working-directory: ./examples/2-drawing
 
       - name: Build
         run: ekx web -V
