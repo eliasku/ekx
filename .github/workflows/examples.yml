@@ -57,7 +57,6 @@ jobs:
           cmake --version
           echo $CC $CXX
           java --version
-          ccache --version
           node --version
           npm --version
           which ninja
@@ -138,5 +137,5 @@ jobs:
           which ekx
 
       - name: Build
-        run: cd ./examples/2-drawing && ekx web -V
-#        working-directory: ./examples/2-drawing
+        run: ekx web -V
+        working-directory: ./examples/2-drawing
