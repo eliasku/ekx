@@ -127,7 +127,7 @@ export function resolveOptions(options?: BuildOptions): Required<BuildOptions> {
     opts.cmakePath = opts.cmakePath ?? ".";
     opts.buildsFolder = opts.buildsFolder ?? path.resolve(opts.workingDir, "build");
     opts.buildDir = opts.buildDir ?? path.resolve(opts.buildsFolder, getBuildDirName(opts.os!, opts.buildType));
-    opts.ccache = opts.ccache ?? true;
+    opts.ccache = opts.ccache ?? !!(process.env.USE_CCACHE as string | 0);
     opts.ninja = opts.ninja ?? true;
     opts.definitions = opts.definitions ?? {};
     opts.clean = opts.clean ?? true;
@@ -145,7 +145,6 @@ export function resolveOptions(options?: BuildOptions): Required<BuildOptions> {
         if (!opts.cxx) opts.cxx = "clang++";
     }
 
-    opts.ccache = opts.ccache ?? !!(process.env.USE_CCACHE as string | 0);
     if (opts.ccache && opts.os !== getOsName()) {
         if (opts.os !== "web") {
             opts.ccache = false;
