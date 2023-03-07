@@ -12,18 +12,6 @@ jobs:
 #      CCACHE: 1
 
     steps:
-      # strange but we cannot use ninja from NDK?
-      - name: Setup Ninja
-        uses: eliasku/gha-setup-ninja@master
-
-      # See b/206099937. Hack needed to make ninja visible to cmake during NDK builds
-      - name: Link Ninja binary
-        run: |
-          chmod +x "${GITHUB_WORKSPACE}/ninja-build/ninja"
-          ln -s "${GITHUB_WORKSPACE}/ninja-build/ninja" "/usr/local/bin/ninja"
-          "${GITHUB_WORKSPACE}/ninja-build/ninja" --version
-          ninja --version
-
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
@@ -40,6 +28,18 @@ jobs:
 
       - name: Checkout Project
         uses: actions/checkout@v3
+
+      # strange but we cannot use ninja from NDK?
+      - name: Setup Ninja
+        uses: eliasku/gha-setup-ninja@master
+
+      # See b/206099937. Hack needed to make ninja visible to cmake during NDK builds
+      - name: Link Ninja binary
+        run: |
+          chmod +x "${GITHUB_WORKSPACE}/ninja-build/ninja"
+          ln -s "${GITHUB_WORKSPACE}/ninja-build/ninja" "/usr/local/bin/ninja"
+          "${GITHUB_WORKSPACE}/ninja-build/ninja" --version
+          ninja --version
 
       - name: Install
         run: npm ci
@@ -86,14 +86,6 @@ jobs:
           path: ${{env.EM_CACHE_FOLDER}}
           key: ${{env.EM_VERSION}}-${{ runner.os }}
 
-      - name: Setup Ninja
-        uses: eliasku/gha-setup-ninja@master
-
-      - name: Link Ninja binary
-        run: |
-          chmod +x ninja-build/ninja
-          ln -s "${GITHUB_WORKSPACE}/ninja-build/ninja" "/usr/local/bin/ninja"
-
       - name: Install CCache
         uses: eliasku/install-ccache-action@master
 
@@ -114,6 +106,14 @@ jobs:
 
       - name: Checkout Project
         uses: actions/checkout@v3
+
+      - name: Setup Ninja
+        uses: eliasku/gha-setup-ninja@master
+
+      - name: Link Ninja binary
+        run: |
+          chmod +x ninja-build/ninja
+          ln -s "${GITHUB_WORKSPACE}/ninja-build/ninja" "/usr/local/bin/ninja"
 
       - name: Setup EKX package
         run: npm ci
