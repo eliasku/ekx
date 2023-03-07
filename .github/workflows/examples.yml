@@ -19,8 +19,8 @@ jobs:
       # See b/206099937. Hack needed to make ninja visible to cmake during NDK builds
       - name: Link Ninja binary
         run: |
+          chmod +x ninja-build/ninja
           ln -s "${GITHUB_WORKSPACE}/ninja-build/ninja" "/usr/local/bin/ninja"
-          ln -s "${GITHUB_WORKSPACE}/ninja-build/ninja" "/usr/local/bin/ninja-build"
 
       - name: Set up JDK 11
         uses: actions/setup-java@v3
@@ -89,8 +89,8 @@ jobs:
 
       - name: Link Ninja binary
         run: |
+          chmod +x ninja-build/ninja
           ln -s "${GITHUB_WORKSPACE}/ninja-build/ninja" "/usr/local/bin/ninja"
-          ln -s "${GITHUB_WORKSPACE}/ninja-build/ninja" "/usr/local/bin/ninja-build"
 
       - name: Install CCache
         uses: eliasku/install-ccache-action@master
