@@ -1,7 +1,7 @@
 {
   "name": "ekx",
   "description": "Toy game engine",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "ISC",
   "author": "Ilya Kuzmichev <eliasku.games@gmail.com> (https://eliasku-games.web.app)",
   "type": "module",
