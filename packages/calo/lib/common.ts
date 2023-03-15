@@ -66,7 +66,7 @@ const calcStructSize = (type: Type) => {
     }
     let byteSize = 0;
     if (!type.fields.size) {
-        byteSize = Math.ceil(type.options.primitiveBitSize / 8);
+        byteSize = Math.ceil((type.options.primitiveBitSize ?? 8) / 8);
     } else {
         for (const [, fieldType] of type.fields) {
             if (fieldType === type) {

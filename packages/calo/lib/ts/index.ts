@@ -6,16 +6,16 @@ const codegen_ts = {
 };
 
 const isSimpleArray = (type: Type) => {
-    return type.options.variableLengthArray && type.options.generics.length === 1;
+    return type.options.variableLengthArray && type.options.generics?.length === 1;
 };
 
-const getTSType = (type: Type) => {
+const getTSType = (type: Type):string => {
     const targetTypeName = type.options.target?.ts?.typeName;
     if (targetTypeName) {
         return targetTypeName;
     }
     if (isSimpleArray(type)) {
-        return getTSType(type.options.generics[0]) + "[]";
+        return getTSType(type.options.generics![0]) + "[]";
     }
     return type.typeName;
 }
