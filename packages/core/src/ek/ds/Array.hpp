@@ -105,7 +105,7 @@ public:
 
     Array(const Array& m) noexcept: buffer{nullptr} {
         ek_core_dbg_inc(EK_CORE_DBG_ARRAY);
-        _initCopyMem((const T*) m.buffer, ek_buf_length(m.buffer));
+        _initCopyMem((const T*) m.buffer, arr_size(m.buffer));
     }
 
     void _initCopyMem(const T* ptr, SizeType len) {
@@ -116,7 +116,7 @@ public:
     void reset() {
         if (buffer) {
             reduce_size(0);
-            ek_buf_reset(&buffer);
+            arr_reset(&buffer);
         }
     }
 
@@ -153,10 +153,10 @@ public:
 
         // destruct all prev allocated elements
         reduce_size(0);
-        const auto otherSize = ek_buf_length(m.buffer);
-        if (ek_buf_capacity(buffer) < otherSize) {
+        const auto otherSize = arr_size(m.buffer);
+        if (arr_capacity(buffer) < otherSize) {
             // grow buffer
-            ek_buf_set_capacity(&buffer, ek_buf_capacity(m.buffer), ElementSize);
+            ek_buf_set_capacity(&buffer, arr_capacity(m.buffer), ElementSize);
         }
         if (buffer) {
             ek_buf_header(buffer)->length = otherSize;
@@ -172,7 +172,7 @@ public:
 
     [[nodiscard]]
     bool empty() const {
-        return ek_buf_empty(buffer);
+        return arr_empty(buffer);
     }
 
     void clear() {
@@ -181,25 +181,25 @@ public:
 
     void grow(SizeType capacity) {
         EK_ASSERT_R2(capacity != 0);
-        const auto sz = ek_buf_length(buffer);
+        const auto sz = arr_size(buffer);
 
         void* newBuffer = nullptr;
         ek_buf_set_size(&newBuffer, ElementSize, sz, capacity);
         constructMove((T*) newBuffer, (T*) buffer, sz);
 
-        ek_buf_reset(&buffer);
+        arr_reset(&buffer);
         buffer = newBuffer;
     }
 
     void reserve(SizeType capacity) {
-        if (ek_buf_capacity(buffer) < capacity) {
+        if (arr_capacity(buffer) < capacity) {
             grow(capacity);
         }
     }
 
     void maybeGrow() {
-        if (ek_buf_full(buffer)) {
-            grow(buffer ? (ek_buf_capacity(buffer) << 1) : 1);
+        if (arr_full(buffer)) {
+            grow(buffer ? (arr_capacity(buffer) << 1) : 1);
         }
     }
 
@@ -244,11 +244,11 @@ public:
     }
 
     void resize(SizeType newSize) {
-        const auto len = ek_buf_length(buffer);
+        const auto len = arr_size(buffer);
         if (newSize < len) {
             reduce_size(newSize);
         } else {
-            const auto cap = ek_buf_capacity(buffer);
+            const auto cap = arr_capacity(buffer);
             if (newSize > cap) {
                 // TODO: optimize by nextPowerOfTwo
                 grow(newSize);
@@ -313,7 +313,7 @@ public:
         EK_ASSERT_R2(i < size());
         auto* removedSlot = (T*) ek_buf_remove_(buffer, i, ElementSize);
         removedSlot->~T();
-        const auto len = ek_buf_length(buffer);
+        const auto len = arr_size(buffer);
         if (i < len) {
             constructMove<T>(removedSlot, begin() + len, 1);
         }
@@ -346,12 +346,12 @@ public:
 
     [[nodiscard]]
     SizeType size() const {
-        return ek_buf_length(buffer);
+        return arr_size(buffer);
     }
 
     [[nodiscard]]
     SizeType capacity() const {
-        return ek_buf_capacity(buffer);
+        return arr_capacity(buffer);
     }
 
     [[nodiscard]]

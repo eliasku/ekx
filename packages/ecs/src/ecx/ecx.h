@@ -45,7 +45,11 @@ typedef struct entity_t {
     };
 } entity_t;
 
-#define NULL_ENTITY ((struct entity_t){0})
+#ifdef __cplusplus
+#define NULL_ENTITY (entity_t{0u})
+#else
+#define NULL_ENTITY ((entity_t){0u})
+#endif
 
 /**
  * Constructs entity structure by known numerical ID

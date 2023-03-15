@@ -1,39 +1,7 @@
-#ifndef EK_FORMAT_MODEL_3D_H
-#define EK_FORMAT_MODEL_3D_H
-
-#include <ek/math.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-typedef struct model3d_vertex_t {
-    vec3_t position;
-    vec3_t normal;
-    vec2_t uv;
-    color_t color;
-    color_t color2;
-} model3d_vertex_t;
-
-typedef struct model3d_t {
-    model3d_vertex_t* vertices;
-    uint16_t* indices;
-} model3d_t;
-
-model3d_t create_cube(vec3_t position, vec3_t size, color_t color);
-
-model3d_t create_plane(vec3_t position, vec2_t size, color_t color);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif // EK_FORMAT_MODEL_3D_H
-
-#ifdef EK_FORMAT_MODEL_3D_IMPLEMENT
+#include "dto.h"
 #include <ek/buf.h>
 
-extern "C" model3d_t create_cube(const vec3_t position, const vec3_t size, color_t color) {
+model3d_t create_cube(const vec3_t position, const vec3_t size, color_t color) {
     model3d_t result = {0};
 
     // 6 sides
@@ -41,8 +9,8 @@ extern "C" model3d_t create_cube(const vec3_t position, const vec3_t size, color
     // 2 faces per size
     uint32_t vertices_count= 6 * 4;
     uint32_t indices_count= 6 * 2 * 3;
-    ek_buf_set_size((void**) &result.vertices, sizeof(model3d_vertex_t), vertices_count, vertices_count);
-    ek_buf_set_size((void**) &result.indices, sizeof(uint16_t), indices_count, indices_count);
+    arr_reinit(result.vertices, vertices_count);
+    arr_reinit(result.indices, indices_count);
 
     vec3_t n;
     const float u = 0.5f;
@@ -113,7 +81,7 @@ extern "C" model3d_t create_cube(const vec3_t position, const vec3_t size, color
     return result;
 }
 
-extern "C" model3d_t create_plane(const vec3_t position, const vec2_t size, color_t color) {
+model3d_t create_plane(const vec3_t position, const vec2_t size, color_t color) {
     model3d_t result = {0};
 
     const float u = 0.5f;
@@ -123,8 +91,8 @@ extern "C" model3d_t create_plane(const vec3_t position, const vec2_t size, colo
 
     uint32_t vertices_count= 4;
     uint32_t indices_count= 2 * 3;
-    ek_buf_set_size((void**) &result.vertices, sizeof(model3d_vertex_t), vertices_count, vertices_count);
-    ek_buf_set_size((void**) &result.indices, sizeof(uint16_t), indices_count, indices_count);
+    arr_reinit(result.vertices, vertices_count);
+    arr_reinit(result.indices, indices_count);
 
     result.vertices[0] = (model3d_vertex_t){vec3(-u, -u, 0), n, vec2(0, 0), color1, color2};
     result.vertices[1] = (model3d_vertex_t){vec3(u, -u, 0), n, vec2(1, 0), color1, color2};
@@ -147,4 +115,3 @@ extern "C" model3d_t create_plane(const vec3_t position, const vec2_t size, colo
 
     return result;
 }
-#endif // EK_FORMAT_MODEL_3D_IMPLEMENT

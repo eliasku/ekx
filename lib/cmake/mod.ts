@@ -167,8 +167,8 @@ export function resolveOptions(options?: BuildOptions): Required<BuildOptions> {
                 if (!process.env.EM_NODE_JS && nodePath) {
                     process.env.EM_NODE_JS = nodePath;
                 }
-                //options.cc = undefined;
-                //options.cxx = undefined;
+                opts.cc = undefined;
+                opts.cxx = undefined;
             }
                 break;
             case "android":

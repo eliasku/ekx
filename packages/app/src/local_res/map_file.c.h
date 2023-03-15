@@ -51,7 +51,7 @@ static int ek_local_res__map_file(const char* inPathName, uint8_t** outDataPtr, 
             }
         }
 
-        // Now close the file. The kernel doesn’t use our file descriptor.
+        // Now close the file. The kernel doesn't use our file descriptor.
         close(fileDescriptor);
     }
 

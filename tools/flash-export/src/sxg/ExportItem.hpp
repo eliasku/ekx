@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ek/format/SGFile.hpp>
+#include <ek/format/sg.h>
 #include <ek/ds/Array.hpp>
 #include <memory>
 
@@ -10,7 +10,7 @@ struct Element;
 
 struct ExportItem {
 
-    SGNodeData node;
+    sg_node_data_t node = sg_node_data_ctr();
 
     float estimated_scale = 0.001f;
     float max_abs_scale = 100000.0f;
@@ -48,7 +48,7 @@ struct ExportItem {
     void append_to(ExportItem* parent_);
 
     [[nodiscard]]
-    ExportItem* find_library_item(const string_hash_t libraryName) const;
+    ExportItem* find_library_item(string_hash_t libraryName) const;
 
     void inc_ref(ExportItem& lib);
 

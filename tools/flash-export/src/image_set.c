@@ -132,14 +132,14 @@ void save(image_set_t* images, const char* output) {
     for (uint32_t i = 0; i < images->resolutions_num; ++i) {
         image_set_res_t* res = images->resolutions + i;
         uint32_t numImages = 0;
-        for (uint32_t image_index = 0, images_num = ek_buf_length(res->sprites); image_index < images_num; ++image_index) {
+        for (uint32_t image_index = 0, images_num = arr_size(res->sprites); image_index < images_num; ++image_index) {
             sprite_data_t* image = res->sprites + image_index;
             if (image->bitmap.pixels) {
                 ++numImages;
             }
         }
         fprintf(f, "%u\n", numImages);
-        for (uint32_t image_index = 0, images_num = ek_buf_length(res->sprites); image_index < images_num; ++image_index) {
+        for (uint32_t image_index = 0, images_num = arr_size(res->sprites); image_index < images_num; ++image_index) {
             sprite_data_t* image = res->sprites + image_index;
             if (image->bitmap.pixels) {
                 snprintf(path, sizeof path, "%s/%d.bmp", output, idx++);

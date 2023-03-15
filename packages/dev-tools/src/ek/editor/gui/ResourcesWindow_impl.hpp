@@ -3,12 +3,12 @@
 #include "ResourcesWindow.hpp"
 
 
+#include <ek/format/sg.h>
 #include <ek/scenex/3d/Material3D.hpp>
 #include <ek/scenex/3d/StaticMesh.hpp>
 #include <ek/scenex/2d/Atlas.hpp>
 #include <ek/scenex/text/Font.hpp>
 #include <ek/scenex/2d/DynamicAtlas.hpp>
-#include <ek/format/SGFile.hpp>
 #include <ek/scenex/text/Font.hpp>
 #include <ek/scenex/text/TrueTypeFont.hpp>
 #include <ek/scenex/text/BitmapFont.hpp>
@@ -27,19 +27,23 @@ void draw_font_info(void* asset) {
 }
 
 void draw_sg_info(void* asset) {
-    const SGFile* sg_file = (const SGFile*) asset;
+    const sg_file_t* sg_file = (const sg_file_t*) asset;
     if(!sg_file) {
         ImGui::TextColored(ImColor{1.0f, 0.0f, 0.0f}, "null");
         return;
     }
-    if (ImGui::TreeNode("##scene-list", "Scenes (%u)", sg_file->scenes.size())) {
-        for (auto& sceneName: sg_file->scenes) {
-            ImGui::Text("%u %s", sceneName, hsp_get(sceneName));
+    uint32_t scenes_count = arr_size(sg_file->scenes);
+    if (ImGui::TreeNode("##scene-list", "Scenes (%u)", scenes_count)) {
+        for(uint32_t i = 0; i < scenes_count; ++i) {
+            string_hash_t name = sg_file->scenes[i];
+            ImGui::Text("%u %s", name, hsp_get(name));
         }
         ImGui::TreePop();
     }
-    if (ImGui::TreeNode("##linkages-list", "Linkages (%u)", sg_file->linkages.size())) {
-        for (auto& info: sg_file->linkages) {
+    uint32_t linkages_count = arr_size(sg_file->linkages);
+    if (ImGui::TreeNode("##linkages-list", "Linkages (%u)", linkages_count)) {
+        for(uint32_t i = 0; i < linkages_count; ++i) {
+            sg_scene_info_t info = sg_file->linkages[i];
             auto* node = sg_get(sg_file, info.linkage);
             if (ImGui::TreeNode(node, "%u %s -> %u %s", info.name, hsp_get(info.name), info.linkage,
                                 hsp_get(info.linkage))) {

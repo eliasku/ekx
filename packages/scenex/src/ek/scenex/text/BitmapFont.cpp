@@ -1,7 +1,6 @@
 #include "BitmapFont.hpp"
 #include <ek/scenex/2d/Sprite.hpp>
 
-
 namespace ek {
 
 BitmapFont::BitmapFont() :
@@ -16,12 +15,12 @@ void BitmapFont::load(const uint8_t* buffer, size_t length) {
         EK_ASSERT("can't load bmfont, buffer is empty");
         return;
     }
-    bmfont_file_map(buffer, &file);
-    lineHeightMultiplier = file.header->line_height_multiplier;
-    for (uint32_t i = 0, end = file.header->codepoints_num * 2; i < end;) {
-        const uint32_t codepoint = file.codepoints[i++];
-        const uint32_t glyph_id = file.codepoints[i++];
-        map.set(codepoint, glyph_id);
+    calo_reader_t r = {};
+    r.p = (uint8_t*)buffer;
+    file = read_stream_bmfont(&r);
+    lineHeightMultiplier = file.header.line_height_multiplier;
+    arr_for(entry, file.dict) {
+        map.set(entry->codepoint, entry->glyph_index);
     }
 
     ready_ = loaded_ = true;
@@ -30,12 +29,12 @@ void BitmapFont::load(const uint8_t* buffer, size_t length) {
 bool BitmapFont::getGlyph(uint32_t codepoint, Glyph& outGlyph) {
     const auto index = map.get(codepoint, 0xFFFFFFFFu);
     if (index != 0xFFFFFFFFu) {
-        bmfont_glyph* glyph = file.glyphs + index;
+        bmfont_glyph_t* glyph = file.glyphs + index;
         outGlyph.advanceWidth = glyph->advance_x;
         outGlyph.lineHeight = lineHeightMultiplier;
         sprite_t* spr = &RES_NAME_RESOLVE(res_sprite, glyph->sprite);
         if (spr->state & SPRITE_LOADED) {
-            outGlyph.rect = spr->rect / file.header->base_font_size;
+            outGlyph.rect = spr->rect / file.header.base_font_size;
             outGlyph.texCoord = spr->tex;
             outGlyph.image = REF_RESOLVE(res_image, spr->image_id);
             outGlyph.rotated = spr->state & SPRITE_ROTATED;
@@ -51,11 +50,11 @@ bool BitmapFont::getGlyph(uint32_t codepoint, Glyph& outGlyph) {
 bool BitmapFont::getGlyphMetrics(uint32_t codepoint, Glyph& outGlyph) {
     const auto index = map.get(codepoint, 0xFFFFFFFFu);
     if (index != 0xFFFFFFFFu) {
-        bmfont_glyph* glyph = file.glyphs + index;
+        bmfont_glyph_t* glyph = file.glyphs + index;
         outGlyph.advanceWidth = glyph->advance_x;
         outGlyph.lineHeight = lineHeightMultiplier;
-        outGlyph.ascender = file.header->ascender;
-        outGlyph.descender = file.header->descender;
+        outGlyph.ascender = file.header.ascender;
+        outGlyph.descender = file.header.descender;
         outGlyph.rect = glyph->box;
         outGlyph.source = this;
         return true;

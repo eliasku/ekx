@@ -273,13 +273,13 @@ void glyph_build_sprites(FT_Face face,
             image.source.x = 0;
             image.source.y = 0;
 
-            arr_push(&resolution->images, image_t, image);
+            arr_push(resolution->images, image);
         }
     }
 }
 
 glyph_t* find_data_by_glyph_index(glyph_t* glyphs, uint32_t glyph_index) {
-    const uint32_t len = ek_buf_length(glyphs);
+    const uint32_t len = arr_size(glyphs);
     for (uint32_t i = 0; i < len; ++i) {
         if (glyphs[i].glyph_index == glyph_index) {
             return glyphs + i;
@@ -289,11 +289,11 @@ glyph_t* find_data_by_glyph_index(glyph_t* glyphs, uint32_t glyph_index) {
 }
 
 glyph_t* find_data_by_codepoint(glyph_t* glyphs, uint32_t codepoint) {
-    const uint32_t len = ek_buf_length(glyphs);
+    const uint32_t len = arr_size(glyphs);
     for (uint32_t i = 0; i < len; ++i) {
         glyph_t* glyph = glyphs + i;
         const uint32_t* codepoints = glyph->codepoints;
-        const uint32_t codepoints_num = ek_buf_length(codepoints);
+        const uint32_t codepoints_num = arr_size(codepoints);
         for (uint32_t j = 0; j < codepoints_num; ++j) {
             if (codepoints[j] == codepoint) {
                 return glyph;
@@ -323,14 +323,14 @@ font_t build_bitmap_font(const bitmap_font_build_options_t* decl, image_set_t* d
         if (!glyph) {
             glyph_t data = build_glyph_data(face, glyph_index);
             glyph_build_sprites(face, glyph_index, decl->font_size, decl->filters, decl->filters_num, dest_image_set);
-            arr_push(&result.glyphs, glyph_t, data);
-            glyph = result.glyphs + ek_buf_length(result.glyphs) - 1;
+            arr_push(result.glyphs, data);
+            glyph = result.glyphs + arr_size(result.glyphs) - 1;
         }
-        arr_push(&glyph->codepoints, uint32_t, codepoint);
+        arr_push(glyph->codepoints, codepoint);
     }
 
     if (info.hasKerning && decl->use_kerning && false) {
-        const uint32_t glyphs_len = ek_buf_length(result.glyphs);
+        const uint32_t glyphs_len = arr_size(result.glyphs);
         for (uint32_t i = 0; i < glyphs_len; ++i) {
             const uint32_t glyph_left = result.glyphs[i].glyph_index;
             for (uint32_t j = 0; j < glyphs_len; ++j) {
@@ -346,23 +346,22 @@ font_t build_bitmap_font(const bitmap_font_build_options_t* decl, image_set_t* d
     // use mirrored letter case for missing glyphs
     if (decl->mirror_case) {
         glyph_t* glyphs = result.glyphs;
-        uint32_t glyphs_len = ek_buf_length(glyphs);
-        for (uint32_t gi = 0; gi < glyphs_len; ++gi) {
-            uint32_t** arr_codepoints = &glyphs[gi].codepoints;
-            for (uint32_t i = 0, len = ek_buf_length(*arr_codepoints); i < len; ++i) {
-                const uint32_t code = (*arr_codepoints)[i];
-                const uint32_t upper = (uint32_t) toupper((int) code);
-                const uint32_t lower = (uint32_t) tolower((int) code);
+        arr_for(glyph, glyphs) {
+            uint32_t* codepoints_ = glyphs->codepoints;
+            arr_for(code, codepoints_) {
+                const uint32_t upper = (uint32_t) toupper((int)code);
+                const uint32_t lower = (uint32_t) tolower((int)code);
                 if (lower != upper) {
                     glyph_t* glyph_lower = find_data_by_codepoint(glyphs, lower);
                     glyph_t* glyph_upper = find_data_by_codepoint(glyphs, upper);
                     if (!glyph_lower) {
-                        arr_push(arr_codepoints, uint32_t, lower);
+                        arr_push(codepoints_, lower);
                     } else if (!glyph_upper) {
-                        arr_push(arr_codepoints, uint32_t, upper);
+                        arr_push(codepoints_, upper);
                     }
                 }
             }
+            glyph->codepoints = codepoints_;
         }
     }
     return result;

@@ -8,8 +8,8 @@ enum {
 };
 
 enum sprite_flags_t {
-    SPRITE_LOADED = 1,
-    SPRITE_ROTATED = 2
+    SPRITE_ROTATED = 1,
+    SPRITE_LOADED = 2,
 };
 
 typedef struct sprite_t {

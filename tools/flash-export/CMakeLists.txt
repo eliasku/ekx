@@ -72,6 +72,7 @@ target_link_libraries(${PROJECT_NAME}
         PUBLIC cairo
         PUBLIC miniz
         PUBLIC ekx::sg-file
+        PUBLIC ekx::core
         )
 
 target_include_directories(${PROJECT_NAME} PUBLIC src)

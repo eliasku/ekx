@@ -1,10 +1,9 @@
 #pragma once
 
-#include <ek/io.h>
-
 #include "export_atlas.h"
 #include "binpack.h"
 #include "sprpk_image.h"
+#include <ek/format/sg.h>
 #include <ek/log.h>
 #include <ek/print.h>
 #include <ek/hash.h>
@@ -21,7 +20,7 @@ formatAtlasFileName(char* buffer, int bufferSize, const char* name, float scale,
     if (page_index != 0) {
         ek_snprintf(pageSuffix, 8, "_%d", page_index);
     }
-    const char* scaleSuffix = "";
+    const char* scaleSuffix;
     if (scale <= 1) scaleSuffix = "1x";
     else if (scale <= 2) scaleSuffix = "2x";
     else if (scale <= 3) scaleSuffix = "3x";
@@ -35,26 +34,35 @@ formatAtlasFileName(char* buffer, int bufferSize, const char* name, float scale,
 }
 
 void save_atlas_resolution(atlas_res_t* resolution, const char* output_path, const char* name) {
-    io_t io;
-    io_alloc(&io, 100);
-    io_write_i32(&io, (int32_t) resolution->pages_num);
+    char atlas_path[1024];
+    formatAtlasFileName(atlas_path, 1024, name, resolution->resolution.scale, 0, "atlas");
+    char abs_atlas_path[1024];
+    ek_snprintf(abs_atlas_path, 1024, "%s/%s", output_path, atlas_path);
+    calo_writer_t writer = new_writer(100);
+    FILE* f = fopen(abs_atlas_path, "wb");
+
+    write_u32(&writer, resolution->pages_num);
 
     char image_path[1024];
     for (uint32_t page_index = 0; page_index < resolution->pages_num; ++page_index) {
         atlas_page_t* page = resolution->pages + page_index;
         EK_ASSERT(page->bitmap.pixels != NULL);
         formatAtlasFileName(image_path, 1024, name, resolution->resolution.scale, page_index, "png");
-        IO_WRITE(&io, page->w);
-        IO_WRITE(&io, page->h);
-        io_write_string(&io, image_path, (int) strnlen(image_path, 1024));
-        io_write_u32(&io, page->sprites_num);
+
+        write_u16(&writer, page->w);
+        write_u16(&writer, page->h);
+
+        // STREAM WRITE C-STRING
+        write_stream_string(&writer, image_path);
+
+        write_u32(&writer, page->sprites_num);
         for (uint32_t spr_index = 0; spr_index < page->sprites_num; ++spr_index) {
             sprite_data_t* spr = page->sprites + spr_index;
-            IO_WRITE(&io, spr->name);
+            write_u32(&writer, spr->name);
             // keep only rotation flag in output
-            io_write_u32(&io, spr->flags & 1);
-            IO_WRITE(&io, spr->rc);
-            IO_WRITE(&io, spr->uv);
+            write_u32(&writer, spr->flags & 1);
+            write_stream_rect(&writer, spr->rc);
+            write_stream_rect(&writer, spr->uv);
         }
 
         char absImagePath[1024];
@@ -64,16 +72,10 @@ void save_atlas_resolution(atlas_res_t* resolution, const char* output_path, con
         sprite_pack_image_save(&page->bitmap, absImagePath, SPRITE_PACK_ALPHA | SPRITE_PACK_PNG);
         // saveImageJPG(*page.image, name + get_atlas_suffix(resolution.resolution_scale, page_index));
     }
-
-    char atlas_path[1024];
-    formatAtlasFileName(atlas_path, 1024, name, resolution->resolution.scale, 0, "atlas");
-    char abs_atlas_path[1024];
-    ek_snprintf(abs_atlas_path, 1024, "%s/%s", output_path, atlas_path);
-    FILE* f = fopen(abs_atlas_path, "wb");
-    fwrite(io.data, 1, io.pos, f);
+    fwrite_calo(f, &writer);
     fclose(f);
 
-    io_free(&io);
+    free_writer(&writer);
 }
 
 typedef struct {
@@ -109,11 +111,11 @@ irect_t no_pack_padding(binpack_rect_t rect, int pad) {
     rect.y += pad;
     rect.r -= pad;
     rect.b -= pad;
-    return (irect_t){
-        .x = rect.x,
-        .y = rect.y,
-        .w = rect.r - rect.x,
-        .h = rect.b - rect.y
+    return (irect_t) {
+            .x = rect.x,
+            .y = rect.y,
+            .w = rect.r - rect.x,
+            .h = rect.b - rect.y
     };
 }
 

@@ -25,7 +25,7 @@ void ExportItem::append_to(ExportItem* parent_) {
 
 ExportItem* ExportItem::find_library_item(const string_hash_t libraryName) const {
     for (auto& child : children) {
-        if (child->node.libraryName == libraryName) {
+        if (child->node.library_name == libraryName) {
             return child;
         }
     }
@@ -34,8 +34,8 @@ ExportItem* ExportItem::find_library_item(const string_hash_t libraryName) const
 
 void ExportItem::inc_ref(ExportItem& lib) {
     ++usage;
-    if (node.libraryName) {
-        auto* dependency = lib.find_library_item(node.libraryName);
+    if (node.library_name) {
+        auto* dependency = lib.find_library_item(node.library_name);
         if (dependency && dependency != this) {
             dependency->inc_ref(lib);
         }
@@ -50,7 +50,7 @@ void ExportItem::inc_ref(ExportItem& lib) {
 }
 
 void ExportItem::update_scale(ExportItem& lib, const mat3x2_t parent_matrix) {
-    if (!rect_is_empty(node.scaleGrid)) {
+    if (!rect_is_empty(node.scale_grid)) {
         estimated_scale = 1.0f;
         return;
     }
@@ -63,8 +63,8 @@ void ExportItem::update_scale(ExportItem& lib, const mat3x2_t parent_matrix) {
         max_abs_scale = 1.0f;
     }
 
-    if (node.libraryName) {
-        auto* dependency = lib.find_library_item(node.libraryName);
+    if (node.library_name) {
+        auto* dependency = lib.find_library_item(node.library_name);
         if (dependency && dependency != this) {
             dependency->update_scale(lib, global_matrix);
         }

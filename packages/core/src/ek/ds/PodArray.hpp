@@ -37,7 +37,7 @@ public:
     }
 
     PodArray(const PodArray& m) noexcept: buffer{nullptr} {
-        arr_init_from((void**) &buffer, sizeof(T), m.buffer, ek_buf_length(m.buffer));
+        arr_init_from((void**) &buffer, sizeof(T), m.buffer, arr_size(m.buffer));
     }
 
     ~PodArray() {
@@ -46,12 +46,12 @@ public:
     }
 
     void reset() {
-        ek_buf_reset((void**) &buffer);
+        arr_reset((void**) &buffer);
     }
 
     [[nodiscard]]
     bool empty() const {
-        return ek_buf_empty(buffer);
+        return arr_empty(buffer);
     }
 
     void clear() const {
@@ -62,12 +62,12 @@ public:
 
     [[nodiscard]]
     uint32_t size() const {
-        return ek_buf_length(buffer);
+        return arr_size(buffer);
     }
 
     [[nodiscard]]
     uint32_t capacity() const {
-        return ek_buf_capacity(buffer);
+        return arr_capacity(buffer);
     }
 
     PodArray& operator=(PodArray&& m) noexcept {
@@ -93,7 +93,7 @@ public:
             return *this;
         }
 
-        arr_assign((void**) &buffer, sizeof(T), m.buffer);
+        arr_assign_((void**) &buffer, sizeof(T), m.buffer);
         return *this;
     }
 
@@ -101,7 +101,7 @@ public:
 //    }
 
     void reserve(uint32_t capacity) {
-        if (ek_buf_capacity(buffer) < capacity) {
+        if (arr_capacity(buffer) < capacity) {
             arr_grow((void**) &buffer, capacity, sizeof(T));
         }
     }
@@ -132,7 +132,7 @@ public:
     }
 
     void erase_at(uint32_t i) {
-        arr_remove(buffer, sizeof(T), i);
+        arr_erase_(buffer, buffer + i, sizeof(T), 1);
     }
 
     void set(uint32_t i, const T& el) {
@@ -162,7 +162,7 @@ public:
     }
 
     void swap_remove(uint32_t i) {
-        arr_swap_remove(buffer, sizeof(T), i);
+        arr_swap_remove_(buffer, sizeof(T), i);
     }
 
     [[nodiscard]]

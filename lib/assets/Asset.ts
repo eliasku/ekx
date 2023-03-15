@@ -40,7 +40,6 @@ export class Asset {
     }
 }
 
-
 export class AssetBuilderContext {
     readonly writer = new BytesWriter();
 

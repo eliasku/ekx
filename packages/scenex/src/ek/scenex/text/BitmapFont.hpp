@@ -1,8 +1,7 @@
 #pragma once
 
 #include "FontImplBase.hpp"
-#include <ek/format/bmfont.h>
-#include <ek/ds/Array.hpp>
+#include <ek/format/sg.h>
 #include <ek/ds/Hash.hpp>
 
 namespace ek {
@@ -24,7 +23,7 @@ public:
 
 public:
     // bmfont is mapped to memory, we use this control structure with mapped pointers as source of data
-    bmfont_file file = {};
+    bmfont_t file = {};
     // dynamic hash-map to map 32-bit codepoint to 32-bit glyph index
     Hash<uint32_t> map;
 };

@@ -5,12 +5,12 @@
 
 namespace ek {
 
-float ease(float x, const SGEasingData& data);
+float ease(float x, const sg_easing_t* data);
 
 void apply_frame(entity_t e, MovieClip& mov);
 
 void MovieClip::updateAll() {
-    for (auto e : ecs::view<MovieClip>()) {
+    for (auto e: ecs::view<MovieClip>()) {
         auto& mov = ecs::get<MovieClip>(e);
         auto dt = g_time_layers[mov.timer].dt;
         if (mov.playing) {
@@ -21,11 +21,11 @@ void MovieClip::updateAll() {
     }
 }
 
-int findKeyFrame(const Array<SGMovieFrameData>& frames, float t) {
-    const int end = int(frames.size());
+int findKeyFrame(const sg_movie_frame_t* frames, float t) {
+    const uint32_t end = arr_size(frames);
     for (int i = 0; i < end; ++i) {
-        const auto& kf = frames[i];
-        if (t >= kf.index && t < kf.index + kf.duration) {
+        const sg_movie_frame_t kf = frames[i];
+        if (t >= (float)kf.index && t < (float)(kf.index + kf.duration)) {
             return i;
         }
     }
@@ -43,13 +43,13 @@ struct easing_progress_t {
     }
 };
 
-float get_frame_local_time(const SGMovieFrameData* frame, float time) {
-    return (time - (float)frame->index) / (float)frame->duration;
+float get_frame_local_time(const sg_movie_frame_t* frame, float time) {
+    return (time - (float) frame->index) / (float) frame->duration;
 }
 
-sg_keyframe_transform lerp(const sg_keyframe_transform& begin,
-                         const sg_keyframe_transform& end,
-                         const easing_progress_t& progress) {
+sg_keyframe_transform_t lerp(const sg_keyframe_transform_t& begin,
+                             const sg_keyframe_transform_t& end,
+                             const easing_progress_t& progress) {
     return {
             lerp_vec2(begin.position, end.position, progress.position),
             lerp_vec2(begin.scale, end.scale, progress.scale),
@@ -59,39 +59,41 @@ sg_keyframe_transform lerp(const sg_keyframe_transform& begin,
     };
 }
 
-easing_progress_t get_easing_progress(const float t, const Array<SGEasingData>& easing) {
+easing_progress_t get_easing_progress(const float t, const sg_easing_t* easing) {
     easing_progress_t progress{};
-    if (easing.empty()) {
+    uint32_t easing_count = arr_size(easing);
+    if (arr_empty(easing)) {
         progress.fill(t);
         return progress;
     }
 
-    for (const auto& e : easing) {
+    for (uint32_t i = 0; i < easing_count; ++i) {
+        const sg_easing_t* e = easing + i;
         const float x = ease(t, e);
-        if (e.attribute == 0) {
+        if (e->attribute == 0) {
             progress.fill(x);
             break;
-        } else if (e.attribute == 1) {
+        } else if (e->attribute == 1) {
             progress.position = x;
-        } else if (e.attribute == 2) {
+        } else if (e->attribute == 2) {
             progress.skew = x;
-        } else if (e.attribute == 3) {
+        } else if (e->attribute == 3) {
             progress.scale = x;
-        } else if (e.attribute == 4) {
+        } else if (e->attribute == 4) {
             progress.color = x;
         }
     }
     return progress;
 }
 
-void apply_transform(entity_t e, const sg_keyframe_transform& keyframe) {
+void apply_transform(entity_t e, const sg_keyframe_transform_t& keyframe) {
     auto& transform = ecs::add<Transform2D>(e);
     transform.setTransform(keyframe.position, keyframe.scale, keyframe.skew, keyframe.pivot);
     transform.color.scale = color_vec4(keyframe.color.scale);
     transform.color.offset = color_vec4(keyframe.color.offset);
 }
 
-void update_target(float time, entity_t e, const SGMovieLayerData& layer) {
+void update_target(float time, entity_t e, const sg_movie_layer_t & layer) {
     const auto ki = findKeyFrame(layer.frames, time);
     if (ki < 0) {
         set_visible(e, false);
@@ -99,7 +101,7 @@ void update_target(float time, entity_t e, const SGMovieLayerData& layer) {
     }
     const auto& k1 = layer.frames[ki];
     set_visible(e, k1.visible);
-    if (k1.motion_type == 1 && (ki + 1) < layer.frames.size()) {
+    if (k1.motion_type == 1 && (ki + 1) < arr_size(layer.frames)) {
         const auto& k2 = layer.frames[ki + 1];
         const float t = get_frame_local_time(&k1, time);
         const auto progress = get_easing_progress(t, k1.easing);
@@ -109,21 +111,21 @@ void update_target(float time, entity_t e, const SGMovieLayerData& layer) {
         apply_transform(e, k1.transform);
     }
 
-    if (k1.loopMode != 0 && ecs::has<MovieClip>(e)) {
+    if (k1.loop_mode != 0 && ecs::has<MovieClip>(e)) {
         auto& mc = ecs::get<MovieClip>(e);
-        const auto loop = k1.loopMode;
+        const auto loop = k1.loop_mode;
         if (loop == 1) {
             goto_and_stop(e, time - k1.index);
         } else if (loop == 2) {
             const auto offset = fmin(time, k1.index + k1.duration) - k1.index;
-            auto t = k1.firstFrame + offset;
+            auto t = k1.first_frame + offset;
             const auto* mcData = mc.data;
             if (mcData && t > mcData->frames) {
                 t = mcData->frames;
             }
             goto_and_stop(e, t);
         } else if (loop == 3) {
-            goto_and_stop(e, k1.firstFrame);
+            goto_and_stop(e, k1.first_frame);
         }
     }
 }
@@ -136,12 +138,12 @@ void apply_frame(entity_t e, MovieClip& mov) {
         return;
     }
     auto it = get_first_child(e);
-    const auto totalTargets = static_cast<int>(data->layers.size());
+    const int total_targets = (int) arr_size(data->layers);
     while (it.id) {
         MovieClipTargetIndex* ti = ecs::try_get<MovieClipTargetIndex>(it);
         if (ti) {
-            const auto idx = ti->key;
-            if (idx < totalTargets) {
+            const int idx = ti->key;
+            if (idx < total_targets) {
                 update_target(time, it, data->layers[idx]);
             }
         }
@@ -273,19 +275,20 @@ float get_bezier_y(const vec2_t* curve, float x) {
                                        curve[3].y);
 }
 
-float ease(float x, const SGEasingData& data) {
+float ease(float x, const sg_easing_t* data) {
     float y = x;
-    if (data.curve.size() > 3) {
+    const uint32_t curve_len = arr_size(data->curve);
+    if (curve_len > 3) {
         // bezier
-        for (size_t i = 0; i < data.curve.size() - 3; ++i) {
-            const float x0 = data.curve[i].x;
-            const float x1 = data.curve[i + 3].x;
+        for (uint32_t i = 0; i < curve_len - 3; ++i) {
+            const float x0 = data->curve[i].x;
+            const float x1 = data->curve[i + 3].x;
             if (x0 <= x && x <= x1) {
-                return get_bezier_y(data.curve.data() + i, x);
+                return get_bezier_y(data->curve + i, x);
             }
         }
-    } else if (data.ease != 0) {
-        float e = data.ease; //  / 100.0f
+    } else if (data->ease != 0) {
+        float e = data->ease; //  / 100.0f
         float t;
         if (e < 0.0f) {
             // Ease in

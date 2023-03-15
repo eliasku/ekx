@@ -3,6 +3,7 @@
 #include "ExportItem.hpp"
 #include "../image_set.h"
 #include <unordered_map>
+#include <ek/ds/String.hpp>
 
 namespace ek::xfl {
 
@@ -56,7 +57,7 @@ public:
     void render(const ExportItem& item, image_set_t* toImageSet) const;
 
     [[nodiscard]]
-    SGFile export_library();
+    sg_file_t export_library();
 
     ExportItem* addElementToDrawingLayer(ExportItem* item, const Element& el);
 

@@ -9,13 +9,12 @@ extern "C" void export_xfl(const char* xfl_path, image_set_t* image_set, const c
     fe.build_library();
     fe.build_sprites(image_set);
 
-    ek::SGFile sg_data = fe.export_library();
-    ek::output_memory_stream out{100};
-    ek::IO io{out};
-    io(sg_data);
+    sg_file_t sg_data = fe.export_library();
+    calo_writer_t writer = new_writer(100);
+    write_stream_sg_file(&writer, sg_data);
 
     FILE* f = fopen(output_path, "wb");
-    fwrite(out.data(), out.size(), 1, f);
+    fwrite_calo(f, &writer);
     fclose(f);
 
     save(image_set, output_images_path);

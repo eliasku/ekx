@@ -81,7 +81,7 @@ sprite_data_t renderMultiSample(rect_t bounds,
         bitmap_swizzle_xwzy(&bitmap);
     }
 
-    sprite_data_t data = {0};
+    sprite_data_t data = {};
     data.padding = 1;
     data.rc = rc;
     // TODO: recti_wh(w, h)
@@ -141,7 +141,7 @@ sprite_data_t renderLowQuality(rect_t bounds,
         bitmap_swizzle_xwzy(&bitmap);
     }
 
-    sprite_data_t data = {0};
+    sprite_data_t data = {};
     data.padding = 1;
     data.rc = rc;
     // TODO: recti_wh

@@ -15,9 +15,12 @@ import {init, readPkg} from "../cmake/npm.js";
 import {updateLockFiles} from "../repos-management/update-lock.js";
 import {getModuleDir, rm} from "../utils/utils.js";
 import {resolveEkxPath} from "../utils/dirs.js";
+import {existsSync} from "fs";
 
 const selfPkg = readPkg(path.resolve(getModuleDir(import.meta), "../.."));
-logger.info(`EKX @ ${selfPkg?.version}`);
+logger.info(`EKX @ ${selfPkg?.version} (${process.argv[1]})`);
+
+// TODO: check if EKX is global - print warning!
 
 if (process.argv.indexOf("help") >= 0) {
     logger.info("--verbose | -v : enable verbose mode");
@@ -58,8 +61,15 @@ if (process.argv.indexOf("cmake") >= 0) {
 if (process.argv.indexOf("reset-sdk") >= 0) {
     UtilityConfig.verbose = true;
     logger._diag = true;
+    logger.info("running ekx reset-sdk");
     try {
-        await rm(resolveEkxPath("cache"))
+        logger.info("remove ekx cache");
+        await rm(resolveEkxPath("cache"));
+        if(existsSync("ek.ts")) {
+            logger.info("remove project build+cache");
+            await rm("cache");
+            await rm("build");
+        }
         process.exit(0);
     }
     catch(e) {
@@ -67,7 +77,6 @@ if (process.argv.indexOf("reset-sdk") >= 0) {
         process.exit(1);
     }
 }
-
 
 if(process.argv.indexOf("update-lock") >= 0) {
     await updateLockFiles();

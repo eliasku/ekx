@@ -5,47 +5,42 @@
 
 #include "../xfl/Doc.hpp"
 #include "../xfl/renderer/Scanner.hpp"
-#include <ek/util/StringUtil.hpp>
 #include <ek/log.h>
 #include <ek/assert.h>
 #include <stb/stb_sprintf.h>
 
-namespace ek::xfl {
-
-enum BoundsMode {
-    Bounds_None = 0,
-    Bounds_Bounds = 1,
-    Bounds_HitArea = 2,
-    Bounds_Scissors = 4
-};
-
-int getBoundingRectFlags(const char* name) {
-    int flags = 0;
-    if (ek_cstr_equals(name, "hitrect", 1)) {
-        flags |= Bounds_HitArea;
+sg_movie_layer_t* find_target_layer(const sg_movie_t* movie, const sg_node_data_t* item) {
+    arr_for(layer, movie->layers) {
+        arr_for (target, layer->targets) {
+            if (item == *target) {
+                return layer;
+            }
+        }
     }
-    if (ek_cstr_equals(name, "bbrect", 1)) {
-        flags |= Bounds_Bounds;
-    }
-    if (ek_cstr_equals(name, "cliprect", 1)) {
-        flags |= Bounds_Scissors;
-    }
-    return flags;
+    return nullptr;
 }
 
+sg_node_flags_t get_bounding_rect_flags(const char* name) {
+    int flags = 0;
+    if (ek_cstr_equals(name, "hitrect", 1)) {
+        flags |= SG_NODE_HIT_AREA_ENABLED;
+    }
+    if (ek_cstr_equals(name, "bbrect", 1)) {
+        flags |= SG_NODE_BOUNDS_ENABLED;
+    }
+    if (ek_cstr_equals(name, "cliprect", 1)) {
+        flags |= SG_NODE_SCISSORS_ENABLED;
+    }
+    return (sg_node_flags_t) flags;
+}
+
+namespace ek::xfl {
+
 bool setupSpecialLayer(const Doc& doc, const Layer& layer, ExportItem& toItem) {
-    auto flags = getBoundingRectFlags(layer.name.c_str());
+    sg_node_flags_t flags = get_bounding_rect_flags(layer.name.c_str());
     if (flags != 0) {
-        toItem.node.boundingRect = Scanner::getBounds(doc, layer.frames[0].elements);
-        if ((flags & Bounds_HitArea) != 0) {
-            toItem.node.hitAreaEnabled = true;
-        }
-        if ((flags & Bounds_Bounds) != 0) {
-            toItem.node.boundsEnabled = true;
-        }
-        if ((flags & Bounds_Scissors) != 0) {
-            toItem.node.scissorsEnabled = true;
-        }
+        toItem.node.bounding_rect = Scanner::getBounds(doc, layer.frames[0].elements);
+        toItem.node.flags = (sg_node_flags_t) (toItem.node.flags | flags);
         return true;
     }
     return false;
@@ -62,10 +57,18 @@ void collectFramesMetaInfo(const Doc& doc, ExportItem& item) {
         }
         for (auto& frame: layer.frames) {
             if (!frame.script.empty()) {
-                item.node.scripts.emplace_back({frame.script, frame.index});
+                sg_frame_script_t script;
+                // TODO: check string life-time?
+                script.code = frame.script.c_str();
+                script.frame = frame.index;
+                arr_push(item.node.scripts, script);
             }
             if (!frame.name.empty()) {
-                item.node.labels.emplace_back({frame.name, frame.index});
+                sg_frame_label_t label;
+                // TODO: check string life-time?
+                label.name = frame.name.c_str();
+                label.frame = frame.index;
+                arr_push(item.node.labels, label);
             }
         }
     }
@@ -74,10 +77,10 @@ void collectFramesMetaInfo(const Doc& doc, ExportItem& item) {
 bool shouldConvertItemToSprite(ExportItem& item) {
     if (item.children.size() == 1 && item.drawingLayerChild) {
         return true;
-    } else if (!item.node.labels.empty() && item.node.labels[0].name == "*static") {
+    } else if (!arr_empty(item.node.labels) && strcmp(item.node.labels[0].name, "*static") == 0) {
         // special user TAG
         return true;
-    } else if (!rect_is_empty(item.node.scaleGrid)) {
+    } else if (!rect_is_empty(item.node.scale_grid)) {
         // scale 9 grid items
         return true;
     }
@@ -87,12 +90,16 @@ bool shouldConvertItemToSprite(ExportItem& item) {
 void process_transform(const Element& el, ExportItem& item) {
     item.node.matrix = el.transform.matrix;
     item.node.color = el.transform.color;
-    item.node.visible = el.isVisible;
+    if (el.isVisible) {
+        item.node.flags = (sg_node_flags_t) (item.node.flags | SG_NODE_VISIBLE);
+    } else {
+        item.node.flags = (sg_node_flags_t) (item.node.flags & ~SG_NODE_VISIBLE);
+    }
 }
 
 // TODO: remove ugly filters
 void process_filters(const Element& el, ExportItem& item) {
-    (void)(item);
+    (void) (item);
     for (auto& filter: el.filters) {
         sg_filter_t fd;
         fd.type = SG_FILTER_NONE;
@@ -114,7 +121,7 @@ void process_filters(const Element& el, ExportItem& item) {
 }
 
 void processTextField(const Element& el, ExportItem& item, const Doc& doc) {
-    auto& tf = item.node.dynamicText.emplace_back();
+    sg_dynamic_text_t tf = {};
     //if(dynamicText.rect != null) {
 //    item->node.matrix.tx += el.rect.x - 2;
 //    item->node.matrix.ty += el.rect.y - 2;
@@ -130,22 +137,23 @@ void processTextField(const Element& el, ExportItem& item, const Doc& doc) {
     }
     // animate exports as CR line-ending (legacy MacOS),
     // we need only LF to not check twice when drawing the text
-    tf.text = textRun.characters;
-    ek_cstr_replace(tf.text.data(), '\r', '\n');
+    tf.text = (const char*) malloc(textRun.characters.size() + 1);
+    memcpy((void*) tf.text, textRun.characters.data(), textRun.characters.size() + 1);
+    ek_cstr_replace((char*) tf.text, '\r', '\n');
+
     tf.font = H(faceName.c_str());
     tf.size = textRun.attributes.size;
     if (el.lineType == TextLineType::Multiline) {
-        tf.wordWrap = true;
+        tf.word_wrap = true;
     }
     tf.rect = rect_expand(el.rect, 2.0f);
-//    tf.rect = el.rect;
     tf.alignment = textRun.attributes.alignment;
-    tf.lineHeight = textRun.attributes.lineHeight;
-    tf.lineSpacing = textRun.attributes.lineSpacing;
+    tf.line_height = textRun.attributes.lineHeight;
+    tf.line_spacing = textRun.attributes.lineSpacing;
 
-    sg_text_layer layer = {};
+    sg_text_layer_t layer = {};
     layer.color = color_vec4(textRun.attributes.color);
-    tf.layers.push_back(layer);
+    arr_push(tf.layers, layer);
 
     for (auto& filter: el.filters) {
         layer.color = color_vec4(filter.color);
@@ -155,9 +163,13 @@ void processTextField(const Element& el, ExportItem& item, const Doc& doc) {
         if (filter.type == FilterType::drop_shadow) {
             layer.offset = filter.distance * vec2_cs(to_radians(filter.angle));
         }
-        layer.strength = int(filter.strength);
-        tf.layers.push_back(layer);
+        layer.strength = (int) filter.strength;
+        arr_push(tf.layers, layer);
     }
+    if (!item.node.dynamic_text) {
+        item.node.dynamic_text = (sg_dynamic_text_t*) malloc(sizeof(sg_dynamic_text_t));
+    }
+    *item.node.dynamic_text = tf;
 }
 
 SGBuilder::SGBuilder(const Doc& doc) : doc{doc} {
@@ -193,7 +205,7 @@ void SGBuilder::build_library() {
     library.children = chi;
 }
 
-SGFile SGBuilder::export_library() {
+sg_file_t SGBuilder::export_library() {
 
     for (auto* item: library.children) {
         // CHANGE: we disable sprite assignment here
@@ -202,22 +214,24 @@ SGFile SGBuilder::export_library() {
 //        }
 
         for (auto* child: item->children) {
-            item->node.children.push_back(child->node);
+            arr_push(item->node.children, child->node);
         }
 
         // if item should be in global registry,
         // but if it's inline sprite - it's ok to throw it away
-        if (item->node.libraryName) {
-            library.node.children.push_back(item->node);
+        if (item->node.library_name) {
+            arr_push(library.node.children, item->node);
         }
     }
 
-    for (auto& item: library.node.children) {
-        for (auto& child: item.children) {
-            const auto* ref = library.find_library_item(child.libraryName);
-            if (ref && ref->node.sprite == ref->node.libraryName && rect_is_empty(ref->node.scaleGrid)) {
-                child.sprite = ref->node.sprite;
-                child.libraryName = 0;
+    for (uint32_t i = 0, len = arr_size(library.node.children); i < len; ++i) {
+        sg_node_data_t* item = library.node.children + i;
+        for (uint32_t j = 0, len2 = arr_size(item->children); j < len2; ++j) {
+            sg_node_data_t* child = item->children + j;
+            const ExportItem* ref = library.find_library_item(child->library_name);
+            if (ref && ref->node.sprite == ref->node.library_name && rect_is_empty(ref->node.scale_grid)) {
+                child->sprite = ref->node.sprite;
+                child->library_name = 0;
             }
         }
     }
@@ -232,21 +246,25 @@ SGFile SGBuilder::export_library() {
     //     }
     // }
 
-    SGFile sg;
+    sg_file_t sg = {};
     for (auto& pair: linkages) {
-        sg.linkages.emplace_back((sg_scene_info){H(pair.first.c_str()), H(pair.second.c_str())});
+        sg_scene_info_t info;
+        info.name = H(pair.first.c_str());
+        info.linkage = H(pair.second.c_str());
+        arr_push(sg.linkages, info);
     }
     for (auto& info: doc.scenes) {
-        sg.scenes.push_back(H(info.item.c_str()));
+        string_hash_t name_hash = H(info.item.c_str());
+        arr_push(sg.scenes, name_hash);
     }
 
-    for (auto& item: library.node.children) {
-        if (item.sprite == item.libraryName
-            && rect_is_empty(item.scaleGrid)
-            && !isInLinkages(item.libraryName)) {
+    arr_for(item, library.node.children) {
+        if (item->sprite == item->library_name &&
+            rect_is_empty(item->scale_grid) &&
+            !isInLinkages(item->library_name)) {
             continue;
         }
-        sg.library.push_back(item);
+        arr_push(sg.library, *item);
     }
 
     return sg;
@@ -259,9 +277,17 @@ void SGBuilder::process_symbol_instance(const Element& el, ExportItem* parent, p
     item->ref = &el;
     process_transform(el, *item);
     item->node.name = H(el.item.name.c_str());
-    item->node.libraryName = H(el.libraryItemName.c_str());
-    item->node.button = el.symbolType == SymbolType::button;
-    item->node.touchable = !el.silent;
+    item->node.library_name = H(el.libraryItemName.c_str());
+    if (el.symbolType == SymbolType::button) {
+        item->node.flags = (sg_node_flags_t) (item->node.flags | SG_NODE_BUTTON);
+    } else {
+        item->node.flags = (sg_node_flags_t) (item->node.flags & ~SG_NODE_BUTTON);
+    }
+    if (el.silent) {
+        item->node.flags = (sg_node_flags_t) (item->node.flags & ~SG_NODE_TOUCHABLE);
+    } else {
+        item->node.flags = (sg_node_flags_t) (item->node.flags | SG_NODE_TOUCHABLE);
+    }
 
     process_filters(el, *item);
 
@@ -278,7 +304,7 @@ void SGBuilder::process_bitmap_instance(const Element& el, ExportItem* parent, p
     item->ref = &el;
     process_transform(el, *item);
     item->node.name = H(el.item.name.c_str());
-    item->node.libraryName = H(el.libraryItemName.c_str());
+    item->node.library_name = H(el.libraryItemName.c_str());
 
     process_filters(el, *item);
 
@@ -291,7 +317,7 @@ void SGBuilder::process_bitmap_instance(const Element& el, ExportItem* parent, p
 void SGBuilder::process_bitmap_item(const Element& el, ExportItem* parent, processing_bag_t* bag) {
     auto* item = new ExportItem();
     item->ref = &el;
-    item->node.libraryName = H(el.item.name.c_str());
+    item->node.library_name = H(el.item.name.c_str());
     item->renderThis = true;
     item->append_to(parent);
     if (bag) {
@@ -322,9 +348,9 @@ void SGBuilder::process_symbol_item(const Element& el, ExportItem* parent, proce
     auto* item = new ExportItem();
     item->ref = &el;
     process_transform(el, *item);
-    item->node.libraryName = H(el.item.name.c_str());
+    item->node.library_name = H(el.item.name.c_str());
     EK_ASSERT(el.libraryItemName.empty());
-    item->node.scaleGrid = el.scaleGrid;
+    item->node.scale_grid = el.scaleGrid;
 
     collectFramesMetaInfo(doc, *item);
 
@@ -422,7 +448,7 @@ ExportItem* SGBuilder::addElementToDrawingLayer(ExportItem* item, const Element&
 
     auto* layer = new ExportItem();
     layer->ref = shapeItem.get();
-    layer->node.libraryName = H(shapeName);
+    layer->node.library_name = H(shapeName);
     layer->renderThis = true;
     layer->animationSpan0 = _animationSpan0;
     layer->animationSpan1 = _animationSpan1;
@@ -499,8 +525,8 @@ void SGBuilder::render(const ExportItem& item, image_set_t* toImageSet) const {
         // copy string: res.name = spriteID.c_str();
         arr_init_from((void**) &res.name, 1, spriteID.c_str(), spriteID.size() + 1);
 
-        res.trim = rect_is_empty(item.node.scaleGrid);
-        arr_push(&resolution.sprites, sprite_data_t, res);
+        res.trim = rect_is_empty(item.node.scale_grid);
+        arr_push(resolution.sprites, res);
     }
 }
 
@@ -510,7 +536,7 @@ void SGBuilder::build_sprites(image_set_t* toImageSet) const {
             item->node.sprite = H(item->ref->item.name.c_str());
             render(*item, toImageSet);
         }
-        if (!rect_is_empty(item->node.scaleGrid)) {
+        if (!rect_is_empty(item->node.scale_grid)) {
 
         }
     }
@@ -525,19 +551,8 @@ bool SGBuilder::isInLinkages(const string_hash_t id) const {
     return false;
 }
 
-SGMovieLayerData* findTargetLayer(SGMovieData& movie, const SGNodeData* item) {
-    for (auto& layer: movie.layers) {
-        for (const auto* t: layer.targets) {
-            if (t == item) {
-                return &layer;
-            }
-        }
-    }
-    return nullptr;
-}
-
 void SGBuilder::processTimeline(const Element& el, ExportItem* item) {
-    auto& movie = item->node.movie.emplace_back();
+    sg_movie_t movie = {};
     movie.frames = el.timeline.getTotalFrames();
     movie.fps = doc.info.frameRate;
 
@@ -574,8 +589,8 @@ void SGBuilder::processTimeline(const Element& el, ExportItem* item) {
                     process(frameElement, item, &targets);
                 }
             }
-            const auto k0 = createFrameModel(frame);
-            sg_keyframe_transform delta = {0};
+            const sg_movie_frame_t k0 = createFrameModel(frame);
+            sg_keyframe_transform_t delta = {};
             bool has_delta = false;
             if (k0.motion_type == 1
                 && !frame.elements.empty()
@@ -590,56 +605,65 @@ void SGBuilder::processTimeline(const Element& el, ExportItem* item) {
             }
             for (auto* target: targets.list) {
                 if (target->ref) {
-                    auto* targetNodeRef = &target->node;
-                    SGMovieLayerData* targetLayer = nullptr;
+                    sg_node_data_t* targetNodeRef = &target->node;
+                    sg_movie_layer_t* targetLayer = nullptr;
                     if (!target->movieLayerIsLinked) {
-                        targetLayer = &movie.layers.emplace_back();
-                        targetLayer->targets.push_back(targetNodeRef);
+                        sg_movie_layer_t newLayer = {};
+                        arr_push(newLayer.targets, targetNodeRef);
+                        arr_push(movie.layers, newLayer);
+                        targetLayer = movie.layers + arr_size(movie.layers) - 1;
                         target->fromLayer = layerIndex;
                         target->movieLayerIsLinked = true;
                     } else {
-                        targetLayer = findTargetLayer(movie, targetNodeRef);
+                        targetLayer = find_target_layer(&movie, targetNodeRef);
                         EK_ASSERT(targetLayer);
                     }
 
-                    auto kf0 = createFrameModel(frame);
+                    sg_movie_frame_t kf0 = createFrameModel(frame);
                     setupFrameFromElement(kf0, *target->ref);
-                    targetLayer->frames.push_back(kf0);
+                    arr_push(targetLayer->frames, kf0);
                     if (has_delta) {
-                        SGMovieFrameData kf1{};
+                        sg_movie_frame_t kf1 = {};
+                        kf1.easing = nullptr;
                         kf1.index = kf0.index + kf0.duration;
-                        kf1.duration = 0;
+                        //kf1.duration = 0;
                         kf1.transform = add_keyframe_transform(&kf0.transform, &delta);
-                        kf1.visible = false;
-                        targetLayer->frames.push_back(kf1);
+                        //kf1.visible = false;
+                        arr_push(targetLayer->frames, kf1);
                     }
                 }
             }
         }
 
-        auto& movieLayers = movie.layers;
-        for (auto it = movieLayers.begin(); it != movieLayers.end();) {
-            bool empty = it->frames.empty();
-            if (it->frames.size() == 1) {
-                const auto& frame = it->frames[0];
+        for (sg_movie_layer_t* it = movie.layers, * end = arr_end(movie.layers); it != end;) {
+            uint32_t frames_num = arr_size(it->frames);
+            bool empty = frames_num == 0;
+            if (frames_num == 1) {
+                sg_movie_frame_ frame = it->frames[0];
                 if (frame.index == 0 && frame.motion_type != 2 && frame.duration == movie.frames) {
                     empty = true;
                 }
             }
             if (empty) {
-                movieLayers.eraseIterator(it);
+                arr_erase(movie.layers, it);
+                --end;
             } else {
-                it++;
+                ++it;
             }
         }
 
-        if (movie.frames > 1 && !movieLayers.empty()) {
-            for (size_t i = 0; i < movieLayers.size(); ++i) {
-                for (auto* target: movieLayers[i].targets) {
-                    target->movieTargetId = static_cast<int>(i);
+        if (movie.frames > 1 && !arr_empty(movie.layers)) {
+            uint32_t layers_count = arr_size(movie.layers);
+            for (uint32_t i = 0; i < layers_count; ++i) {
+                sg_node_data_t** targets = movie.layers[i].targets;
+                for (sg_node_data_t** it = targets, ** end = targets + arr_size(targets); it != end; ++it) {
+                    (*it)->movie_target_id = static_cast<int>(i);
                 }
             }
-            item->node.movie[0] = movie;
+            if (!item->node.movie) {
+                item->node.movie = (sg_movie_t*) malloc(sizeof(sg_movie_t));
+            }
+            *(item->node.movie) = movie;
         }
 
         _animationSpan0 = 0;

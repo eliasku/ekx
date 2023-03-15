@@ -26,7 +26,7 @@ public:
         ek_core_dbg_inc(EK_CORE_DBG_STRING);
         if (cstr && *cstr != '\0') {
             const auto sz = strlen(cstr) + 1;
-            ek_buf_set_size((void**) &_buffer, 1, sz, sz);
+            arr_reinit(_buffer, sz);
             memcpy(_buffer, cstr, sz);
         }
     }
@@ -35,7 +35,7 @@ public:
         ek_core_dbg_inc(EK_CORE_DBG_STRING);
         if (data && *data != '\0') {
             const auto sz = size + 1;
-            ek_buf_set_size((void**) &_buffer, 1, sz, sz);
+            arr_reinit(_buffer, sz);
             memcpy(_buffer, data, size);
             _buffer[size] = '\0';
         }
@@ -43,7 +43,7 @@ public:
 
     String(const String& m) noexcept: _buffer{nullptr} {
         ek_core_dbg_inc(EK_CORE_DBG_STRING);
-        arr_init_from((void**) &_buffer, 1, m._buffer, ek_buf_length(m._buffer));
+        arr_init_from((void**) &_buffer, 1, m._buffer, arr_size(m._buffer));
     }
 
     String(String&& m) noexcept: _buffer{m._buffer} {
@@ -62,13 +62,13 @@ public:
 
     String& operator=(const String& obj) {
         if (this != &obj) {
-            arr_assign((void**) &_buffer, 1, obj._buffer);
+            arr_assign_((void**) &_buffer, 1, obj._buffer);
         }
         return *this;
     }
 
     String& operator=(String&& m) noexcept {
-        ek_buf_reset((void**) &_buffer);
+        arr_reset((void**) &_buffer);
         _buffer = m._buffer;
         m._buffer = nullptr;
         return *this;
@@ -76,17 +76,17 @@ public:
 
     ~String() noexcept {
         ek_core_dbg_dec(EK_CORE_DBG_STRING);
-        ek_buf_reset((void**) &_buffer);
+        arr_reset((void**) &_buffer);
     }
 
     [[nodiscard]]
     uint32_t size() const {
-        return _buffer ? (ek_buf_length(_buffer) - 1) : 0;
+        return _buffer ? (arr_size(_buffer) - 1) : 0;
     }
 
     [[nodiscard]]
     uint32_t capacity() const {
-        return _buffer ? (ek_buf_capacity(_buffer) - 1) : 0;
+        return _buffer ? (arr_capacity(_buffer) - 1) : 0;
     }
 
     [[nodiscard]]
@@ -112,7 +112,7 @@ public:
         const auto sz2 = other.size();
         const auto sz = sz1 + sz2 + 1;
         String s;
-        ek_buf_set_size((void**) &s._buffer, 1, sz, sz);
+        arr_reinit(s._buffer, sz);
         if (sz1) {
             memcpy(s._buffer, _buffer, sz1);
         }
@@ -158,13 +158,13 @@ public:
 
     [[nodiscard]]
     constexpr uint64_t hash() const noexcept {
-        //return _buffer ? hash_murmur2_64(_buffer, ek_buf_length(_buffer), HASH_MURMUR2_64_DEFAULT_SEED) : 0;
+        //return _buffer ? hash_murmur2_64(_buffer, arr_size(_buffer), HASH_MURMUR2_64_DEFAULT_SEED) : 0;
         return _buffer ? hash_fnv64(_buffer, HASH_FNV64_INIT) : 0;
     }
 
     [[nodiscard]]
     constexpr uint32_t hash32() const noexcept {
-        //return _buffer ? hash_murmur2_64(_buffer, ek_buf_length(_buffer), HASH_MURMUR2_64_DEFAULT_SEED) : 0;
+        //return _buffer ? hash_murmur2_64(_buffer, arr_size(_buffer), HASH_MURMUR2_64_DEFAULT_SEED) : 0;
         return _buffer ? hash_fnv32(_buffer, HASH_FNV32_INIT) : 0;
     }
 
@@ -174,7 +174,7 @@ public:
 
     void reserve(uint32_t cap) {
         const auto sz = cap + 1;
-        if (sz > ek_buf_capacity(_buffer)) {
+        if (sz > arr_capacity(_buffer)) {
             ek_buf_set_capacity((void**) &_buffer, sz, 1);
         }
     }
@@ -203,10 +203,10 @@ public:
     }
 
     void push_back(char ch) {
-        if (ek_buf_full(_buffer)) {
-            ek_buf_set_capacity((void**) &_buffer, ek_buf_capacity(_buffer) + 1, 1);
+        if (arr_full(_buffer)) {
+            ek_buf_set_capacity((void**) &_buffer, arr_capacity(_buffer) + 1, 1);
         }
-        const auto len = ek_buf_length(_buffer);
+        const auto len = arr_size(_buffer);
         // replace NULL to char
         data()[len - 1] = ch;
         // set NULL to the end
@@ -218,7 +218,7 @@ public:
         const auto sz1 = size();
         const auto sz2 = other.size();
         const auto sz = sz1 + sz2 + 1;
-        ek_buf_set_size((void**) &_buffer, 1, sz, sz);
+        arr_reinit(_buffer, sz);
         if (sz2) {
             memcpy(_buffer + sz1, other._buffer, sz2 + 1);
         }

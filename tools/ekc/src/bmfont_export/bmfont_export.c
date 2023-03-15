@@ -4,14 +4,14 @@
 //#endif
 
 #include <stb/stb_image_write.h>
-#include "bmfont_export.h"
-#include "ek/buf.h"
-#include "ek/log.h"
+#include <ek/buf.h>
+#include <ek/log.h>
+#include <ek/print.h>
+#include <ek/hash.h>
+#include <ek/format/sg.h>
 
+#include "bmfont_export.h"
 #include "bmfont_export/build_bitmap_font.c.h"
-#include "ek/print.h"
-#include "ek/hash.h"
-#include "ek/format/bmfont.h"
 
 void convert_a8_to_argb32pma(uint8_t const* source_a8_buf,
                              uint32_t* dest_argb32_buf,
@@ -556,7 +556,7 @@ void save_font_bitmaps(const char* font_name, const image_set_t* images, const c
     for (uint32_t i = 0; i < images->resolutions_num; ++i) {
         const resolution_t* resolution = images->resolutions + i;
         uint32_t bitmaps_num = 0;
-        uint32_t images_len = ek_buf_length(resolution->images);
+        uint32_t images_len = arr_size(resolution->images);
         for (uint32_t ii = 0; ii < images_len; ++ii) {
             if (resolution->images[ii].bitmap.pixels) {
                 ++bitmaps_num;
@@ -624,48 +624,48 @@ int export_bitmap_font(const char* config_path) {
 
     // calculate codepoint map size
     uint32_t dictSize = 0;
-    uint32_t glyphs_num = ek_buf_length(fontData.glyphs);
+    uint32_t glyphs_num = arr_size(fontData.glyphs);
     for (uint32_t i = 0; i < glyphs_num; ++i) {
-        dictSize += ek_buf_length(fontData.glyphs[i].codepoints);
+        dictSize += arr_size(fontData.glyphs[i].codepoints);
     }
 
-    f = fopen(output_font, "wb");
-    bmfont_header hdr = {0};
-    hdr.base_font_size = fontData.fontSize;
-    hdr.line_height_multiplier = fontData.lineHeight;
-    hdr.ascender = fontData.ascender;
-    hdr.descender = fontData.descender;
-    hdr.codepoints_data_offset = (sizeof hdr);
-    hdr.codepoints_num = dictSize;
-    hdr.glyphs_data_offset = hdr.codepoints_data_offset + sizeof(uint32_t) * dictSize * 2;
-    hdr.glyphs_num = glyphs_num;
-    fwrite(&hdr, 1, sizeof hdr, f);
+    bmfont_t font = {0};
+    font.header.base_font_size = fontData.fontSize;
+    font.header.line_height_multiplier = fontData.lineHeight;
+    font.header.ascender = fontData.ascender;
+    font.header.descender = fontData.descender;
 
+    bmfont_entry_t entry = {0};
     // codepoints map
-    for (uint32_t i = 0; i < glyphs_num; ++i) {
-        const glyph_t* glyph = fontData.glyphs + i;
+    arr_for(glyph, fontData.glyphs) {
+        ++entry.glyph_index;
         // pair<u32, u32>
-        const uint32_t codepoints_num = ek_buf_length(glyph->codepoints);
-        for (uint32_t ci = 0; ci < codepoints_num; ++ci) {
-            uint32_t cp = glyph->codepoints[ci];
-            fwrite(&cp, 1, sizeof(uint32_t), f);
-            fwrite(&i, 1, sizeof(uint32_t), f);
+        arr_for(codepoint, glyph->codepoints) {
+            entry.codepoint = codepoint;
+            arr_push(font.dict, entry);
         }
     }
 
     char sprite_name[1024];
-
     // glyphs
-    for (uint32_t i = 0; i < glyphs_num; ++i) {
-        const glyph_t* glyph = fontData.glyphs + i;
-        fwrite(&glyph->box, 1, sizeof glyph->box, f);
-        fwrite(&glyph->advance_x, 1, sizeof(float), f);
+    arr_for(glyph, fontData.glyphs) {
         ek_snprintf(sprite_name, sizeof sprite_name, "%s%u", font_name, glyph->glyph_index);
-        const uint32_t hashed_name = H(sprite_name);
-        fwrite(&hashed_name, 1, sizeof(uint32_t), f);
+        bmfont_glyph_t glyph_data = (bmfont_glyph_t){
+                .box = glyph->box,
+                .advance_x = glyph->advance_x,
+                .sprite = H(sprite_name),
+        };
+        arr_push(font.glyphs, glyph_data);
     }
 
-    fclose(f);
+    {
+        f = fopen(output_font, "wb");
+        calo_writer_t w = new_writer(100);
+        write_stream_bmfont(&w, font);
+        fwrite_calo(f, &w);
+        free_writer(&w);
+        fclose(f);
+    }
 
     return 0;
 }

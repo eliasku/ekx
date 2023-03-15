@@ -1,5 +1,6 @@
 #include "Asset_impl.hpp"
 
+#include <ek/serialize/serialize.hpp>
 #include <ek/ds/String.hpp>
 #include <ek/log.h>
 #include <ek/assert.h>
@@ -13,10 +14,8 @@
 
 #include <ek/format/image_data.h>
 #include <ek/scenex/SceneFactory.hpp>
-#include <ek/format/SGFile.hpp>
 #include <ek/scenex/2d/Atlas.hpp>
 #include <ek/scenex/3d/StaticMesh.hpp>
-#include <ek/format/model3d.h>
 
 #include <ek/scenex/text/Font.hpp>
 #include <ek/scenex/text/TrueTypeFont.hpp>
@@ -204,7 +203,7 @@ public:
                           [](ek_local_res* lr) {
                               SceneAsset* this_ = (SceneAsset*) lr->userdata;
                               if (ek_local_res_success(lr)) {
-                                  SGFile* file = &REF_RESOLVE(res_sg, this_->res);
+                                  sg_file_t* file = &REF_RESOLVE(res_sg, this_->res);
                                   sg_load(file, lr->buffer, (uint32_t) lr->length);
                               }
                               ek_local_res_close(lr);
@@ -213,10 +212,10 @@ public:
     }
 
     void do_unload() override {
-        SGFile* file = &REF_RESOLVE(res_sg, res);
-        file->library.clear();
-        file->linkages.clear();
-        file->scenes.clear();
+        sg_file_t* file = &REF_RESOLVE(res_sg, res);
+        arr_reset((void**)&file->library);
+        arr_reset((void**)&file->linkages);
+        arr_reset((void**)&file->scenes);
     }
 
     R(SGFile) res;
@@ -413,18 +412,10 @@ public:
                 [](ek_local_res* lr) {
                     ModelAsset* this_ = (ModelAsset*) lr->userdata;
                     if (ek_local_res_success(lr)) {
-                        model3d_t model = {0};
-                        input_memory_stream input{lr->buffer, lr->length};
-                        IO io{input};
-                        uint32_t vertices_count = 0;
-                        uint32_t indices_count = 0;
-                        io(vertices_count);
-                        ek_buf_set_size((void**)&model.vertices, sizeof(model3d_vertex_t), vertices_count, vertices_count);
-                        io.span(model.vertices, vertices_count * sizeof(model3d_vertex_t));
-                        io(indices_count);
-                        ek_buf_set_size((void**)&model.indices, sizeof(uint16_t), indices_count, indices_count);
-                        io.span(model.indices, indices_count * sizeof(uint16_t));
-
+                        calo_reader_t reader = {0};
+                        reader.p = lr->buffer;
+                        read_calo(&reader);
+                        model3d_t model = read_stream_model3d(&reader);
                         RES_NAME_RESOLVE(res_mesh3d, H(this_->name_.c_str())) = new StaticMesh(model);
                         ek_local_res_close(lr);
                     } else {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ecx/ecx_fwd.hpp>
-#include <ek/format/SGFile.hpp>
+#include <ek/format/sg.h>
 #include <ek/scenex/SceneFactory.hpp>
 
 #include <ek/ds/String.hpp>
@@ -10,7 +10,7 @@
 namespace ek {
 
 struct MovieClip {
-    const SGMovieData* data = nullptr;
+    const sg_movie_t* data = nullptr;
     float time = 0.0f;
     float fps = 24.0f;
     TimeLayer timer = 0;

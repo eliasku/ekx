@@ -28,6 +28,7 @@ target_link_libraries(${PROJECT_NAME}
         PUBLIC freetype
         PUBLIC ekx::std
         PUBLIC ekx::sg-file
+        PUBLIC calo
         )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

@@ -7,7 +7,6 @@
 #include <ek/string.c>
 #include <ek/time.c>
 #include <ek/utf8.c>
-#include <ek/io.c>
 #include <ek/rnd.c>
 #include <ek/ids.c>
 #include <ek/math.c>

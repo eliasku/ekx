@@ -3,7 +3,7 @@
 
 #include <ek/log.h>
 #include <ek/math.h>
-#include <ek/format/model3d.h>
+#include <ek/format/sg.h>
 
 typedef model3d_vertex_t vertex3d_t;
 
@@ -57,11 +57,14 @@ int convertObjModel(const char* input, const char* output) {
 
         fast_obj_destroy(mesh);
 
+        calo_writer_t writer = new_writer(100);
+        write_u32(&writer, verticesCount);
+        write_span(&writer, vertices, sizeof(vertex3d_t) * verticesCount);
+        write_u32(&writer, indicesCount);
+        write_span(&writer, indices, sizeof(uint16_t) * indicesCount);
+
         FILE* f = fopen(output, "wb");
-        fwrite(&verticesCount, 1, sizeof verticesCount, f);
-        fwrite(vertices, 1, sizeof(vertex3d_t) * verticesCount, f);
-        fwrite(&indicesCount, 1, sizeof indicesCount, f);
-        fwrite(indices, 1, sizeof(uint16_t) * indicesCount, f);
+        fwrite_calo(f, &writer);
         fclose(f);
 
         free(vertices);

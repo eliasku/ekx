@@ -172,16 +172,19 @@ public class GameServices extends EkPlugin {
 
     @Keep
     public static void achievement_update(final String achievement_id, final int increment) {
-        if (_instance._achievements != null) {
-            if (increment > 0) {
-                Log.d(TAG, "increment achievement");
-                _instance._achievements.increment(achievement_id, increment);
-            } else {
-                Log.d(TAG, "unlock achievement");
-                _instance._achievements.unlock(achievement_id);
-            }
-        } else {
+        if (_instance._achievements == null) {
             Log.d(TAG, "[achievement_update] not ready");
+            return;
+        }
+        if (achievement_id == null) {
+            return;
+        }
+        if (increment > 0) {
+            Log.d(TAG, "increment achievement");
+            _instance._achievements.increment(achievement_id, increment);
+        } else {
+            Log.d(TAG, "unlock achievement");
+            _instance._achievements.unlock(achievement_id);
         }
     }
 

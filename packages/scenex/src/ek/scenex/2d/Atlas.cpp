@@ -2,13 +2,10 @@
 #include "Sprite.hpp"
 
 #include <ek/log.h>
-
-#include <ek/serialize/serialize.hpp>
-#include <ek/ds/String.hpp>
-#include <ek/ds/PodArray.hpp>
 #include <ek/local_res.h>
 #include <ek/gfx.h>
 #include <ek/print.h>
+#include <ek/format/dto.h>
 
 struct res_atlas res_atlas;
 
@@ -32,55 +29,6 @@ void update_res_atlas(void) {
     }
 }
 
-
-namespace ek {
-
-/**** DTO *****/
-struct SpriteInfo {
-    enum Flags {
-        Rotated = 1u
-    };
-
-    string_hash_t name;
-
-    // flags in atlas image
-    uint32_t flags;
-
-    // physical rect
-    rect_t rc;
-
-    // coords in atlas image
-    rect_t uv;
-
-    [[nodiscard]]
-    inline bool isRotated() const {
-        return (flags & Rotated) != 0;
-    }
-};
-
-template<> struct declared_as_pod_type<SpriteInfo> : public std::true_type {};
-
-struct AtlasPageInfo {
-    uint16_t width;
-    uint16_t height;
-    String imagePath;
-    PodArray<SpriteInfo> sprites;
-
-    template<typename S>
-    void serialize(IO<S>& io) {
-        io(width, height, imagePath, sprites);
-    }
-};
-
-struct AtlasInfo {
-    Array<AtlasPageInfo> pages;
-
-    template<typename S>
-    void serialize(IO<S>& io) {
-        io(pages);
-    }
-};
-
 int get_scale_num(float scale) {
     if (scale <= 1.0f) {
         return 1;
@@ -92,6 +40,8 @@ int get_scale_num(float scale) {
     return 4;
 }
 
+namespace ek {
+
 Atlas::Atlas() = default;
 
 Atlas::~Atlas() {
@@ -102,57 +52,52 @@ void load_atlas_meta(Atlas* atlas, ek_local_res* lr) {
     log_debug("Decoding Atlas META");
     log_debug("Atlas Base Path: %s", atlas->base_path.c_str());
 
-    input_memory_stream input{lr->buffer, lr->length};
-    IO io{input};
-
     // header
-    AtlasInfo atlasInfo{};
-    io(atlasInfo);
+    calo_reader_t reader = {0};
+    reader.p = lr->buffer;
+    read_calo(&reader);
+    atlas_info_t atlas_info = read_stream_atlas_info(&reader);
 
     for (auto* loader: atlas->loaders) {
         ek_texture_loader_destroy(loader);
     }
     atlas->loaders.clear();
 
-    for (const auto& page: atlasInfo.pages) {
-        auto image_asset = R_IMAGE(H(page.imagePath.c_str()));
+    arr_for(page, atlas_info.pages) {
+        res_id image_asset = R_IMAGE(H(page->image_path));
 
         sg_image* image = &REF_RESOLVE(res_image, image_asset);
         if (image->id) {
-            log_debug("Destroy old page image %s", page.imagePath.c_str());
+            log_debug("Destroy old page image %s", page->image_path);
             sg_destroy_image(*image);
             *image = {SG_INVALID_ID};
         }
 
         atlas->pages.push_back(image_asset);
         atlas->loaders.emplace_back(ek_texture_loader_create());
-        for (auto& spr_data: page.sprites) {
-            auto ref = R_SPRITE(spr_data.name);
+        arr_for(spr, page->sprites) {
+            res_id ref = R_SPRITE(spr->name);
             atlas->sprites.push_back(ref);
 
-            auto* sprite = &REF_RESOLVE(res_sprite, ref);
-//            EK_ASSERT(!(sprite->state & SPRITE_LOADED));
-            sprite->state = SPRITE_LOADED;
-            if(spr_data.flags & SpriteInfo::Rotated) {
-                sprite->state |= SPRITE_ROTATED;
-            }
+            sprite_t* sprite = &REF_RESOLVE(res_sprite, ref);
+            EK_ASSERT((sprite->state & SPRITE_LOADED) == 0);
+            sprite->state = spr->flags | SPRITE_LOADED;
             sprite->image_id = image_asset;
-            sprite->rect = spr_data.rc;
-            sprite->tex = spr_data.uv;
+            sprite->rect = spr->rc;
+            sprite->tex = spr->uv;
         }
     }
 
-    for (uint32_t i = 0; i < atlasInfo.pages.size(); ++i) {
-        const auto& pageInfo = atlasInfo.pages[i];
-        const auto& pageImagePath = pageInfo.imagePath;
+    arr_for(page, atlas_info.pages) {
+        const char* page_image_path = page->image_path;
+        log_debug("Load atlas page %s/%s", atlas->base_path.c_str(), page_image_path);
 
-        log_debug("Load atlas page %s/%s", atlas->base_path.c_str(), pageImagePath.c_str());
-
-        auto* loader = atlas->loaders[i];
+        const uint32_t index = page - atlas_info.pages;
+        ek_texture_loader* loader = atlas->loaders[index];
         loader->formatMask = atlas->formatMask;
         ek_texture_loader_set_path(&loader->basePath, atlas->base_path.c_str());
         loader->imagesToLoad = 1;
-        ek_texture_loader_set_path(&loader->urls[0], pageImagePath.c_str());
+        ek_texture_loader_set_path(&loader->urls[0], page_image_path);
         ek_texture_loader_load(loader);
     }
 }

@@ -36,7 +36,7 @@
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 
-#elif defined (__APPLE__)
+#elif defined(__APPLE__)
 
 #define SOKOL_METAL
 

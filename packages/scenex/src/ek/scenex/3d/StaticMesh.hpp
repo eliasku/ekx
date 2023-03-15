@@ -1,10 +1,9 @@
 #pragma once
 
 #include "Material3D.hpp"
-#include <ek/ds/Array.hpp>
-#include <ek/ds/String.hpp>
 #include <ek/gfx.h>
-#include <ek/format/model3d.h>
+#include <ek/format/sg.h>
+#include <ek/buf.h>
 
 namespace ek {
 
@@ -19,11 +18,11 @@ struct StaticMesh {
         desc.usage = SG_USAGE_IMMUTABLE;
         desc.type = SG_BUFFERTYPE_VERTEXBUFFER;
         desc.data.ptr = model.vertices;
-        desc.data.size = ek_buf_length(model.vertices) * sizeof(model3d_vertex_t);
+        desc.data.size = arr_size(model.vertices) * sizeof(model3d_vertex_t);
         vb = sg_make_buffer(&desc);
         EK_ASSERT(vb.id != 0);
 
-        uint32_t num_indices = ek_buf_length(model.indices);
+        uint32_t num_indices = arr_size(model.indices);
         desc.usage = SG_USAGE_IMMUTABLE;
         desc.type = SG_BUFFERTYPE_INDEXBUFFER;
         //desc.size = model.indices.size() * sizeof(uint16_t);
@@ -36,8 +35,8 @@ struct StaticMesh {
     }
 
 //    ~StaticMesh() {
-//        ek_buf_reset(&origin.vertices);
-//        ek_buf_reset(&origin.indices);
+//        arr_reset(&origin.vertices);
+//        arr_reset(&origin.indices);
             // TODO: dispose buffers,
 //    }
 };

@@ -16,15 +16,17 @@ typedef struct ek_buf_header_t {
 
 ek_buf_header_t* ek_buf_header(const void* ptr);
 
-uint32_t ek_buf_capacity(const void* ptr);
+uint32_t arr_capacity(const void* ptr);
 
-uint32_t ek_buf_length(const void* ptr);
+uint32_t arr_size(const void* ptr);
 
-bool ek_buf_full(const void* ptr);
+bool arr_full(const void* ptr);
 
-bool ek_buf_empty(const void* ptr);
+bool arr_empty(const void* ptr);
 
-void ek_buf_reset(void** ptr);
+void arr_reset(void** ptr);
+
+#define arr_reinit(arr, size) ek_buf_set_size((void**)&(arr), sizeof (arr)[0], size, size)
 
 void ek_buf_set_capacity(void** ptr, uint32_t newCapacity, uint32_t elementSize);
 
@@ -47,15 +49,19 @@ void arr_maybe_grow(void** p_arr, uint32_t element_size);
 
 void* arr_push_mem(void** p_arr, uint32_t element_size, const void* src);
 
-void arr_assign(void** p_arr, uint32_t element_size, void* src_arr);
+void arr_assign_(void** p_arr, uint32_t element_size, const void* src_arr);
 
-void arr_remove(void* arr, uint32_t element_size, uint32_t at);
+#define arr_assign(arr_dest, arr_src) arr_assign_((void**)&(arr_dest), sizeof (arr_dest)[0], (void*)src_arr)
 
-void arr_swap_remove(void* arr, uint32_t element_size, uint32_t at);
+void arr_swap_remove_(void* arr, uint32_t element_size, uint32_t at);
 
 void* arr_search(void* arr, uint32_t element_size, const void* el);
 
 void arr_pop(void* arr);
+
+void arr_erase_(void* arr, const void* it, uint32_t element_size, uint32_t count);
+#define arr_erase(arr, ptr) arr_erase_(arr, it, sizeof *(arr), 1)
+#define arr_erase_at(arr, index) arr_erase_(arr, (arr) + (index), sizeof *(arr), 1)
 
 /**
  * internal function ensure we have space for one more element in array
@@ -65,7 +71,13 @@ void arr_pop(void* arr);
  */
 void* arr_add_(void** p_arr, uint32_t element_size);
 
-#define arr_push(p_arr, T, el) (*((T*)arr_add_((void**)(p_arr), sizeof(T))) = (el))
+#define arr_push_(p_arr, T, el) (*((T*)arr_add_((void**)(p_arr), sizeof(T))) = (el))
+#define arr_push(arr, el) ((__typeof__ (arr))arr_add_((void**)&(arr), sizeof (arr)[0]))[0] = (el)
+#define arr_begin(arr) (arr)
+#define arr_end(arr) ((arr) + arr_size(arr))
+
+#define arr_for_block_(arr, Type, It, End) for(Type * It = (arr), * End = (arr) + arr_size(arr); It != End; ++It)
+#define arr_for(Var, InArray) arr_for_block_(InArray, __typeof__(*InArray), Var, Var ## _end)
 
 void* _check_ptr_alignment(void* ptr, uint32_t width);
 

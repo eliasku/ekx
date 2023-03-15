@@ -12,17 +12,17 @@ ek_buf_header_t* ek_buf_header(const void* ptr) {
     return ((ek_buf_header_t*) ptr) - 1;
 }
 
-uint32_t ek_buf_capacity(const void* ptr) {
+uint32_t arr_capacity(const void* ptr) {
     // TODO: add test for empty array
     return ptr ? ek_buf_header(ptr)->capacity : 0;
 }
 
-uint32_t ek_buf_length(const void* ptr) {
+uint32_t arr_size(const void* ptr) {
     // TODO: add test for empty array
     return ptr ? ek_buf_header(ptr)->length : 0;
 }
 
-bool ek_buf_full(const void* ptr) {
+bool arr_full(const void* ptr) {
     // TODO: add test for empty array
     if (ptr) {
         const ek_buf_header_t* hdr = ek_buf_header(ptr);
@@ -31,11 +31,11 @@ bool ek_buf_full(const void* ptr) {
     return true;
 }
 
-bool ek_buf_empty(const void* ptr) {
-    return !ptr || !ek_buf_length(ptr);
+bool arr_empty(const void* ptr) {
+    return !ptr || !arr_size(ptr);
 }
 
-void ek_buf_reset(void** ptr) {
+void arr_reset(void** ptr) {
     if (*ptr) {
         // destroy buffer content
         ek_buf_header_t* hdr = ek_buf_header(*ptr);
@@ -47,7 +47,7 @@ void ek_buf_reset(void** ptr) {
 void ek_buf_set_capacity(void** ptr, uint32_t newCapacity, uint32_t elementSize) {
     // delete case
     if (newCapacity == 0) {
-        ek_buf_reset(ptr);
+        arr_reset(ptr);
         return;
     }
     ek_buf_header_t* prevHeader = *ptr ? ek_buf_header(*ptr) : 0;
@@ -67,7 +67,7 @@ void ek_buf_set_capacity(void** ptr, uint32_t newCapacity, uint32_t elementSize)
 }
 
 void ek_buf_set_size(void** buf, uint32_t element_size, uint32_t len, uint32_t cap) {
-    if(ek_buf_capacity(*buf) < cap) {
+    if (arr_capacity(*buf) < cap) {
         ek_buf_set_capacity(buf, cap, element_size);
     }
     if (*buf) {
@@ -112,7 +112,7 @@ void arr_init_from(void** arr, uint32_t element_size, const void* src, uint32_t 
 }
 
 void arr_resize(void** p_arr, uint32_t element_size, uint32_t new_len) {
-    const uint32_t cap = ek_buf_capacity(*p_arr);
+    const uint32_t cap = arr_capacity(*p_arr);
     if (new_len > cap) {
         arr_grow(p_arr, new_len, element_size);
     }
@@ -123,19 +123,19 @@ void arr_resize(void** p_arr, uint32_t element_size, uint32_t new_len) {
 
 void arr_grow(void** arr, uint32_t capacity, uint32_t element_size) {
     EK_ASSERT_R2(capacity != 0);
-    const uint32_t sz = ek_buf_length(*arr);
+    const uint32_t sz = arr_size(*arr);
 
     void* new_buffer = 0;
     ek_buf_set_size(&new_buffer, element_size, sz, capacity);
     memcpy(new_buffer, *arr, sz * element_size);
 
-    ek_buf_reset(arr);
+    arr_reset(arr);
     *arr = new_buffer;
 }
 
 void arr_maybe_grow(void** arr, uint32_t element_size) {
-    if (ek_buf_full(*arr)) {
-        arr_grow(arr, *arr ? (ek_buf_capacity(*arr) << 1) : 1, element_size);
+    if (arr_full(*arr)) {
+        arr_grow(arr, *arr ? (arr_capacity(*arr) << 1) : 1, element_size);
     }
 }
 
@@ -146,12 +146,12 @@ void* arr_push_mem(void** p_arr, uint32_t element_size, const void* src) {
     return slot;
 }
 
-void arr_assign(void** p_arr, uint32_t element_size, void* src_arr) {
-    const uint32_t other_size = ek_buf_length(src_arr);
+void arr_assign_(void** p_arr, uint32_t element_size, const void* src_arr) {
+    const uint32_t other_size = arr_size(src_arr);
     if (other_size) {
-        if (ek_buf_capacity(*p_arr) < other_size) {
+        if (arr_capacity(*p_arr) < other_size) {
             // grow buffer
-            ek_buf_set_capacity(p_arr, ek_buf_capacity(src_arr), element_size);
+            ek_buf_set_capacity(p_arr, arr_capacity(src_arr), element_size);
         }
         if (*p_arr) {
             memcpy(*p_arr, src_arr, other_size * element_size);
@@ -162,20 +162,7 @@ void arr_assign(void** p_arr, uint32_t element_size, void* src_arr) {
     }
 }
 
-void arr_remove(void* arr, uint32_t element_size, uint32_t at) {
-    EK_ASSERT(arr);
-    ek_buf_header_t* hdr = ek_buf_header(arr);
-    EK_ASSERT(at < hdr->length);
-    // [A, A, A, X, B, B]
-    // [A, A, A, B, B]
-    --hdr->length;
-    if (at != hdr->length) {
-        void* p = (char*) arr + at * element_size;
-        memmove(p, p + element_size, element_size * (hdr->length - at));
-    }
-}
-
-void arr_swap_remove(void* arr, uint32_t element_size, uint32_t at) {
+void arr_swap_remove_(void* arr, uint32_t element_size, uint32_t at) {
     EK_ASSERT(arr);
     ek_buf_header_t* hdr = ek_buf_header(arr);
     EK_ASSERT(at < hdr->length);
@@ -191,12 +178,12 @@ void arr_swap_remove(void* arr, uint32_t element_size, uint32_t at) {
 void* arr_search(void* arr, uint32_t element_size, const void* el) {
     EK_ASSERT(el);
     EK_ASSERT(element_size);
-    if(arr) {
+    if (arr) {
         const ek_buf_header_t* hdr = ek_buf_header(arr);
         const uint32_t len = hdr->length;
-        char* ptr = (char*)arr;
-        for(uint32_t i = 0; i < len; ++i) {
-            if(memcmp(ptr, el, element_size) == 0) {
+        char* ptr = (char*) arr;
+        for (uint32_t i = 0; i < len; ++i) {
+            if (memcmp(ptr, el, element_size) == 0) {
                 return ptr;
             }
         }
@@ -209,6 +196,19 @@ void arr_pop(void* arr) {
     ek_buf_header_t* hdr = ek_buf_header(arr);
     EK_ASSERT_R2(hdr->length);
     --hdr->length;
+}
+
+void arr_erase_(void* arr, const void* it, uint32_t element_size, uint32_t count) {
+    if (arr) {
+        ek_buf_header_t* hdr = ek_buf_header(arr);
+        const char* end = (char*) arr + hdr->length * element_size;
+        const char* next = (char*) it + element_size * count;
+        EK_ASSERT(next <= end);
+        if (next < end) {
+            memmove((void*) it, next, end - next);
+        }
+        hdr->length -= count;
+    }
 }
 
 void* arr_add_(void** p_arr, uint32_t element_size) {
