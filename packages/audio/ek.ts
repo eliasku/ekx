@@ -21,7 +21,8 @@ export async function setup(project: Project) {
             },
         }
     });
-    await project.importModule("../auph/ek.ts");
-    await project.importModule("../std/ek.ts");
-    await project.importModule("../app/ek.ts");
+    await project.import(
+        "../auph/ek.ts",
+        "../app/ek.ts",
+    );
 }

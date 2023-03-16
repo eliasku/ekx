@@ -4,7 +4,7 @@ import {BumpVersionFlag, SemVer} from "./version.js";
 import {resolveFrom} from "./utility/resolveFrom.js";
 import {ModuleDef, validateModuleDef} from "./module.js";
 import {logger} from "./logger.js";
-import {ensureDirSync, getModuleDir, readTextFileSync, writeTextFileSync} from "../utils/utils.js";
+import {ensureDirSync, getModuleDir, readJSONFileSync, writeTextFileSync} from "../utils/utils.js";
 
 const __dirname = getModuleDir(import.meta);
 
@@ -162,6 +162,12 @@ export class Project {
         }
     }
 
+    async import(...modules: string[]): Promise<void> {
+        for (const module of modules) {
+            await this.importModule(module);
+        }
+    }
+
     async runBuildSteps() {
         for (const step of this.build_steps) {
             const res = step();
@@ -173,7 +179,7 @@ export class Project {
 
     constructor() {
         try {
-            this.projectPkg = JSON.parse(readTextFileSync(path.join(this.projectPath, "package.json")));
+            this.projectPkg = readJSONFileSync(path.join(this.projectPath, "package.json"));
         } catch {
             logger.warn("Unable to read project's package.json file");
             this.projectPkg = {};

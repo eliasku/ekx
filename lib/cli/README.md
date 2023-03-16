@@ -1,11 +1,5 @@
 # Command-line manager tool 
 
-### iOS
-
-```
-pip3 install pbxproj
-```
-
 ## Script
 
 ### Build WebAssembly

@@ -6,5 +6,5 @@ export async function setup(project: Project) {
         cpp: "src",
         cpp_include: "include",
     });
-    await project.importModule("../std/ek.ts");
+    await project.import("../std/ek.ts");
 }

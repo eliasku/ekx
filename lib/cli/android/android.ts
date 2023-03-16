@@ -14,7 +14,14 @@ import {CMakeGenerateProject, CMakeGenerateTarget, cmakeLists} from "../../cmake
 import {logger} from "../logger.js";
 import {AndroidProjGen, openAndroidStudioProject} from "../../android-proj/index.js";
 import {buildAppIconAsync} from "../appicon/appicon.js";
-import {callInDirSync, ensureDirSync, readTextFileSync, rm, run, writeTextFileSync} from "../../utils/utils.js";
+import {
+    callInDirSync,
+    ensureDirSync,
+    readJSONFileSync,
+    rm,
+    run,
+    writeTextFileSync
+} from "../../utils/utils.js";
 
 const platforms = ["android"];
 
@@ -264,8 +271,7 @@ export async function export_android(ctx: Project): Promise<void> {
         appAndroid.namespace_ = ctx.android.package_id;
 
         if (signingConfigsPath) {
-            const signingConfigsJson = readTextFileSync(signingConfigsPath);
-            let signingConfigs = JSON.parse(signingConfigsJson) as { [name: string]: any };
+            const signingConfigs = readJSONFileSync(signingConfigsPath);
             for (const name of Object.keys(signingConfigs)) {
                 const config = signingConfigs[name];
                 if (config) {

@@ -635,15 +635,17 @@ int export_bitmap_font(const char* config_path) {
     font.header.ascender = fontData.ascender;
     font.header.descender = fontData.descender;
 
-    bmfont_entry_t entry = {0};
+
     // codepoints map
+    uint32_t glyph_i = 0;
     arr_for(glyph, fontData.glyphs) {
-        ++entry.glyph_index;
-        // pair<u32, u32>
         arr_for(codepoint, glyph->codepoints) {
-            entry.codepoint = codepoint;
+            bmfont_entry_t entry = {0};
+            entry.codepoint = *codepoint;
+            entry.glyph_index = glyph_i;
             arr_push(font.dict, entry);
         }
+        ++glyph_i;
     }
 
     char sprite_name[1024];

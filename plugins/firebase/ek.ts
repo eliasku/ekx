@@ -25,7 +25,7 @@ export async function setup(project: Project) {
             const configPath = path.join(path.resolve(project.projectPath, project.ios.googleServicesConfigDir), configFile);
             try {
                 // CWD is project generated path here
-                copyFileSync(configPath, configFile)
+                copyFileSync(configPath, configFile);
             } catch (err) {
                 logger.error("missing google-service config", configPath, err);
             }
@@ -77,9 +77,15 @@ export async function setup(project: Project) {
             ]
         },
         ios: {
-            xcode_pod: [
+            podfile_pod: [
                 "Firebase/Crashlytics",
                 "Firebase/Analytics"
+            ],
+            podfile_code: [
+                `script_phase name: 'Run Firebase Crashlytics',
+        shell_path: '/bin/sh',
+        script: '"\${PODS_ROOT}/FirebaseCrashlytics/run"',
+        input_files: ['$(SRCROOT)/$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)','\${DWARF_DSYM_FOLDER_PATH}/\${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/\${TARGET_NAME}']`
             ],
             cpp_flags: {
                 files: [
@@ -90,14 +96,6 @@ export async function setup(project: Project) {
             xcode_file: [
                 "GoogleService-Info.plist"
             ],
-            xcode_projectPythonPostScript: `
-# Fabric / Crashlytics
-shell = PBXShellScriptBuildPhase.create(
-    "\${PODS_ROOT}/FirebaseCrashlytics/run",
-    input_paths=["$(SRCROOT)/$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)"]
-)
-project.objects[shell.get_id()] = shell
-app_target.add_build_phase(shell)`
         },
         web: {
             js: "js/lib",
@@ -105,5 +103,5 @@ app_target.add_build_phase(shell)`
         }
     });
 
-    await project.importModule("../../packages/app/ek.ts");
+    await project.import("../../packages/app/ek.ts");
 }

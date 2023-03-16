@@ -43,5 +43,5 @@ export async function setup(project: Project) {
         image: "https://play-ilj.web.app/icons/icon192.png"
     };
 
-    await project.importModule("ekx/packages/graphics/ek.ts");
+    await project.import("ekx/packages/graphics/ek.ts");
 }

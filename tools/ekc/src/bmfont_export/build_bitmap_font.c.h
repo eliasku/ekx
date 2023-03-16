@@ -198,7 +198,7 @@ glyph_t build_glyph_data(FT_Face face, uint32_t glyph_index) {
     const float inv_units_per_em = 1.0f / units_per_em;
 
     glyph_t data = {0};
-    data.advance_x = inv_units_per_em * advance_x;
+    data.advance_x = inv_units_per_em * (float)advance_x;
     const float l = (float) box[0];
     const float t = (float) -box[3];
     const float r = (float) box[2];
@@ -324,12 +324,12 @@ font_t build_bitmap_font(const bitmap_font_build_options_t* decl, image_set_t* d
             glyph_t data = build_glyph_data(face, glyph_index);
             glyph_build_sprites(face, glyph_index, decl->font_size, decl->filters, decl->filters_num, dest_image_set);
             arr_push(result.glyphs, data);
-            glyph = result.glyphs + arr_size(result.glyphs) - 1;
+            glyph = arr_back(result.glyphs);
         }
         arr_push(glyph->codepoints, codepoint);
     }
 
-    if (info.hasKerning && decl->use_kerning && false) {
+    if (info.hasKerning && decl->use_kerning) {
         const uint32_t glyphs_len = arr_size(result.glyphs);
         for (uint32_t i = 0; i < glyphs_len; ++i) {
             const uint32_t glyph_left = result.glyphs[i].glyph_index;
@@ -347,7 +347,7 @@ font_t build_bitmap_font(const bitmap_font_build_options_t* decl, image_set_t* d
     if (decl->mirror_case) {
         glyph_t* glyphs = result.glyphs;
         arr_for(glyph, glyphs) {
-            uint32_t* codepoints_ = glyphs->codepoints;
+            uint32_t* codepoints_ = glyph->codepoints;
             arr_for(code, codepoints_) {
                 const uint32_t upper = (uint32_t) toupper((int)code);
                 const uint32_t lower = (uint32_t) tolower((int)code);

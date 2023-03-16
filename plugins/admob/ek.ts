@@ -25,7 +25,7 @@ export async function setup(project: Project) {
         },
         ios: {
             xcode_framework: "AppTrackingTransparency",
-            xcode_pod: "Google-Mobile-Ads-SDK",
+            podfile_pod: "Google-Mobile-Ads-SDK",
             cpp_flags: {
                 files: [
                     "src/ek_admob.c"
@@ -96,6 +96,8 @@ export async function setup(project: Project) {
         }
     });
 
-    await project.importModule("../firebase/ek.ts");
-    await project.importModule("../../packages/scenex/ek.ts");
+    await project.import(
+        "../firebase/ek.ts",
+        "../../packages/scenex/ek.ts",
+    );
 }

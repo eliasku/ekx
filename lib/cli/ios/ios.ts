@@ -2,12 +2,22 @@ import {copyFolderRecursiveSync, execute2, isDir, replaceInFile} from "../utils.
 import plist from "plist";
 import * as path from "path";
 import * as fs from "fs";
+import {copyFileSync, existsSync} from "fs";
 import {buildAssetPackAsync} from "../assets.js";
 import {Project} from "../project.js";
 import {collectCppFlags, collectObjects, collectStrings} from "../collectSources.js";
 import {logger} from "../logger.js";
 import {buildAppIconAsync} from "../appicon/appicon.js";
-import {callInDir, readTextFileSync, rm, writeTextFileSync} from "../../utils/utils.js";
+import {
+    callInDir,
+    ensureDirSync,
+    readJSONFileSync,
+    readTextFileSync,
+    rm,
+    writeJSONFileSync,
+    writeTextFileSync
+} from "../../utils/utils.js";
+import {resolveCachePath, resolveEkxPath} from "../../utils/dirs.js";
 
 const iosPlatforms = ["apple", "ios"];
 
@@ -20,16 +30,16 @@ interface AppStoreCredentials {
 
 function mod_plist(ctx: Project, filepath: string) {
     const dict: any = plist.parse(readTextFileSync(filepath));
-    dict["CFBundleDisplayName"] = ctx.title;
-    dict["CFBundleShortVersionString"] = ctx.version.name();
-    dict["CFBundleVersion"] = "" + ctx.version.buildNumber();
-    dict["UIRequiresFullScreen"] = true;
-    dict["UIStatusBarHidden"] = true;
-    dict["UIStatusBarStyle"] = "UIStatusBarStyleDefault";
-    dict["UIViewControllerBasedStatusBarAppearance"] = false;
+    dict.CFBundleDisplayName = ctx.title;
+    dict.CFBundleShortVersionString = ctx.version.name();
+    dict.CFBundleVersion = ctx.version.buildNumber().toString();
+    dict.UIRequiresFullScreen = true;
+    dict.UIStatusBarHidden = true;
+    dict.UIStatusBarStyle = "UIStatusBarStyleDefault";
+    dict.UIViewControllerBasedStatusBarAppearance = false;
 
     if (ctx.orientation === "portrait") {
-        dict["UISupportedInterfaceOrientations"] = [
+        dict.UISupportedInterfaceOrientations = [
             "UIInterfaceOrientationPortrait"
         ];
         dict["UISupportedInterfaceOrientations~ipad"] = [
@@ -37,7 +47,7 @@ function mod_plist(ctx: Project, filepath: string) {
             "UIInterfaceOrientationPortraitUpsideDown"
         ];
     } else {
-        dict["UISupportedInterfaceOrientations"] = [
+        dict.UISupportedInterfaceOrientations = [
             "UIInterfaceOrientationLandscapeLeft",
             "UIInterfaceOrientationLandscapeRight"
         ];
@@ -63,12 +73,12 @@ export async function export_ios(ctx: Project): Promise<void> {
     // setup automation
     let credentials: AppStoreCredentials = {};
     try {
-        credentials = JSON.parse(readTextFileSync(ctx.ios.appStoreCredentials!));
+        credentials = readJSONFileSync(ctx.ios.appStoreCredentials!);
     } catch {
         // ignore
     }
 
-    const iconsContents = JSON.parse(readTextFileSync(path.join(ctx.sdk.templates, "template-ios/src/Assets.xcassets/AppIcon.appiconset/Contents.json")));
+    const iconsContents = readJSONFileSync(path.join(ctx.sdk.templates, "xcode-template/src/Assets.xcassets/AppIcon.appiconset/Contents.json"));
     await Promise.all([
         buildAssetPackAsync(ctx),
         buildAppIconAsync({
@@ -90,7 +100,7 @@ export async function export_ios(ctx: Project): Promise<void> {
         logger.assert(!isDir(dest_path));
     }
 
-    copyFolderRecursiveSync(path.join(ctx.sdk.templates, "template-ios"), dest_path);
+    copyFolderRecursiveSync(path.join(ctx.sdk.templates, "xcode-template"), dest_path);
 
     const base_path = "../..";
     await callInDir(dest_path, async () => {
@@ -115,7 +125,7 @@ export async function export_ios(ctx: Project): Promise<void> {
             fn();
         }
 
-        const xcode_projectPythonPostScript = collectStrings(ctx, "xcode_projectPythonPostScript", iosPlatforms, false);
+        //const xcode_projectPythonPostScript = collectStrings(ctx, "xcode_projectPythonPostScript", iosPlatforms, false);
         const declaration: any = {modules: []};
         for (const module of ctx.modules) {
             declaration.modules.push({
@@ -132,23 +142,145 @@ export async function export_ios(ctx: Project): Promise<void> {
                 xcode_framework: collectStrings(module, "xcode_framework", iosPlatforms, false),
                 xcode_capability: collectStrings(module, "xcode_capability", iosPlatforms, false),
                 xcode_plist: collectObjects(module, "xcode_plist", iosPlatforms),
-                xcode_pod: collectStrings(module, "xcode_pod", iosPlatforms, false),
-                xcode_file: collectStrings(module, "xcode_file", iosPlatforms, false)
+                xcode_file: collectStrings(module, "xcode_file", iosPlatforms, false),
             });
         }
         declaration.modules.push({name: "embedded", assets: [embeddedAssetsDir]});
 
-        writeTextFileSync("ek-ios-build.json", JSON.stringify(declaration));
+        let projectDeclaration = {
+            name: "app-ios",
+            options: {
+                deploymentTarget: {
+                    iOS: "12.0"
+                },
+                usesTabs: false,
+                tabWidth: 2,
+                indentWidth: 2,
+                defaultConfig: "Release"
+            },
+            settings: {
+                DEVELOPMENT_TEAM: "696L2V4X5J"
+            },
+            targets: {
+                "app-ios": {
+                    type: "application",
+                    platform: "iOS",
+                    sources: [
+                        {name: "App", path: "src", excludes: []},
+                        {name: "Assets", path: embeddedAssetsDir, excludes: [".inputs_checksum"], type: "folder"},
+                    ] as any[],
+                    dependencies: [] as any,
+                    settings: {
+                        base: {
+                            PRODUCT_BUNDLE_IDENTIFIER: ctx.ios.application_id!,
+                            INFOPLIST_FILE: "src/Info.plist",
+                            HEADER_SEARCH_PATHS: ["$(inherited)"],
+                            GCC_ENABLE_CPP_EXCEPTIONS: "NO",
+                            GCC_ENABLE_CPP_RTTI: "NO",
+                            GCC_ENABLE_OBJC_EXCEPTIONS: "NO",
+                            GCC_C_LANGUAGE_STANDARD: "c11",
+                            CLANG_CXX_LANGUAGE_STANDARD: "c++17",
+                            CLANG_CXX_LIBRARY: "libc++",
+                            OTHER_CFLAGS: ["$(inherited)"],
+                            LD_RUNPATH_SEARCH_PATHS: [
+                                "$(inherited)",
+                                "@executable_path/Frameworks",
+                                "/usr/lib/swift",
+                            ],
+                        },
+                        configs: {
+                            Debug: {
+                                ENABLE_BITCODE: false
+                            },
+                            Release: {
+                                GCC_PREPROCESSOR_DEFINITIONS: [
+                                    "$(inherited)",
+                                    "NDEBUG"
+                                ],
+                                GCC_OPTIMIZATION_LEVEL: "z",
+                                LLVM_LTO: "YES",
+                            }
+                        }
+                    },
+                    attributes: {
+                        SystemCapabilities: {} as any,
+                    },
+                },
+            }
+        };
 
-        /// PRE MOD PROJECT
-        //xcode_patch(ctx, platform_proj_name);
-        await execute2("python3", ["xcode-project-ios.py", platform_proj_name, ctx.ios.application_id!]);
+        const target = projectDeclaration.targets["app-ios"];
+        const defines: string[] = [];
+        for (const module of ctx.modules) {
+            for (const cpp_flags of collectCppFlags(module, iosPlatforms)) {
+                for (const cpp_file of cpp_flags.files) {
+                    target.sources.push({path: cpp_file, compilerFlags: cpp_flags.flags});
+                }
+            }
+            for (const cpp of collectStrings(module, "cpp", iosPlatforms, true)) {
+                target.sources.push({
+                    name: module.name,
+                    path: cpp,
+                    excludes: [
+                        "**/build",
+                        "**/CMakeLists.txt",
+                        "**/.DS_Store",
+                        "**/*.md",
+                        "**/*.js",
+                        "**/*.ts",
+                        "**/*.glsl",
+                        "**/*.sh",
+                    ],
+                });
+                target.settings.base.HEADER_SEARCH_PATHS.push(cpp);
+            }
+            for (const xcode_file of collectStrings(module, "xcode_file", iosPlatforms, false)) {
+                target.sources.push({path: xcode_file});
+            }
+            for (const cpp_include of collectStrings(module, "cpp_include", iosPlatforms, true)) {
+                target.settings.base.HEADER_SEARCH_PATHS.push(cpp_include);
+            }
+            for (const capability of collectStrings(module, "xcode_capability", iosPlatforms, false)) {
+                target.attributes.SystemCapabilities[capability] = {enabled: 1};
+            }
+            for (const framework of collectStrings(module, "xcode_framework", iosPlatforms, false)) {
+                if (!(target.dependencies as any[]).find(d => d.framework === framework)) {
+                    target.dependencies.push({
+                        framework: framework,
+                        embed: false,
+                        link: false,
+                    });
+                }
+            }
+            for (const def of collectStrings(module, "cpp_define", iosPlatforms, false)) {
+                defines.push(def);
+            }
+            for (const lib of collectStrings(module, "cpp_lib", iosPlatforms, false)) {
+                //target.attributes.SystemCapabilities[capability] = {enabled: 1};
+            }
+
+            collectStrings(module, "cpp_lib", iosPlatforms, false)
+        }
+
+        target.settings.base.OTHER_CFLAGS.push(...defines.map(d => `-D${d.replaceAll(`"`, `\\"`)}`));
+
+        writeJSONFileSync("project.json", projectDeclaration);
+
+        {
+            const xcgDir = resolveCachePath("bin/xcg");
+            const xcgPackage = path.join(xcgDir, "Package.swift");
+            if (!existsSync(xcgPackage)) {
+                ensureDirSync(xcgDir);
+                copyFileSync(resolveEkxPath("lib/cli/_templates/xcode-proj-gen/Package.swift"), xcgPackage);
+            }
+            await execute2("swift", ["run", "--package-path", xcgDir, "xcodegen", "generate", "--spec", "project.json"]);
+        }
 
         logger.info("Prepare PodFile");
-        const pods = collectStrings(ctx, "xcode_pod", iosPlatforms, false)
+        let pods = collectStrings(ctx, "podfile_pod", iosPlatforms, false)
             .map((v) => `pod '${v}'`).join("\n  ");
+        pods += "\n\n" + collectStrings(ctx, "podfile_code", iosPlatforms, false).join("\n  ")
         replaceInFile("Podfile", {
-            // "app-ios": platform_proj_name,
             "# TEMPLATE DEPENDENCIES": pods
         });
 
@@ -160,18 +292,10 @@ export async function export_ios(ctx: Project): Promise<void> {
         });
 
         logger.info("Install Pods");
-        if (0 !== await execute2("pod", ["install", "--repo-update"])) {
+        if (ctx.args.indexOf("clean") < 0 || 0 !== await execute2("pod", ["install", "--repo-update"])) {
             // maybe no internet connection, so we can't update pods repo
             await execute2("pod", ["install"]);
         }
-
-        // POST MOD PROJECT
-        replaceInFile("xcode-project-ios-post.py", {
-            "# XCODE_POST_PROJECT": xcode_projectPythonPostScript.join("\n")
-        });
-
-        await execute2("python3", ["xcode-project-ios-post.py",
-            platform_proj_name, ctx.ios.application_id!]);
     });
 
     if (ctx.options.openProject) {

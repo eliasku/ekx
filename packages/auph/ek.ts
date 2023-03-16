@@ -26,6 +26,8 @@ export async function setup(project: Project) {
         linux: {}
     });
 
-    await project.importModule("../../external/headers/ek.ts");
-    await project.importModule("../../external/oboe/ek.ts");
+    await project.import(
+        "../../external/headers/ek.ts",
+        "../../external/oboe/ek.ts",
+    );
 }

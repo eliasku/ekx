@@ -6,9 +6,11 @@ export async function setup(project: Project) {
         cpp: "src"
     });
 
-    await project.importModule("../scenex/ek.ts");
-    await project.importModule("../../plugins/firebase/ek.ts");
-    await project.importModule("../../plugins/admob/ek.ts");
-    await project.importModule("../../plugins/billing/ek.ts");
-    await project.importModule("../../plugins/game-services/ek.ts");
+    await project.import(
+        "../scenex/ek.ts",
+        "../../plugins/firebase/ek.ts",
+        "../../plugins/admob/ek.ts",
+        "../../plugins/billing/ek.ts",
+        "../../plugins/game-services/ek.ts",
+    );
 }

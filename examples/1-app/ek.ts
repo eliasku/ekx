@@ -9,5 +9,5 @@ export async function setup(project: Project) {
     project.title = "sample-1-app";
     project.desc = "sample-1-app";
     project.orientation = "portrait";
-    await project.importModule("ekx/packages/app/ek.ts");
+    await project.import("ekx/packages/app/ek.ts");
 }

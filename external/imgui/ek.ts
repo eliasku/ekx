@@ -5,6 +5,8 @@ export async function setup(project: Project) {
         name: "imgui",
         cpp: "src"
     });
-    await project.importModule("../freetype/ek.ts");
-    await project.importModule("../headers/ek.ts");
+    await project.import(
+        "../headers/ek.ts",
+        "../freetype/ek.ts",
+    );
 }

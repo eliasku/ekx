@@ -26,8 +26,7 @@
 
 ## Prerequisites for tooling
 
-- NodeJS, yarn v1 classic
+- NodeJS >= 18, npm >= 9
 - CMake >= 3.19
 - Android Studio for Android
-- `python3` and `pip`
 - XCode for iOS

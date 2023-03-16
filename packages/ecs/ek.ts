@@ -5,5 +5,5 @@ export async function setup(project: Project) {
         name: "ecs",
         cpp: "src"
     });
-    await project.importModule("../core/ek.ts");
+    await project.import("../core/ek.ts");
 }

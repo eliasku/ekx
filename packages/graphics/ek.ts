@@ -13,7 +13,5 @@ export async function setup(project: Project) {
             },
         }
     });
-    await project.importModule("../std/ek.ts");
-    await project.importModule("../app/ek.ts");
-    await project.importModule("../../external/sokol/ek.ts");
+    await project.import("../app/ek.ts");
 }

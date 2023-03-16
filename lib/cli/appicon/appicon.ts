@@ -3,7 +3,7 @@ import * as fs from "fs";
 import {renderFlashSymbol, RenderFlashSymbolOutputOptions} from "../../assets/helpers/flashExport.js";
 import {logger} from "../logger.js";
 import {isDir} from "../utils.js";
-import {ensureDirSync, getModuleDir, writeTextFileSync} from "../../utils/utils.js";
+import {ensureDirSync, getModuleDir, writeJSONFileSync} from "../../utils/utils.js";
 
 export interface WebManifestIcon {
     src: string; // icons/icon36.png
@@ -135,7 +135,7 @@ function exportIOSIcons(flashPath: string, iconSymbol: string, appIconContents: 
         });
     }
     appIconContents.images = images;
-    writeTextFileSync(path.join(appIconFolder, "Contents.json"), JSON.stringify(appIconContents));
+    writeJSONFileSync(path.join(appIconFolder, "Contents.json"), appIconContents);
 
     return renderFlashSymbol(flashPath, iconSymbol, outputs);
 }

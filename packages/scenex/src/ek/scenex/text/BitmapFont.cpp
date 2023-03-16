@@ -17,6 +17,7 @@ void BitmapFont::load(const uint8_t* buffer, size_t length) {
     }
     calo_reader_t r = {};
     r.p = (uint8_t*)buffer;
+    read_calo(&r);
     file = read_stream_bmfont(&r);
     lineHeightMultiplier = file.header.line_height_multiplier;
     arr_for(entry, file.dict) {

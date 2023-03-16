@@ -75,6 +75,7 @@ void* arr_add_(void** p_arr, uint32_t element_size);
 #define arr_push(arr, el) ((__typeof__ (arr))arr_add_((void**)&(arr), sizeof (arr)[0]))[0] = (el)
 #define arr_begin(arr) (arr)
 #define arr_end(arr) ((arr) + arr_size(arr))
+#define arr_back(arr) ((arr) ? (arr_end(arr) - 1) : 0)
 
 #define arr_for_block_(arr, Type, It, End) for(Type * It = (arr), * End = (arr) + arr_size(arr); It != End; ++It)
 #define arr_for(Var, InArray) arr_for_block_(InArray, __typeof__(*InArray), Var, Var ## _end)

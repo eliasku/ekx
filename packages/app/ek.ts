@@ -35,6 +35,8 @@ export async function setup(project: Project) {
             cpp_lib: ["GLESv2", "GL"]
         },
     });
-    await project.importModule("../std/ek.ts");
-    await project.importModule("../../external/sokol/ek.ts");
+    await project.import(
+        "../std/ek.ts",
+        "../../external/sokol/ek.ts",
+    );
 }

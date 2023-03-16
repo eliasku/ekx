@@ -12,7 +12,13 @@ import {buildWasm} from "./buildWasm.js";
 import {deployFirebaseHosting} from "./deployFirebaseHosting.js";
 import {buildAppIconAsync} from "../appicon/appicon.js";
 import {collectSourceRootsAll} from "../collectSources.js";
-import {ensureDirSync, expandGlobSync, readTextFileSync, writeTextFileSync} from "../../utils/utils.js";
+import {
+    ensureDirSync,
+    expandGlobSync,
+    readJSONFileSync,
+    readTextFileSync, writeJSONFileSync,
+    writeTextFileSync
+} from "../../utils/utils.js";
 
 /*** HTML ***/
 export async function export_web(ctx: Project): Promise<void> {
@@ -67,7 +73,7 @@ export async function export_web(ctx: Project): Promise<void> {
     const buildTask = buildWasm(ctx, buildType);
     const assetsTask = buildAssetPackAsync(ctx, path.join(outputDir, "assets"));
 
-    const webManifest = JSON.parse(readTextFileSync(path.join(ctx.sdk.templates, "web/manifest.json")));
+    const webManifest = readJSONFileSync(path.join(ctx.sdk.templates, "web/manifest.json"));
     webManifest.name = ctx.title ?? ctx.name;
     webManifest.short_name = ctx.title ?? ctx.name;
     webManifest.description = ctx.desc;
@@ -78,7 +84,7 @@ export async function export_web(ctx: Project): Promise<void> {
         webManifest.related_applications = ctx.web.applications;
     }
 
-    writeTextFileSync(path.join(outputDir, "manifest.json"), JSON.stringify(webManifest));
+    writeJSONFileSync(path.join(outputDir, "manifest.json"), webManifest);
     const iconsTask = buildAppIconAsync({
         output: outputDir,
         webManifestIcons: webManifest.icons,

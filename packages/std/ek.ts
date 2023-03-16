@@ -10,6 +10,8 @@ export async function setup(project: Project) {
             //cpp_lib: "--import-memory"
         }
     });
-    await project.importModule("../../external/headers/ek.ts");
-    await project.importModule("../../external/sokol/ek.ts");
+    await project.import(
+        "../../external/headers/ek.ts",
+        "../../external/sokol/ek.ts",
+    );
 }

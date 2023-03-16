@@ -102,6 +102,16 @@ export const readTextFileSync = (filepath: URL | string): string => {
     return fs.readFileSync(filepath, "utf8");
 }
 
+export const readJSONFileSync = (filepath: URL | string): any => {
+    return JSON.parse(fs.readFileSync(filepath, "utf8"));
+}
+
+export const writeJSONFileSync = (filepath: URL | string, object: any, pretty = false): any => {
+    const content = JSON.stringify(object, undefined, pretty ? 4 : undefined);
+    fs.writeFileSync(filepath, content, "utf8");
+}
+
+
 export const expandGlobSync = (pattern: string, options?: { root?: string }): { path: string }[] => {
     let opts: GlobOptions = {
         withFileTypes: false,

@@ -9,9 +9,11 @@ export async function setup(project: Project) {
             android_permission: "android.permission.INTERNET"
         },
     });
-    await project.importModule("../sg-file/ek.ts");
-    await project.importModule("../graphics/ek.ts");
-    await project.importModule("../audio/ek.ts");
-    await project.importModule("../app/ek.ts");
-    await project.importModule("../ecs/ek.ts");
+    await project.import(
+        "../sg-file/ek.ts",
+        "../graphics/ek.ts",
+        "../audio/ek.ts",
+        "../app/ek.ts",
+        "../ecs/ek.ts",
+    );
 }

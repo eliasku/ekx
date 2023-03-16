@@ -63,30 +63,31 @@ const cpp_names: CppName[] = [
 export interface AppleConfig extends CxxConfig {
     xcode_capability?: UserArray<string>;
     xcode_framework?: UserArray<string>;
-    xcode_pod?: UserArray<string>;
     xcode_plist?: UserArray<any>;
     /**
      * files copied in Project which should be added to project (path relative to xcode project's root)
      */
     xcode_file?: UserArray<string>;
 
-    xcode_projectPythonPostScript?: UserArray<string>;
+    podfile_pod?: UserArray<string>;
+    podfile_code?: UserArray<string>;
 }
 
 type AppleName =
     "xcode_capability"
     | "xcode_framework"
-    | "xcode_pod"
     | "xcode_plist"
     | "xcode_file"
-    | "xcode_projectPythonPostScript";
+    | "podfile_pod"
+    | "podfile_code"
+    ;
 const apple_names: AppleName[] = [
     "xcode_capability",
     "xcode_framework",
-    "xcode_pod",
     "xcode_plist",
     "xcode_file",
-    "xcode_projectPythonPostScript"
+    "podfile_pod",
+    "podfile_code",
 ];
 
 export interface AndroidConfig extends CxxConfig {
@@ -129,7 +130,7 @@ export interface AndroidConfig extends CxxConfig {
      * Dictionaries to generate the final strings resource xml file:
      * `app/src/main/res/values/strings.xml`
      */
-    android_strings?: UserArray<Record<string, string|undefined>>;
+    android_strings?: UserArray<Record<string, string | undefined>>;
 }
 
 type AndroidName =
@@ -177,7 +178,7 @@ export interface ModuleDef extends CxxConfig {
 
     android?: AndroidConfig;
 
-    // shared options between macos and ios
+    // shared options between macOS and ios
     apple?: AppleConfig;
     macos?: AppleConfig;
     ios?: AppleConfig;
@@ -202,7 +203,7 @@ function validateFields(module: ModuleDef, data: any, scope: string, ...sets: st
             }
         }
         if (errors.length > 0) {
-            logger.error(`Module ${module.name} (file://${path.join(module.path!, "ek.js")}) has invalid keys for "${scope}" scope:\n` +
+            logger.error(`Module ${module.name} (file://${path.join(module.path!, "ek.ts")}) has invalid keys for "${scope}" scope:\n` +
                 errors.join("\n"));
             logger.warn("Allowed keys:\n\t" + sets.map(p => "[" + p.join(", ") + "]").join("\n\t"));
         }
