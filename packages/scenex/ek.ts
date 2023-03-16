@@ -10,7 +10,7 @@ export async function setup(project: Project) {
         },
     });
     await project.import(
-        "../sg-file/ek.ts",
+        "../calo/ek.ts",
         "../graphics/ek.ts",
         "../audio/ek.ts",
         "../app/ek.ts",

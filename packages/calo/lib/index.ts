@@ -1,12 +1,10 @@
 import {
     c_include,
     CGenOptions,
-    generateStreamWriteFunctions,
-    generateType_c,
-    generateTypeReadFunctions,
+    generateType as gen_C,
     save_c
 } from "./c/index.js";
-import {generateType_ts, save_ts} from "./ts/index.js";
+import {generateType as gen_TS, save_ts} from "./ts/index.js";
 import {collectTypes, Type} from "./common.js";
 import {atlas_info} from "./atlas.js";
 import {join} from "node:path";
@@ -17,6 +15,7 @@ import {sg_file, sg_filter, sg_frame_label, sg_frame_script, sg_node_data} from 
 import {bmfont} from "./bmfont.js";
 import {getModuleDir} from "../../../lib/utils/utils.js";
 import * as path from "path";
+import {image_data} from "./images.js";
 
 c_include("ek/math.h", true, false);
 c_include("ek/hash.h", true, false);
@@ -36,10 +35,8 @@ const generate = (options: GenerateOptions) => {
     collectTypes(types, ...options.types);
     const rtypes = [...types.values()].reverse();
     for (const type of rtypes) {
-        generateType_ts(type);
-        generateType_c(type);
-        generateTypeReadFunctions(type);
-        generateStreamWriteFunctions(type);
+        gen_C(type);
+        gen_TS(type);
     }
 
     const file_prefix = "gen_";
@@ -64,17 +61,22 @@ generate({
         sourceDir: path.join(caloDir, "src"),
         name: "gen_sg",
     },
-    outputDirTs: path.join(caloDir, "lib/examples"),
+    outputDirTs: path.join(caloDir, "lib/generated"),
     name: "sg",
     types: [
+        // dedicated images/textures
+        image_data,
+        // bitmap font resource
         bmfont,
+        // sprite atlas resource
         atlas_info,
+        // 3d model resource
         model3d,
-        // scenex
+        // scene model
         sg_filter,
         sg_node_data,
         sg_file,
         sg_frame_label,
         sg_frame_script,
-    ]
+    ],
 });

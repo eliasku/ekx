@@ -36,6 +36,8 @@ struct bmfont_glyph_;
 struct bmfont_entry_;
 struct bmfont_header_;
 struct bmfont_;
+struct image_path_;
+struct image_data_;
 typedef struct sg_frame_script_ {
 	int32_t frame;
 	const char* code;
@@ -210,6 +212,22 @@ typedef struct bmfont_ {
 	struct bmfont_glyph_* glyphs;
 } bmfont_t;
 
+typedef struct image_path_ {
+	char str[128];
+} image_path_t;
+
+typedef enum {
+   IMAGE_DATA_NORMAL = 0,
+   IMAGE_DATA_CUBE_MAP = 1
+} image_data_type_t;
+
+typedef struct image_data_ {
+	image_data_type_t type;
+	uint32_t format_mask;
+	uint32_t images_num;
+	struct image_path_ images[6];
+} image_data_t;
+
 
 /*** functions ***/
 
@@ -332,6 +350,14 @@ void write_stream_bmfont_header(calo_writer_t* w, bmfont_header_t v);
 bmfont_t read_stream_bmfont(calo_reader_t* r);
 
 void write_stream_bmfont(calo_writer_t* w, bmfont_t v);
+
+image_path_t read_stream_image_path(calo_reader_t* r);
+
+void write_stream_image_path(calo_writer_t* w, image_path_t v);
+
+image_data_t read_stream_image_data(calo_reader_t* r);
+
+void write_stream_image_data(calo_writer_t* w, image_data_t v);
 
 // functions
 

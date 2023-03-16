@@ -36,3 +36,36 @@
 - macOS: dev
 - Linux: dev (WIP)
 - Windows: dev (WIP)
+
+## Requirements
+
+- NodeJS >= 18 & NPM >= 9
+- CMake >= 3.19
+- Ninja build
+- Android Studio for Android
+- XCode for iOS
+- Emscripten SDK for Web
+
+## Key Features
+
+- **Edit Mode**
+  - Resources *hot reloading*
+  - Resources *loading on the fly*
+  - Resources *deferred export*
+  - Sprites resolution hot reloading on Window Resize
+  - Export Platforms (iOS, Android, Web)
+
+- Export for Production
+  - Build statically against the whole Codebase
+  - Run/Debug in XCode and Android Studio
+  - Debug runtime-code
+  - Stripped libraries code
+
+- Capabilities
+  - ECS framework
+  - Multi-resolution export: @x1, @x2, @x3, @x4
+  - Export from Animate CC (`.fla` / `.xfl` files)
+  - Import TTF fonts with Effects
+  - GLSL shaders
+  - Marketing assets export from Flash template
+  - Simple Binary serialization

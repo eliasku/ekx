@@ -45,7 +45,7 @@ const getCTypeName = (type: Type) => {
     return getCStructName(type);
 };
 
-export const generateType_c = (type: Type) => {
+const generateTypeDeclaration = (type: Type) => {
     if (type.options.extern) {
         return;
     }
@@ -97,12 +97,15 @@ export const generateType_c = (type: Type) => {
     for (const [field, fieldType] of type.fields) {
         if (fieldType.options.generics?.length === 1) {
             const T = fieldType.options.generics[0];
-            let arrayTypeString = `struct ${getCName(T)}_`;
-            if (T.options.extern) {
-                arrayTypeString = getCTypeName(T);
+            const N = fieldType.options.staticLength;
+            let subTypeString = getCTypeName(T);
+            if (!T.options.extern) {
+                subTypeString = `struct ${getCName(T)}_`;
             }
             if (fieldType.options.variableLengthArray || fieldType.options.optional) {
-                code += `\t${arrayTypeString}* ${field};\n`;
+                code += `\t${subTypeString}* ${field};\n`;
+            } else if (N) {
+                code += `\t${subTypeString} ${field}[${N}];\n`;
             }
         } else {
             code += `\t${getCTypeName(fieldType)} ${field};\n`;
@@ -125,7 +128,7 @@ const getReaderName = (type: Type) => {
     return T.options.target?.c?.reader ?? `read_stream_${getCName(T)}`;
 }
 
-export const generateTypeReadFunctions = (type: Type) => {
+export const generateStreamRead = (type: Type) => {
     if (type.options.apiStreamRead || type.options.readAsType) {
         return;
     }
@@ -167,7 +170,9 @@ export const generateTypeReadFunctions = (type: Type) => {
             if (type.options.transientFields?.[field]) {
                 continue;
             }
-            if (fieldType.options.enumBaseType) {
+            if (fieldType.options.staticLength) {
+                code += `\tread_span(r, val.${field}, sizeof val.${field});\n`;
+            } else if (fieldType.options.enumBaseType) {
                 code += `\tval.${field} = (${getCTypeName(fieldType)})${getReaderName(fieldType)}(r);\n`;
             } else {
                 code += `\tval.${field} = ${getReaderName(fieldType)}(r);\n`;
@@ -192,7 +197,7 @@ const getWriterName = (type: Type) => {
     return T.options.target?.c?.writer ?? `write_stream_${getCName(T)}`;
 }
 
-export const generateStreamWriteFunctions = (type: Type) => {
+export const generateStreamWrite = (type: Type) => {
     if (type.options.apiStreamWrite || type.options.readAsType) {
         return;
     }
@@ -228,7 +233,11 @@ export const generateStreamWriteFunctions = (type: Type) => {
             if (type.options.transientFields?.[field]) {
                 continue;
             }
-            code += `\t${getWriterName(fieldType)}(w, v.${field});\n`;
+            if (fieldType.options.staticLength) {
+                code += `\twrite_span(w, v.${field}, sizeof v.${field});\n`;
+            } else {
+                code += `\t${getWriterName(fieldType)}(w, v.${field});\n`;
+            }
         }
     }
     code += `}`;
@@ -239,6 +248,13 @@ export const generateStreamWriteFunctions = (type: Type) => {
         definition: code,
     });
 };
+
+export const generateType = (type: Type) => {
+    generateTypeDeclaration(type);
+    generateStreamRead(type);
+    generateStreamWrite(type);
+}
+
 
 let includes: { path: string, api?: boolean, user: boolean }[] = [];
 
@@ -282,3 +298,5 @@ ${printImplementation(input)}`;
         writeFileSync(path.join(options.includeDir, name + "_header_only.h"), code, "utf-8");
     }
 };
+
+

@@ -1,6 +1,6 @@
 #include "AnimationHelpers.hpp"
 
-#include <ek/format/sg.h>
+#include "sg_utils.h"
 #include "../xfl/Doc.hpp"
 #include <ek/log.h>
 #include <ek/assert.h>

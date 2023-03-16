@@ -30,8 +30,8 @@ target_link_libraries(${PROJECT_NAME}
         PUBLIC ekx::graphics
         PUBLIC ekx::audio
         PUBLIC ekx::app
-        PUBLIC ekx::sg-file
         PUBLIC ekx::ecs
+        PUBLIC calo
         )
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

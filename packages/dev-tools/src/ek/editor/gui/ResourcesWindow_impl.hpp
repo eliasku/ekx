@@ -2,8 +2,7 @@
 
 #include "ResourcesWindow.hpp"
 
-
-#include <ek/format/sg.h>
+#include <gen_sg.h>
 #include <ek/scenex/3d/Material3D.hpp>
 #include <ek/scenex/3d/StaticMesh.hpp>
 #include <ek/scenex/2d/Atlas.hpp>

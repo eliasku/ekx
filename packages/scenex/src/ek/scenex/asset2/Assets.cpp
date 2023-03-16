@@ -12,7 +12,6 @@
 // texture loading
 #include <ek/texture_loader.h>
 
-#include <ek/format/image_data.h>
 #include <ek/scenex/SceneFactory.hpp>
 #include <ek/scenex/2d/Atlas.hpp>
 #include <ek/scenex/3d/StaticMesh.hpp>

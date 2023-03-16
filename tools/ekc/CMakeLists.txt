@@ -27,7 +27,6 @@ target_link_libraries(${PROJECT_NAME}
         PUBLIC miniz
         PUBLIC freetype
         PUBLIC ekx::std
-        PUBLIC ekx::sg-file
         PUBLIC calo
         )
 

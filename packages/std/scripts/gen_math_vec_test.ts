@@ -1,42 +1,39 @@
-function f32_trunc(x, digits_after_point) {
+import {writeFileSync} from "fs";
+
+function f32_trunc(x: number, digits_after_point: number) {
     const mult = Math.pow(10, digits_after_point);
     return Math.round(x * mult) / mult;
 }
 
-function generate_vec_test_suite(name, fields, T) {
+const generate_vec_test_suite = (name: string, fields: string[], T: string) => {
     const name_t = name + "_t";
-    const a_values = [];
-    const b_values = [];
+    const a_values: number[] = [];
+    const b_values: number[] = [];
     const digits_after_point = T === "float" ? 6 : 0;
     for (let i = 0; i < fields.length; ++i) {
         a_values[i] = f32_trunc(100 * Math.random() - 50, digits_after_point);
         b_values[i] = f32_trunc(100 * Math.random() - 50, digits_after_point);
     }
 
-    function number_literal(x) {
+    const number_literal = (x: number) => {
         if (T === "float") {
             return (x | 0) === x ? `${x}.0f` : `${x}f`;
         }
         return `${x | 0}`;
     }
 
-    function list(pattern, del = ", ") {
-        let values = [];
+    const list = (pattern: string, del = ", ") => {
+        let values: string[] = [];
         for (const field of fields) {
             values.push(pattern.replace(/\$/g, field));
         }
         return values.join(del);
     }
 
-    function a() {
-        return `${name_t} a = ${name}(${a_values.map(number_literal).join(" ,")});`;
-    }
+    const a = () => `${name_t} a = ${name}(${a_values.map(number_literal).join(" ,")});`;
+    const b = () => `${name_t} b = ${name}(${b_values.map(number_literal).join(" ,")});`;
 
-    function b() {
-        return `${name_t} b = ${name}(${b_values.map(number_literal).join(" ,")});`;
-    }
-
-    function checks(op) {
+    const checks = (op: (a: number[], b: number[], i: number) => number) => {
         let values = [];
         for (let i = 0; i < fields.length; ++i) {
             const field = fields[i];
@@ -45,7 +42,19 @@ function generate_vec_test_suite(name, fields, T) {
         return values.join("\n");
     }
 
-    const simple_tests = [
+    const simple_tests: {
+        op_type1?: string,
+        op_type2?: string,
+        op_expr?: string,
+        op_inv_expr?: string,
+        c_arg_list?: string,
+        cop?: string,
+        op?: string,
+        op_inv?: string,
+        _eval: (a: number[], b: number[], i: number) => number,
+        _eval_inv?: (a: number[], b: number[], i: number) => number,
+        binary: boolean
+    }[] = [
         {
             cop: "neg",
             op: "-",
@@ -128,7 +137,7 @@ ${checks(simple_test._eval)}
 \t\t\t${a()}
 \t\t\t${b()}
 \t\t\t${name_t} r = ${simple_test.op_inv_expr ?? "b " + op_inv + " a"};
-${checks(simple_test._eval_inv)}
+${checks(simple_test._eval_inv!)}
 \t\t}`);
         }
     }
@@ -159,4 +168,4 @@ code += `}
 #endif // MATH_VEC_TEST_H
 `;
 
-require("fs").writeFileSync("test/math/math_vec_test.c", code);
+writeFileSync("test/math/math_vec_test.c", code, "utf8");

@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 project(flash-export)
 
 add_executable(${PROJECT_NAME}
+        src/sxg/sg_utils.c
         src/flash_export_main.c
         src/commands.cpp
 
@@ -71,8 +72,8 @@ target_link_libraries(${PROJECT_NAME}
         PUBLIC pugixml
         PUBLIC cairo
         PUBLIC miniz
-        PUBLIC ekx::sg-file
         PUBLIC ekx::core
+        PUBLIC calo
         )
 
 target_include_directories(${PROJECT_NAME} PUBLIC src)

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ek/format/sg.h>
+#include "sg_utils.h"
 #include <ek/ds/Array.hpp>
 #include <memory>
 

@@ -5,7 +5,7 @@
 
 typedef sg_scene_info_t* sg_scene_info_array_t;
 
-typedef string_hash_t* string_hash_array_t;
+typedef string_hash_t* stringhash32_array_t;
 
 typedef vec2_t* vec2_array_t;
 
@@ -40,9 +40,9 @@ sg_scene_info_array_t read_stream_sg_scene_info_array(calo_reader_t* r);
 
 void write_stream_sg_scene_info_array(calo_writer_t* w, sg_scene_info_array_t v);
 
-string_hash_array_t read_stream_string_hash_array(calo_reader_t* r);
+stringhash32_array_t read_stream_stringhash32_array(calo_reader_t* r);
 
-void write_stream_string_hash_array(calo_writer_t* w, string_hash_array_t v);
+void write_stream_stringhash32_array(calo_writer_t* w, stringhash32_array_t v);
 
 vec2_array_t read_stream_vec2_array(calo_reader_t* r);
 
@@ -159,8 +159,8 @@ void write_stream_sg_scene_info_array(calo_writer_t* w, sg_scene_info_array_t v)
     }
 }
 
-string_hash_array_t read_stream_string_hash_array(calo_reader_t* r) {
-    string_hash_array_t val;
+stringhash32_array_t read_stream_stringhash32_array(calo_reader_t* r) {
+    stringhash32_array_t val;
     {
         uint32_t count = read_u32(r);
         val = 0;
@@ -172,7 +172,7 @@ string_hash_array_t read_stream_string_hash_array(calo_reader_t* r) {
     return val;
 }
 
-void write_stream_string_hash_array(calo_writer_t* w, string_hash_array_t v) {
+void write_stream_stringhash32_array(calo_writer_t* w, stringhash32_array_t v) {
     {
         uint32_t count = arr_size(v);
         write_u32(w, count);
@@ -184,14 +184,14 @@ void write_stream_string_hash_array(calo_writer_t* w, string_hash_array_t v) {
 
 sg_file_t read_stream_sg_file(calo_reader_t* r) {
     sg_file_t val;
-	val.scenes = read_stream_string_hash_array(r);
+	val.scenes = read_stream_stringhash32_array(r);
 	val.linkages = read_stream_sg_scene_info_array(r);
 	val.library = read_stream_sg_node_data_struct_array(r);
     return val;
 }
 
 void write_stream_sg_file(calo_writer_t* w, sg_file_t v) {
-	write_stream_string_hash_array(w, v.scenes);
+	write_stream_stringhash32_array(w, v.scenes);
 	write_stream_sg_scene_info_array(w, v.linkages);
 	write_stream_sg_node_data_struct_array(w, v.library);
 }
@@ -928,4 +928,30 @@ void write_stream_bmfont(calo_writer_t* w, bmfont_t v) {
 	write_stream_bmfont_header(w, v.header);
 	write_stream_bmfont_entry_array(w, v.dict);
 	write_stream_bmfont_glyph_array(w, v.glyphs);
+}
+
+image_path_t read_stream_image_path(calo_reader_t* r) {
+    image_path_t val;
+	read_span(r, val.str, sizeof val.str);
+    return val;
+}
+
+void write_stream_image_path(calo_writer_t* w, image_path_t v) {
+	write_span(w, v.str, sizeof v.str);
+}
+
+image_data_t read_stream_image_data(calo_reader_t* r) {
+    image_data_t val;
+	val.type = (image_data_type_t)read_u32(r);
+	val.format_mask = read_u32(r);
+	val.images_num = read_u32(r);
+	read_span(r, val.images, sizeof val.images);
+    return val;
+}
+
+void write_stream_image_data(calo_writer_t* w, image_data_t v) {
+	write_u32(w, v.type);
+	write_u32(w, v.format_mask);
+	write_u32(w, v.images_num);
+	write_span(w, v.images, sizeof v.images);
 }

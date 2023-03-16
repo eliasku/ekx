@@ -1,7 +1,7 @@
-#ifndef EK_FORMAT_SG_H
-#define EK_FORMAT_SG_H
+#ifndef FLASH_EXPORT_UTILS_H
+#define FLASH_EXPORT_UTILS_H
 
-#include "dto.h"
+#include <gen_sg.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,12 +13,8 @@ sg_keyframe_transform_t sub_keyframe_transform(const sg_keyframe_transform_t* a,
 
 sg_node_data_t sg_node_data_ctr(void);
 
-model3d_t create_cube(vec3_t position, vec3_t size, color_t color);
-
-model3d_t create_plane(vec3_t position, vec2_t size, color_t color);
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif // EK_FORMAT_SG_H
+#endif // FLASH_EXPORT_UTILS_H

@@ -8,7 +8,7 @@
 #include <ek/log.h>
 #include <ek/print.h>
 #include <ek/hash.h>
-#include <ek/format/sg.h>
+#include <gen_sg.h>
 
 #include "bmfont_export.h"
 #include "bmfont_export/build_bitmap_font.c.h"

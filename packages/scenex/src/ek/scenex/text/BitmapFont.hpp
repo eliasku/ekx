@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FontImplBase.hpp"
-#include <ek/format/sg.h>
+#include <gen_sg.h>
 #include <ek/ds/Hash.hpp>
 
 namespace ek {

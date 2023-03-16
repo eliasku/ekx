@@ -104,7 +104,12 @@ const sg_node_data_struct = type("sg_node_data_struct", {}, {
             typeName: "struct sg_node_data_",
             reader: "read_stream_sg_node_data",
             writer: "write_stream_sg_node_data",
-        }
+        },
+        ts: {
+            typeName: "sg_node_data",
+            reader: "read_stream_sg_node_data",
+            writer: "write_stream_sg_node_data",
+        },
     },
 });
 
@@ -119,6 +124,10 @@ const sg_movie_layer = type("sg_movie_layer", {
         target: {
             c: {
                 typeName: "struct sg_node_data_ **",
+                reader: "_THIS_IS_TRANSIENT_FIELD_",
+            },
+            ts: {
+                typeName: "any",
                 reader: "_THIS_IS_TRANSIENT_FIELD_",
             }
         },

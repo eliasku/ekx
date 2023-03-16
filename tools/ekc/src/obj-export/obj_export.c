@@ -3,7 +3,7 @@
 
 #include <ek/log.h>
 #include <ek/math.h>
-#include <ek/format/sg.h>
+#include <gen_sg.h>
 
 typedef model3d_vertex_t vertex3d_t;
 

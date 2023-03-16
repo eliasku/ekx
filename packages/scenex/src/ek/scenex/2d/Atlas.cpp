@@ -5,7 +5,7 @@
 #include <ek/local_res.h>
 #include <ek/gfx.h>
 #include <ek/print.h>
-#include <ek/format/dto.h>
+#include <gen_sg.h>
 
 struct res_atlas res_atlas;
 

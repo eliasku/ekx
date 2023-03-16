@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ecx/ecx_fwd.hpp>
-#include <ek/format/sg.h>
+#include <gen_sg.h>
 #include <ek/scenex/SceneFactory.hpp>
 
 #include <ek/ds/String.hpp>

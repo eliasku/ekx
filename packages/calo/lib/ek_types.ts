@@ -1,9 +1,14 @@
 import {f32, type, u32} from "./common.js";
 
-export const StringHash32 = type("string_hash", {}, {
+export const StringHash32 = type("StringHash32", {}, {
     primitiveBytes: 4,
     extern: true,
     readAsType: u32,
+    target: {
+        c: {
+            typeName: "string_hash_t",
+        }
+    }
 });
 
 export const RectF = type("Rect", {

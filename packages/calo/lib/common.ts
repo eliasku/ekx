@@ -8,6 +8,7 @@ export interface TypeOptions {
     primitiveBitSize?: number;
     primitiveBytes?: number;
     variableLengthArray?: boolean;
+    staticLength?: number;
     optional?: boolean;
     generics?: Type[],
     extern?: boolean,
@@ -130,6 +131,23 @@ export const CString = type("CString", {}, {
     },
 });
 
+export const char = type("char", {}, {
+    primitiveBitSize: 8,
+    extern: true,
+    apiStreamRead: true,
+    apiStreamWrite: true,
+    target: {
+        c: {
+            typeName: "char",
+            reader: "read_u8",
+            writer: "write_u8",
+        },
+        ts: {
+            typeName: "number",
+        },
+    },
+});
+
 export const u8 = type("u8", {}, {
     primitiveBitSize: 8,
     extern: true,
@@ -140,10 +158,7 @@ export const u8 = type("u8", {}, {
             typeName: "uint8_t",
             reader: "read_u8",
             writer: "write_u8",
-        },
-        ts: {
-            typeName: "number",
-        },
+        }
     },
 });
 
@@ -158,9 +173,6 @@ export const u16 = type("u16", {}, {
             reader: "read_u16",
             writer: "write_u16",
         },
-        ts: {
-            typeName: "number",
-        },
     },
 });
 
@@ -174,10 +186,7 @@ export const u32 = type("u32", {}, {
             typeName: "uint32_t",
             reader: "read_u32",
             writer: "write_u32",
-        },
-        ts: {
-            typeName: "number",
-        },
+        }
     },
 });
 
@@ -191,10 +200,7 @@ export const i32 = type("i32", {}, {
             typeName: "int32_t",
             reader: "read_i32",
             writer: "write_i32",
-        },
-        ts: {
-            typeName: "number",
-        },
+        }
     },
 });
 
@@ -208,10 +214,7 @@ export const f32 = type("f32", {}, {
             typeName: "float",
             reader: "read_f32",
             writer: "write_f32",
-        },
-        ts: {
-            typeName: "number",
-        },
+        }
     },
 });
 
@@ -225,10 +228,7 @@ export const f64 = type("f64", {}, {
             typeName: "double",
             reader: "read_f64",
             writer: "write_f64",
-        },
-        ts: {
-            typeName: "number",
-        },
+        }
     },
 });
 
@@ -241,8 +241,15 @@ export const bool = type("bool", {}, {
         },
         ts: {
             typeName: "boolean",
+            reader: "read_stream_boolean",
+            writer: "write_stream_boolean",
         },
     },
+});
+
+export const optional = (elementType: Type) => type("Optional", {}, {
+    optional: true,
+    generics: [elementType],
 });
 
 export const array = (elementType: Type) => type("Array", {}, {
@@ -250,10 +257,25 @@ export const array = (elementType: Type) => type("Array", {}, {
     generics: [elementType],
 });
 
-// TODO: implement
-export const optional = (elementType: Type) => type("Optional", {}, {
-    optional: true,
+export const static_array = (elementType: Type, length: number) => type("StaticArray", {}, {
+    extern: true,
+    apiStreamWrite: true,
+    apiStreamRead: true,
+    staticLength: length,
     generics: [elementType],
+});
+
+export const static_string = (length: number) => type("StaticString", {}, {
+    extern: true,
+    apiStreamWrite: true,
+    apiStreamRead: true,
+    staticLength: length,
+    generics: [char],
+    target: {
+        ts: {
+            typeName: "StaticString<" + length + ">",
+        }
+    }
 });
 
 export const collectTypes = (allTypes: Set<Type>, ...mainTypeList: Type[]) => {

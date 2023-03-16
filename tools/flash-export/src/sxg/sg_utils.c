@@ -1,4 +1,4 @@
-#include "model3d.c.h"
+#include "sg_utils.h"
 
 sg_keyframe_transform_t add_keyframe_transform(const sg_keyframe_transform_t* a, const sg_keyframe_transform_t* b) {
     return (sg_keyframe_transform_t){

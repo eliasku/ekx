@@ -2,8 +2,8 @@
 
 #include "Material3D.hpp"
 #include <ek/gfx.h>
-#include <ek/format/sg.h>
 #include <ek/buf.h>
+#include <gen_sg.h>
 
 namespace ek {
 

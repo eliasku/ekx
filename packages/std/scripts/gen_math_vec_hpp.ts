@@ -1,12 +1,14 @@
-function generate_vec_cxx_operators(name, fields, scalar_type = "float") {
+import {writeFileSync} from "fs";
+
+const generate_vec_cxx_operators = (name: string, fields: string[], scalar_type = "float") => {
     const name_t = name + "_t";
-    function list(pattern, del = ", ") {
+    const list = (pattern: string, del = ", ") => {
         let values = [];
         for(const field of fields) {
             values.push(pattern.replace(/\$/g, field));
         }
         return values.join(del);
-    }
+    };
 
     return `/// ${name}_t operator overloading
 inline static ${name_t} operator-(const ${name_t} a) {
@@ -100,4 +102,4 @@ code += generate_vec_cxx_operators("ivec3", ["x", "y", "z"], "int");
 code += generate_vec_cxx_operators("ivec4", ["x", "y", "z", "w"], "int");
 code += "#endif // __cplusplus\n";
 
-require("fs").writeFileSync("include/ek/math/vec.hpp", code);
+writeFileSync("include/ek/math/vec.hpp", code, "utf8");

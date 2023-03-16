@@ -3,7 +3,8 @@
 #include "export_atlas.h"
 #include "binpack.h"
 #include "sprpk_image.h"
-#include <ek/format/sg.h>
+#include <calo.h>
+#include <gen_sg.h>
 #include <ek/log.h>
 #include <ek/print.h>
 #include <ek/hash.h>

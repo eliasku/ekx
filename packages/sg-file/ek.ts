@@ -1,9 +1,0 @@
-import {Project} from "../../lib/cli/project.js";
-
-export async function setup(project: Project) {
-    project.addModule({
-        name: "sg-file",
-        cpp: "src",
-    });
-    await project.import("../calo/ek.ts");
-}
