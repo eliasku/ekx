@@ -107,8 +107,11 @@ export interface sg_file {
 
 export const read_stream_sg_file = (r: Reader): sg_file => {
     const val = {} as sg_file;
+	val.scenes = [];
 	for(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.scenes[i] = read_stream_u32(r);
+	val.linkages = [];
 	for(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.linkages[i] = read_stream_sg_scene_info(r);
+	val.library = [];
 	for(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.library[i] = read_stream_sg_node_data(r);
     return val;
 }
@@ -157,6 +160,7 @@ export interface sg_easing {
 export const read_stream_sg_easing = (r: Reader): sg_easing => {
     const val = {} as sg_easing;
 	val.ease = read_stream_f32(r);
+	val.curve = [];
 	for(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.curve[i] = read_stream_Vec2(r);
 	val.attribute = read_stream_u8(r);
     return val;
@@ -187,6 +191,7 @@ export const read_stream_sg_movie_frame = (r: Reader): sg_movie_frame => {
 	val.index = read_stream_i32(r);
 	val.duration = read_stream_i32(r);
 	val.motion_type = read_stream_i32(r);
+	val.easing = [];
 	for(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.easing[i] = read_stream_sg_easing(r);
 	val.transform = read_stream_sg_keyframe_transform(r);
 	val.visible = read_stream_boolean(r);
@@ -218,6 +223,7 @@ export interface sg_movie_layer {
 
 export const read_stream_sg_movie_layer = (r: Reader): sg_movie_layer => {
     const val = {} as sg_movie_layer;
+	val.frames = [];
 	for(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.frames[i] = read_stream_sg_movie_frame(r);
     return val;
 }
@@ -237,6 +243,7 @@ export const read_stream_sg_movie = (r: Reader): sg_movie => {
     const val = {} as sg_movie;
 	val.frames = read_stream_i32(r);
 	val.fps = read_stream_f32(r);
+	val.layers = [];
 	for(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.layers[i] = read_stream_sg_movie_layer(r);
     return val;
 }
@@ -295,6 +302,7 @@ export const read_stream_sg_dynamic_text = (r: Reader): sg_dynamic_text => {
 	val.rect = read_stream_Rect(r);
 	val.line_spacing = read_stream_f32(r);
 	val.line_height = read_stream_f32(r);
+	val.layers = [];
 	for(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.layers[i] = read_stream_sg_text_layer(r);
 	val.word_wrap = read_stream_boolean(r);
     return val;
@@ -405,6 +413,7 @@ export const read_stream_sg_node_data = (r: Reader): sg_node_data => {
 	val.flags = read_stream_u32(r) as sg_node_flags;
 	val.bounding_rect = read_stream_Rect(r);
 	val.scale_grid = read_stream_Rect(r);
+	val.children = [];
 	for(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.children[i] = read_stream_sg_node_data(r);
 	{ const has = read_stream_u8(r); if (has) val.dynamic_text = read_stream_sg_dynamic_text(r); }
 	{ const has = read_stream_u8(r); if (has) val.movie = read_stream_sg_movie(r); }
@@ -531,7 +540,9 @@ export interface model3d {
 
 export const read_stream_model3d = (r: Reader): model3d => {
     const val = {} as model3d;
+	val.vertices = [];
 	for(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.vertices[i] = read_stream_model3d_vertex(r);
+	val.indices = [];
 	for(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.indices[i] = read_stream_u16(r);
     return val;
 }
@@ -578,6 +589,7 @@ export const read_stream_atlas_page_info = (r: Reader): atlas_page_info => {
 	val.width = read_stream_u16(r);
 	val.height = read_stream_u16(r);
 	val.image_path = read_stream_string(r);
+	val.sprites = [];
 	for(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.sprites[i] = read_stream_sprite_info(r);
     return val;
 }
@@ -596,6 +608,7 @@ export interface atlas_info {
 
 export const read_stream_atlas_info = (r: Reader): atlas_info => {
     const val = {} as atlas_info;
+	val.pages = [];
 	for(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.pages[i] = read_stream_atlas_page_info(r);
     return val;
 }
@@ -690,7 +703,9 @@ export interface bmfont {
 export const read_stream_bmfont = (r: Reader): bmfont => {
     const val = {} as bmfont;
 	val.header = read_stream_bmfont_header(r);
+	val.dict = [];
 	for(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.dict[i] = read_stream_bmfont_entry(r);
+	val.glyphs = [];
 	for(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.glyphs[i] = read_stream_bmfont_glyph(r);
     return val;
 }
@@ -703,20 +718,6 @@ export const write_stream_bmfont = (w: Writer, v: bmfont): void => {
 	for(let i = 0; i < v.glyphs.length; ++i) write_stream_bmfont_glyph(w, v.glyphs[i]);
 }
 
-export interface image_path {
-	str: StaticString<128>;
-}
-
-export const read_stream_image_path = (r: Reader): image_path => {
-    const val = {} as image_path;
-	val.str = read_stream_static_string(r, 128);
-    return val;
-}
-
-export const write_stream_image_path = (w: Writer, v: image_path): void => {
-	write_stream_static_string(w, v.str, 128);
-}
-
 export const enum image_data_type {
    IMAGE_DATA_NORMAL = 0,
    IMAGE_DATA_CUBE_MAP = 1,
@@ -725,22 +726,21 @@ export const enum image_data_type {
 export interface image_data {
 	type: image_data_type;
 	format_mask: u32;
-	images_num: u32;
-	images: StaticArray<image_path, 6>;
+	images: string[];
 }
 
 export const read_stream_image_data = (r: Reader): image_data => {
     const val = {} as image_data;
 	val.type = read_stream_u32(r) as image_data_type;
 	val.format_mask = read_stream_u32(r);
-	val.images_num = read_stream_u32(r);
-	for(let i = 0, sz = 6; i < sz; ++i) val.images[i] = read_stream_image_path(r);
+	val.images = [];
+	for(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.images[i] = read_stream_string(r);
     return val;
 }
 
 export const write_stream_image_data = (w: Writer, v: image_data): void => {
 	write_stream_u32(w, v.type);
 	write_stream_u32(w, v.format_mask);
-	write_stream_u32(w, v.images_num);
-	for(let i = 0; i < 6; ++i) write_stream_image_path(w, v.images[i]);
+	write_stream_u32(w, v.images.length);
+	for(let i = 0; i < v.images.length; ++i) write_stream_string(w, v.images[i]);
 }

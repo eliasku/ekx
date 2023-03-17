@@ -49,26 +49,11 @@ double read_f64(calo_reader_t* r) {
 const char* read_stream_string(calo_reader_t* r) {
     uint32_t handle = read_u32(r);
     return get_data(&r->strings, handle);
-//    uint32_t size = read_u32(r);
-//    if (size) {
-//        char* val = (char*) malloc(size);
-//        read_span(r, val, size);
-//        if (val[size - 1] != 0) abort();
-//        return val;
-//    }
-//    return NULL;
 }
 
 const void* read_stream_data(calo_reader_t* r) {
     uint32_t handle = read_u32(r);
     return get_data(&r->strings, handle);
-//    uint32_t size = read_u32(r);
-//    if (size) {
-//        void* val = (void*) malloc(size);
-//        read_span(r, val, size);
-//        return val;
-//    }
-//    return NULL;
 }
 
 const char* map_stream_string(calo_reader_t* r) {
@@ -182,18 +167,9 @@ void write_f64(calo_writer_t* w, double v) {
 void write_stream_data(calo_writer_t* w, const void* data, uint32_t size) {
     uint32_t handle = add_data(&w->strings, data, size);
     write_u32(w, handle);
-
-//    ensure_writer_space(w, size + 4);
-//    write_u32(w, size);
-//    if (size) {
-//        write_span(w, data, size);
-//    }
 }
 
 void write_stream_string(calo_writer_t* w, const char* s) {
     uint32_t handle = add_string(&w->strings, s);
     write_u32(w, handle);
-//    const uint32_t max_length = 1024;
-//    uint32_t data_len = s ? (strlen(s) + 1) : 0;
-//    write_stream_data(w, s, data_len);
 }

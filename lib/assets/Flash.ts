@@ -7,6 +7,7 @@ import {H} from "../cli/utility/hash.js";
 import {logger} from "../cli/logger.js";
 import {hashFile, hashGlob} from "./helpers/hash.js";
 import {ensureDirSync, writeTextFileSync} from "../utils/utils.js";
+import {write_stream_string, write_stream_u32, Writer} from "../../packages/calo/lib/generated/calo.js";
 
 export interface FlashDesc extends AssetDesc {
     filepath: string;
@@ -32,6 +33,7 @@ export class FlashAsset extends Asset {
         return hash;
     }
 
+    _skip = false;
     async build() {
         const targetAtlas = this.desc.atlas ?? "main";
         ensureDirSync(path.join(this.owner.cache, this.desc.name!));
@@ -43,7 +45,7 @@ export class FlashAsset extends Asset {
             // path <path>
             // output_path <output>
             // output_images_path <outputImages>
-            // resoulutions_num %u
+            // resolutions_num %u
             // resolution_scale %f
             // ...
             const exportConfig = `${path.resolve(this.owner.basePath, this.desc.filepath)}
@@ -58,13 +60,17 @@ ${atlasAsset.desc.resolutions?.map(r => `${r.scale}`)?.join("\n")}
             atlasAsset.inputs.push(path.join(imagesOutput, "images.txt"));
 
             // header for .sg file
-            this.writer.writeU32(H("scene"));
-            this.writer.writeU32(H(this.desc.name!));
-            this.writer.writeString(this.desc.name! + ".sg");
+            this._skip = false;
         } else {
+            this._skip = true;
             logger.error(`Atlas target ${targetAtlas} is not found`);
             logger.info("atlases: " + this.owner.map.get(MultiResAtlasAsset.typeName)?.keys());
         }
     }
 
+    writeInfo(w: Writer) {
+        write_stream_u32(w, H("scene"));
+        write_stream_u32(w, H(this.desc.name!));
+        write_stream_string(w, this.desc.name! + ".sg");
+    }
 }

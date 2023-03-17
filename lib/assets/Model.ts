@@ -5,6 +5,7 @@ import {objExport} from "./helpers/objExport.js";
 import {H} from "../cli/utility/hash.js";
 import {hashFile} from "./helpers/hash.js";
 import {ensureDirSync} from "../utils/utils.js";
+import {write_stream_string, write_stream_u32, Writer} from "../../packages/calo/lib/generated/calo.js";
 
 export interface ObjImporterDesc extends AssetDesc {
     filepath: string;
@@ -30,9 +31,10 @@ export class ModelAsset extends Asset {
         ensureDirSync(path.dirname(outputPath));
 
         await objExport(inputPath, outputPath);
-
-        this.writer.writeU32(H(ModelAsset.typeName));
-        this.writer.writeString(this.desc.name!);
     }
 
+    writeInfo(w: Writer) {
+        write_stream_u32(w, H(ModelAsset.typeName));
+        write_stream_string(w, this.desc.name!);
+    }
 }

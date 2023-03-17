@@ -1,7 +1,5 @@
 #include "Asset_impl.hpp"
 
-#include <ek/serialize/serialize.hpp>
-#include <ek/ds/String.hpp>
 #include <ek/log.h>
 #include <ek/assert.h>
 #include <ek/time.h>
@@ -27,7 +25,7 @@
 
 namespace ek {
 
-Asset* unpack_asset(const void* data, uint32_t size);
+Asset* unpack_asset(calo_reader_t* r, string_hash_t type);
 
 class AudioAsset : public Asset {
 public:
@@ -275,17 +273,18 @@ public:
     ImageAsset(string_hash_t name, image_data_t data) :
             res{R_IMAGE(name)},
             data_{data} {
-        weight_ = (float) data_.images_num;
+        weight_ = (float) arr_size(data_.images);
     }
 
     void do_load() override {
         loader = ek_texture_loader_create();
         ek_texture_loader_set_path(&loader->basePath, manager_->base_path.c_str());
-        EK_ASSERT(data_.images_num <= EK_TEXTURE_LOADER_IMAGES_MAX_COUNT);
-        for (int i = 0; i < data_.images_num; ++i) {
-            ek_texture_loader_set_path(loader->urls + i, data_.images[i].str);
+        const int num = (int)arr_size(data_.images);
+        EK_ASSERT(num > 0 && num <= EK_TEXTURE_LOADER_IMAGES_MAX_COUNT);
+        for (int i = 0; i < num; ++i) {
+            ek_texture_loader_set_path(loader->urls + i, data_.images[i]);
         }
-        loader->imagesToLoad = (int) data_.images_num;
+        loader->imagesToLoad = num;
         if (data_.type == IMAGE_DATA_CUBE_MAP) {
             loader->isCubeMap = true;
             loader->premultiplyAlpha = false;
@@ -494,71 +493,52 @@ public:
     string_hash_t glyphCache_;
 };
 
-Asset* unpack_asset(const void* data, uint32_t size) {
-    input_memory_stream stream{data, size};
-    IO io{stream};
-    string_hash_t type;
-    io(type);
+Asset* unpack_asset(calo_reader_t* r, string_hash_t type) {
     if (type == H("audio")) {
-        string_hash_t name;
-        uint32_t flags = 0;
-        String path;
-        io(name, flags, path);
+        string_hash_t name = read_u32(r);
+        uint32_t flags = read_u32(r);
+        const char* path = read_stream_string(r);
         return new AudioAsset(name, path, flags);
     } else if (type == H("scene")) {
-        string_hash_t name;
-        String path;
-        io(name, path);
+        string_hash_t name = read_u32(r);
+        const char* path = read_stream_string(r);
         return new SceneAsset(name, path);
     } else if (type == H("bmfont")) {
-        string_hash_t name;
-        String path;
-        io(name, path);
+        string_hash_t name = read_u32(r);
+        const char* path = read_stream_string(r);
         return new BitmapFontAsset(name, path);
     } else if (type == H("ttf")) {
-        string_hash_t name;
-        String path;
-        string_hash_t glyphCache;
-        float baseFontSize;
-        io(name, path, glyphCache, baseFontSize);
+        string_hash_t name =read_u32(r);
+        const char* path =read_stream_string(r);
+        string_hash_t glyphCache =read_u32(r);
+        float baseFontSize = read_f32(r);
         return new TrueTypeFontAsset(name, path, glyphCache, baseFontSize);
     } else if (type == H("atlas")) {
-        IOStringView name;
-        uint32_t formatMask = 1;
-        io(name, formatMask);
-        return new AtlasAsset(name.data, formatMask);
+        const char* name = read_stream_string(r);
+        uint32_t formatMask = read_u32(r);
+        return new AtlasAsset(name, formatMask);
     } else if (type == H("dynamic_atlas")) {
-        string_hash_t name;
-        uint32_t flags;
-        io(name, flags);
+        string_hash_t name =read_u32(r);
+        uint32_t flags =read_u32(r);
         return new DynamicAtlasAsset(name, flags);
     } else if (type == H("model")) {
-        String name;
-        io(name);
+        const char* name = read_stream_string(r);
         return new ModelAsset(name);
     } else if (type == H("texture")) {
-        string_hash_t name;
-        image_data_t texData;
-        io(name);
-        io(texData.type, texData.format_mask);
-        io(texData.images_num);
-        for(uint32_t i = 0; i < texData.images_num; ++i) {
-            io.span(texData.images[i].str, sizeof(image_path_t));
-        }
+        string_hash_t name = read_u32(r);
+        image_data_t texData = read_stream_image_data(r);
         return new ImageAsset(name, texData);
     } else if (type == H("strings")) {
-        String name;
-        io(name);
-        uint32_t langs_num;
+        const char* name = read_stream_string(r);
+        uint32_t langs_num = read_u32(r);
         lang_name_t langs[LANG_MAX_COUNT];
-        io(langs_num);
-        for (uint32_t i = 0; i < langs_num; ++i) {
-            io.span(langs[i].str, sizeof(lang_name_t));
-        }
+        // TODO:
+        memcpy(langs, r->p, sizeof langs);
+        r->p += sizeof langs;
+
         return new StringsAsset(name, langs, langs_num);
     } else if (type == H("pack")) {
-        String name;
-        io(name);
+        const char* name = read_stream_string(r);
         return new PackAsset(name);
     } else {
         EK_ASSERT(false && "asset: unknown `type` name hash");
@@ -580,21 +560,21 @@ void PackAsset::do_load() {
             [](ek_local_res* lr) {
                 PackAsset* this_ = (PackAsset*) lr->userdata;
                 if (ek_local_res_success(lr)) {
-                    input_memory_stream input{lr->buffer, lr->length};
-                    IO io{input};
-                    bool end = false;
-                    while (!end) {
-                        uint32_t headerSize = 0;
-                        io(headerSize);
-                        if (headerSize != 0) {
-                            auto* asset = unpack_asset(io.stream.dataAtPosition(), headerSize);
+                    calo_reader_t reader = {};
+                    reader.p = lr->buffer;
+                    const uint8_t* end = reader.p + lr->length;
+                    read_calo(&reader);
+                    while (reader.p < end) {
+                        string_hash_t type = read_u32(&reader);
+                        if(type) {
+                            Asset* asset = unpack_asset(&reader, type);
                             if (asset) {
                                 this_->assets.push_back(asset);
                                 this_->manager_->add(asset);
                             }
-                            io.stream.seek((int32_t) headerSize);
-                        } else {
-                            end = true;
+                        }
+                        else {
+                            break;
                         }
                     }
                     ek_local_res_close(lr);

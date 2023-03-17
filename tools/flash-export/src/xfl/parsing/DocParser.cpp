@@ -145,7 +145,7 @@ void DocParser::load() {
 
         auto* file = root->open(path);
         const auto& content = file->content();
-        bi.bitmap.reset(BitmapData::parse(content.c_str(), content.size()));
+        bi.bitmap.reset(parse_bitmap_data((const uint8_t*)content.c_str(), content.size()));
         doc.library.emplace_back(std::move(bi));
     }
 

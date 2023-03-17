@@ -37,7 +37,7 @@ void fwrite_table(FILE* stream, vla_table_t* table);
 
 typedef struct {
     uint8_t* p;
-    void* data;
+    uint8_t* data;
     uint32_t cap;
     vla_table_t strings;
 } calo_writer_t;

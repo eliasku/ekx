@@ -94,6 +94,7 @@ export const generateStreamRead = (type: Type) => {
         } else if (N && T) {
             code += `\tfor(let i = 0, sz = ${N}; i < sz; ++i) val.${field}[i] = ${getReaderName(T)}(r);\n`;
         } else if (T && fieldType.options.variableLengthArray) {
+            code += `\tval.${field} = [];\n`;
             code += `\tfor(let i = 0, sz = read_stream_u32(r); i < sz; ++i) val.${field}[i] = ${getReaderName(T)}(r);\n`;
         } else if (T && fieldType.options.optional) {
             code += `\t{ const has = read_stream_u8(r); if (has) val.${field} = ${getReaderName(T)}(r); }\n`;

@@ -4,6 +4,12 @@ import {H} from "../cli/utility/hash.js";
 import {hashGlob} from "./helpers/hash.js";
 import {ensureDirSync, expandGlobSync} from "../utils/utils.js";
 import {msgfmt} from "./helpers/msgfmt.js";
+import {
+    write_stream_static_string,
+    write_stream_string,
+    write_stream_u32,
+    Writer
+} from "../../packages/calo/lib/generated/calo.js";
 
 export interface TranslationsDesc extends AssetDesc {
     filepath: string
@@ -32,14 +38,21 @@ export class TranslationsAsset extends Asset {
         const outputPath = path.join(this.owner.output, this.desc.name!);
         ensureDirSync(outputPath);
 
-        const langs: string[] = [];
+        this._langs = [];
         for (const [lang, filepath] of this.languages) {
-            langs.push(lang);
+            this._langs.push(lang);
             await msgfmt(filepath, path.join(outputPath, lang) + ".mo");
         }
+    }
 
-        this.writer.writeU32(H("strings"));
-        this.writer.writeString(this.desc.name!);
-        this.writer.writeFixedASCIIArray(langs, 8);
+    _langs: string[] = [];
+
+    writeInfo(w: Writer) {
+        write_stream_u32(w, H("strings"));
+        write_stream_string(w, this.desc.name!);
+        write_stream_u32(w, this._langs.length);
+        for (const l of this._langs) {
+            write_stream_static_string(w, l, 8);
+        }
     }
 }

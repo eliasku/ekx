@@ -35,6 +35,8 @@ typedef bmfont_glyph_t* bmfont_glyph_array_t;
 
 typedef bmfont_entry_t* bmfont_entry_array_t;
 
+typedef const char** cstring_array_t;
+
 
 sg_scene_info_array_t read_stream_sg_scene_info_array(calo_reader_t* r);
 
@@ -99,6 +101,10 @@ void write_stream_bmfont_glyph_array(calo_writer_t* w, bmfont_glyph_array_t v);
 bmfont_entry_array_t read_stream_bmfont_entry_array(calo_reader_t* r);
 
 void write_stream_bmfont_entry_array(calo_writer_t* w, bmfont_entry_array_t v);
+
+cstring_array_t read_stream_cstring_array(calo_reader_t* r);
+
+void write_stream_cstring_array(calo_writer_t* w, cstring_array_t v);
 
 sg_frame_script_t read_stream_sg_frame_script(calo_reader_t* r) {
     sg_frame_script_t val;
@@ -930,28 +936,39 @@ void write_stream_bmfont(calo_writer_t* w, bmfont_t v) {
 	write_stream_bmfont_glyph_array(w, v.glyphs);
 }
 
-image_path_t read_stream_image_path(calo_reader_t* r) {
-    image_path_t val;
-	read_span(r, val.str, sizeof val.str);
+cstring_array_t read_stream_cstring_array(calo_reader_t* r) {
+    cstring_array_t val;
+    {
+        uint32_t count = read_u32(r);
+        val = 0;
+        arr_reinit(val, count);
+        for(uint32_t i = 0; i < count; ++i) {
+            val[i] = read_stream_string(r);
+        }
+    }
     return val;
 }
 
-void write_stream_image_path(calo_writer_t* w, image_path_t v) {
-	write_span(w, v.str, sizeof v.str);
+void write_stream_cstring_array(calo_writer_t* w, cstring_array_t v) {
+    {
+        uint32_t count = arr_size(v);
+        write_u32(w, count);
+        for(uint32_t i = 0; i < count; ++i) {
+            write_stream_string(w, v[i]);
+        }
+    }
 }
 
 image_data_t read_stream_image_data(calo_reader_t* r) {
     image_data_t val;
 	val.type = (image_data_type_t)read_u32(r);
 	val.format_mask = read_u32(r);
-	val.images_num = read_u32(r);
-	read_span(r, val.images, sizeof val.images);
+	val.images = read_stream_cstring_array(r);
     return val;
 }
 
 void write_stream_image_data(calo_writer_t* w, image_data_t v) {
 	write_u32(w, v.type);
 	write_u32(w, v.format_mask);
-	write_u32(w, v.images_num);
-	write_span(w, v.images, sizeof v.images);
+	write_stream_cstring_array(w, v.images);
 }

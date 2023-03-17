@@ -6,6 +6,12 @@ import {H} from "../cli/utility/hash.js";
 import {hashFile} from "./helpers/hash.js";
 import {logger} from "../cli/logger.js";
 import {ensureDirSync} from "../utils/utils.js";
+import {
+    write_stream_f32,
+    write_stream_string,
+    write_stream_u32,
+    Writer
+} from "../../packages/calo/lib/generated/calo.js";
 
 export interface TTFImporterDesc extends AssetDesc {
     filepath: string;
@@ -36,13 +42,14 @@ export class TTFAsset extends Asset {
         const outputPath = path.join(this.owner.output, this.desc.name + ".ttf");
         ensureDirSync(path.dirname(outputPath));
         fs.copyFileSync(path.resolve(this.owner.basePath, this.desc.filepath), outputPath);
-
-        this.writer.writeU32(H(this.typeName));
-        this.writer.writeU32(H(this.desc.name!));
-        this.writer.writeString(this.desc.name + ".ttf");
-        this.writer.writeU32(H(this.desc.glyph_cache ?? "default_glyph_cache"));
-        this.writer.writeF32(this.desc.base_font_size ?? 48);
-
         return null;
+    }
+
+    writeInfo(w: Writer) {
+        write_stream_u32(w, H(this.typeName));
+        write_stream_u32(w, H(this.desc.name!));
+        write_stream_string(w, this.desc.name + ".ttf");
+        write_stream_u32(w, H(this.desc.glyph_cache ?? "default_glyph_cache"));
+        write_stream_f32(w, this.desc.base_font_size ?? 48);
     }
 }

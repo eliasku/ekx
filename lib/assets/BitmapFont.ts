@@ -5,6 +5,7 @@ import {MultiResAtlasAsset} from "./Atlas.js";
 import {H} from "../cli/utility/hash.js";
 import {hashFile} from "./helpers/hash.js";
 import {ensureDirSync, writeTextFileSync} from "../utils/utils.js";
+import {write_stream_string, write_stream_u32, Writer} from "../../packages/calo/lib/generated/calo.js";
 
 export interface BMFontDesc extends AssetDesc {
     filepath: string;
@@ -59,8 +60,12 @@ ${resolutions.map(r=> ""+r.scale).join("\n")}
 
         atlasAsset.inputs.push(path.join(imagesOutput, "images.txt"));
 
-        this.writer.writeU32(H(BitmapFontAsset.typeName));
-        this.writer.writeU32(H(this.desc.name!));
-        this.writer.writeString(this.desc.name + ".font");
+
+    }
+
+    writeInfo(w: Writer) {
+        write_stream_u32(w, H(BitmapFontAsset.typeName));
+        write_stream_u32(w, H(this.desc.name!));
+        write_stream_string(w, this.desc.name + ".font");
     }
 }

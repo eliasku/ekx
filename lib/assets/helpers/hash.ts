@@ -1,6 +1,5 @@
 import * as path from "path";
 import * as fs from "fs";
-import {H} from "../../cli/utility/hash.js";
 import {isFile} from "../../cli/utils.js";
 import {expandGlobSync} from "../../utils/utils.js";
 
@@ -8,10 +7,6 @@ import {expandGlobSync} from "../../utils/utils.js";
 const seed = 0x811C9DC5;
 
 // FNV-1a hash
-export function hashObject(obj: any): number {
-    return H(JSON.stringify(obj));
-}
-
 export function hashBytes(bytes: Uint8Array): number {
     let hash = seed;
     for (let i = 0; i < bytes.byteLength; ++i) {
@@ -27,8 +22,8 @@ export function hashFile(filepath: string): number {
 
 export function hashGlob(pattern: string): number {
     let hash = 0;
-    const files:string[] = [];
-    for(const file of expandGlobSync(pattern)) {
+    const files: string[] = [];
+    for (const file of expandGlobSync(pattern)) {
         files.push(file.path);
     }
     files.sort();

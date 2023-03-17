@@ -2,10 +2,10 @@ import * as fs from "fs";
 import * as path from "path";
 import {isDir, isFile} from "../cli/utils.js";
 import {logger} from "../cli/logger.js";
-import {BytesWriter} from "./helpers/BytesWriter.js";
 import {Project} from "../cli/project.js";
 import {H} from "../cli/utility/hash.js";
 import {ensureDirSync, expandGlobSync, readTextFileSync, writeTextFileSync} from "../utils/utils.js";
+import {newWriter, save_writer, write_stream_u32, Writer} from "../../packages/calo/lib/generated/calo.js";
 
 export interface AssetDesc {
     name?: string; //
@@ -14,7 +14,6 @@ export interface AssetDesc {
 }
 
 export class Asset {
-    readonly writer = new BytesWriter();
     priority: number = 0;
     owner!: AssetBuilderContext;
 
@@ -38,11 +37,12 @@ export class Asset {
     resolveInputs(): number {
         return H(JSON.stringify(this.base_desc));
     }
+
+    writeInfo(w: Writer) {
+    }
 }
 
 export class AssetBuilderContext {
-    readonly writer = new BytesWriter();
-
     cache: string = "";
     output: string = "";
     devMode = true;
@@ -97,8 +97,7 @@ export class AssetBuilderContext {
                     ++total;
                 }
             }
-        }
-        else {
+        } else {
             logger.warn(`assets base path is not a directory: ${this.basePath}`);
         }
         if (total === 0) {
@@ -166,12 +165,11 @@ export class AssetBuilderContext {
         await this.runPhase(this.assetsToBuild, "build");
         await this.runPhase(this.assetsToBuild, "postBuild");
 
+        const writer = newWriter(100);
         for (const a of this.assetsToBuild) {
-            if (a.writer.size > 0) {
-                this.writer.writeSection(a.writer);
-            }
+            a.writeInfo(writer);
         }
-        this.writer.writeU32(0);
-        this.writer.save(path.join(this.output, "pack.bin"));
+        write_stream_u32(writer, 0);
+        save_writer(writer, path.join(this.output, "pack.bin"));
     }
 }

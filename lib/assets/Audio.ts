@@ -5,6 +5,7 @@ import {removePathExtension} from "../cli/utils.js";
 import {H} from "../cli/utility/hash.js";
 import {hashFile} from "./helpers/hash.js";
 import {ensureDirSync} from "../utils/utils.js";
+import {write_stream_string, write_stream_u32, Writer} from "../../packages/calo/lib/generated/calo.js";
 
 export interface AudioFile {
     filepath: string;
@@ -37,31 +38,39 @@ export class AudioAsset extends Asset {
             super.resolveInputs();
     }
 
+    _skip = false;
+    _name = "";
+    _flags = 0;
     build(): null {
         const outputPath = path.join(this.owner.output, this.desc.filepath);
         const inputPath = path.join(this.owner.basePath, this.desc.filepath);
         ensureDirSync(path.dirname(outputPath));
 
         fs.copyFileSync(inputPath, outputPath);
-        const name = this.desc.name ?? removePathExtension(this.desc.filepath);
+        this._name = this.desc.name ?? removePathExtension(this.desc.filepath);
         const streaming = this.desc.streaming ?? false;
         const lazy = this.desc.lazy ?? true;
-        const dev = this.desc.dev ?? false;
-        if (dev && !this.owner.devMode) {
-            return null;
-        }
-        this.writer.writeU32(H("audio"));
-        this.writer.writeU32(H(name));
-        let flags = 0;
+        this._flags = 0;
         if (streaming) {
-            flags |= 1;
+            this._flags |= 1;
         }
         if (lazy) {
-            flags |= 2;
+            this._flags |= 2;
         }
-        this.writer.writeU32(flags);
-        this.writer.writeString(this.desc.filepath);
+
+        const dev = this.desc.dev ?? false;
+        this._skip = dev && !this.owner.devMode;
 
         return null;
+    }
+
+    writeInfo(w: Writer) {
+        if(this._skip) {
+            return;
+        }
+        write_stream_u32(w, H("audio"));
+        write_stream_u32(w, H(this._name));
+        write_stream_u32(w, this._flags);
+        write_stream_string(w, this.desc.filepath);
     }
 }

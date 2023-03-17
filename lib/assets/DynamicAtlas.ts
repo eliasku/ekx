@@ -1,5 +1,6 @@
 import {Asset, AssetDesc} from "./Asset.js";
 import {H} from "../cli/utility/hash.js";
+import {write_stream_u32, Writer} from "../../packages/calo/lib/generated/calo.js";
 
 export interface DynamicAtlasDesc extends AssetDesc {
     name: string;
@@ -14,16 +15,18 @@ export class DynamicAtlasAsset extends Asset {
         super(desc, DynamicAtlasAsset.typeName);
     }
 
+    _flags = 0;
+
     build(): null {
-        let flags = 0;
-        if (this.desc.alpha_map) flags |= 1;
-        if (this.desc.mipmaps) flags |= 2;
-
-        this.writer.writeU32(H(DynamicAtlasAsset.typeName));
-        this.writer.writeU32(H(this.desc.name));
-        this.writer.writeU32(flags);
-
+        this._flags = 0;
+        if (this.desc.alpha_map) this._flags |= 1;
+        if (this.desc.mipmaps) this._flags |= 2;
         return null;
     }
 
+    writeInfo(w: Writer) {
+        write_stream_u32(w, H(DynamicAtlasAsset.typeName));
+        write_stream_u32(w, H(this.desc.name));
+        write_stream_u32(w, this._flags);
+    }
 }

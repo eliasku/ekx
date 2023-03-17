@@ -5,6 +5,7 @@ import {Asset, AssetDesc} from "./Asset.js";
 import {spritePacker} from "./helpers/spritePacker.js";
 import {H} from "../cli/utility/hash.js";
 import {ensureDirSync, expandGlobSync, writeTextFileSync} from "../utils/utils.js";
+import {write_stream_string, write_stream_u32, Writer} from "../../packages/calo/lib/generated/calo.js";
 
 export interface MultiResAtlasImporterDesc extends AssetDesc {
     name: string; // required!
@@ -71,9 +72,11 @@ ${this.inputs.join("\n")}
                 }
             }
         }
+    }
 
-        this.writer.writeU32(H("atlas"));
-        this.writer.writeString(this.desc.name);
+    writeInfo(w: Writer) {
+        write_stream_u32(w, H("atlas"));
+        write_stream_string(w, this.desc.name);
         // variants
         let formatMask = 1;
         if (this.desc.webp) {
@@ -82,6 +85,6 @@ ${this.inputs.join("\n")}
             }
             formatMask |= 2;
         }
-        this.writer.writeU32(formatMask);
+        write_stream_u32(w, formatMask);
     }
 }

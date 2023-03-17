@@ -8,18 +8,18 @@
 #include <memory>
 #include <optional>
 
-namespace ek::xfl {
-
 struct BitmapData {
     int width = 0;
     int height = 0;
     int bpp = 4;
     bool alpha = true;
-    Array<uint8_t> data;
-
-    // TODO: data is data, remove string usage
-    static BitmapData* parse(const void* data, uint32_t size);
+    ek::Array<uint8_t> data;
 };
+
+// TODO: data is data, remove string usage
+BitmapData* parse_bitmap_data(const uint8_t* data, uint32_t size);
+
+namespace ek::xfl {
 
 enum class FilterType {
     none = 0,

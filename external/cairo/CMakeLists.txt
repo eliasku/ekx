@@ -7,7 +7,7 @@ add_library(${PROJECT_NAME} STATIC
         src/cairo-error.c
         src/cairo-font-face.c
         src/cairo-font-options.c
-        src/cairo-version.c
+#        src/cairo-version.c
         src/cairo-surface.c
         src/cairo-pattern.c
         src/cairo-observer.c

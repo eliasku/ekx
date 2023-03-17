@@ -70,7 +70,6 @@ struct Frame;
 struct Layer;
 struct Timeline;
 struct Edge;
-struct BitmapData;
 
 class FileNode;
 

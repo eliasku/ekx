@@ -1,24 +1,18 @@
-#include "parsing.hpp"
-
 #include "../types.hpp"
 
-#include <ek/serialize/serialize.hpp>
+#include <calo.h>
 #include <ek/log.h>
 #include <ek/assert.h>
-
-//#include <ek/image_stb.c.h>
 #include <stb/stb_image.h>
-
 #include <miniz.h>
 
-namespace ek::xfl {
-
 // thanks to https://github.com/charrea6/flash-hd-upscaler/blob/master/images.py
+
 const uint16_t SIGNATURE_JPEG = 0xD8FF;
 const uint16_t SIGNATURE_ARGB = 0x0503;
 const uint16_t SIGNATURE_CLUT = 0x0303;
 
-struct BitmapItemHeader {
+typedef struct {
     uint16_t stride;
     uint16_t width;
     uint16_t height;
@@ -27,21 +21,21 @@ struct BitmapItemHeader {
     uint32_t height_high;
     uint32_t height_tw;
     uint8_t flags;
+} BitmapItemHeader;
 
-    template<typename S>
-    void serialize(IO<S> io) {
-        io(
-                stride,
-                width,
-                height,
-                width_high,
-                width_tw,
-                height_high,
-                height_tw,
-                flags
-        );
-    }
-};
+BitmapItemHeader read_bitmap_item_header(calo_reader_t* r) {
+    BitmapItemHeader desc{};
+    desc.stride = read_u16(r);
+    desc.width = read_u16(r);
+    desc.height = read_u16(r);
+    desc.width_high = read_u32(r);
+    desc.width_tw = read_u32(r);
+    desc.height_high = read_u32(r);
+    desc.height_tw = read_u32(r);
+    desc.flags = read_u8(r);
+    return desc;
+}
+
 
 // bgra_to_argb / vica versa
 void reverse_color_components(uint8_t* data, size_t size) {
@@ -77,64 +71,62 @@ void convert_clut(uint8_t* data, size_t size) {
     }
 }
 
-size_t ekUncompress(input_memory_stream& input, uint8_t* dest, size_t dest_size) {
-    auto chunkSize = input.read<uint16_t>();
-    output_memory_stream buffer{chunkSize};
-    while (chunkSize > 0u) {
-        buffer.write(static_cast<const std::byte*>(input.data()) + input.position(), chunkSize);
-        input.seek(chunkSize);
-        chunkSize = input.read<uint16_t>();
+size_t ekUncompress(calo_reader_t* r, uint8_t* dest, size_t dest_size) {
+    uint16_t chunk_size = read_u16(r);
+    calo_writer_t w = new_writer(100);
+    while (chunk_size) {
+        write_span(&w, r->p, chunk_size);
+        r->p += chunk_size;
+        chunk_size = read_u16(r);
     }
 
-    size_t sz = dest_size;
-    mz_uncompress(dest, reinterpret_cast<mz_ulong*>(&sz), static_cast<const uint8_t*>(buffer.data()),
-                  (mz_ulong) buffer.size());
+    mz_ulong sz = dest_size;
+    mz_uncompress(dest, &sz, w.data, (mz_ulong) (w.p - w.data));
+
+    free_writer(&w);
     return sz;
 }
 
-void readBitmapARGB(input_memory_stream& input, BitmapData& bitmap) {
-    BitmapItemHeader desc{};
-    IO io{input};
-    io(desc);
-    const auto compressed = input.read<uint8_t>();
+void readBitmapARGB(calo_reader_t* r, BitmapData* bitmap) {
+    BitmapItemHeader desc = read_bitmap_item_header(r);
+    const uint8_t compressed = read_u8(r);
     EK_ASSERT(desc.width_tw == desc.width * 20u);
     EK_ASSERT(desc.height_tw == desc.height * 20u);
-    bitmap.width = desc.width;
-    bitmap.height = desc.height;
-    bitmap.bpp = desc.stride / bitmap.width;
-    bitmap.alpha = desc.flags != 0;
-    bitmap.data.resize(bitmap.width * bitmap.height * bitmap.bpp);
-    const auto bm_size = bitmap.data.size();
-    auto* bm_data = bitmap.data.data();
+    bitmap->width = desc.width;
+    bitmap->height = desc.height;
+    bitmap->bpp = desc.stride / bitmap->width;
+    bitmap->alpha = desc.flags != 0;
+    bitmap->data.resize(bitmap->width * bitmap->height * bitmap->bpp);
+    const auto bm_size = bitmap->data.size();
+    auto* bm_data = bitmap->data.data();
     if ((compressed & 1) != 0) {
-        auto written = ekUncompress(input, bm_data, bm_size);
+        auto written = ekUncompress(r, bm_data, bm_size);
         if (written != bm_size) {
             log_error("bitmap decompress error");
         }
     } else {
-        input.read(bm_data, bm_size);
+        memcpy(bm_data, r->p, bm_size);
+        r->p += bm_size;
     }
 
     reverse_color_components(bm_data, bm_size);
 }
 
-void readBitmapCLUT(input_memory_stream& input, BitmapData& bitmap) {
-    BitmapItemHeader desc{};
-    IO io{input};
-    io(desc);
+void readBitmapCLUT(calo_reader_t* r, BitmapData* bitmap) {
+    BitmapItemHeader desc = read_bitmap_item_header(r);
     EK_ASSERT(desc.width_tw == desc.width * 20u);
     EK_ASSERT(desc.height_tw == desc.height * 20u);
-    auto nColors = input.read<uint8_t>();
+    uint8_t nColors = read_u8(r);
     if (nColors == 0) {
         nColors = 0xFF;
     }
 
     // read padding to align
-    input.read<uint16_t>();
+    read_u16(r);
 
     uint32_t colorTable[256];
     for (int i = 0; i < nColors; ++i) {
-        colorTable[i] = input.read<uint32_t>();
+        colorTable[i] = read_u32(r);
     }
     // convert color table to our cairo format
     convert_color_to_bgra(reinterpret_cast<uint8_t*>(colorTable), nColors * 4);
@@ -143,60 +135,56 @@ void readBitmapCLUT(input_memory_stream& input, BitmapData& bitmap) {
         // transparent
         colorTable[0] = 0x0;
     }
-    Array<uint8_t> buffer{};
+    ek::Array<uint8_t> buffer{};
     buffer.resize(desc.stride * desc.height);
-    auto written = ekUncompress(input, buffer.data(), buffer.size());
+    auto written = ekUncompress(r, buffer.data(), buffer.size());
     if (written != buffer.size()) {
         log_error("bitmap decompress error");
     }
-    bitmap.width = desc.width;
-    bitmap.height = desc.height;
-    bitmap.bpp = 4;
-    bitmap.alpha = desc.flags != 0;
-    bitmap.data.resize(bitmap.width * bitmap.height * 4);
-    auto* pixels = reinterpret_cast<uint32_t*>(bitmap.data.data());
+    bitmap->width = desc.width;
+    bitmap->height = desc.height;
+    bitmap->bpp = 4;
+    bitmap->alpha = desc.flags != 0;
+    bitmap->data.resize(bitmap->width * bitmap->height * 4);
+    auto* pixels = reinterpret_cast<uint32_t*>(bitmap->data.data());
     for (size_t i = 0; i < buffer.size(); ++i) {
         pixels[i] = colorTable[buffer[i]];
     }
 }
 
-void readBitmapJPEG(const void* data, uint32_t size, BitmapData& bitmap) {
-    int w = 0;
-    int h = 0;
-    int channels = 0;
-    auto* imageData = stbi_load_from_memory((const uint8_t*)data, (int)size,
-                                             &w, &h, &channels, 4);
+void readBitmapJPEG(const uint8_t* data, int size, BitmapData* bitmap) {
+    int w = 0, h = 0, channels = 0;
+    stbi_uc* imageData = stbi_load_from_memory(data, size,
+                                               &w, &h, &channels, 4);
 
     if (imageData != nullptr) {
-        bitmap.width = w;
-        bitmap.height = h;
-        bitmap.bpp = 4;
-        bitmap.alpha = false;
-        bitmap.data.resize(bitmap.width * bitmap.height * bitmap.bpp);
-        memcpy(bitmap.data.data(), imageData, bitmap.data.size());
+        bitmap->width = w;
+        bitmap->height = h;
+        bitmap->bpp = 4;
+        bitmap->alpha = false;
+        bitmap->data.resize(bitmap->width * bitmap->height * bitmap->bpp);
+        memcpy(bitmap->data.data(), imageData, bitmap->data.size());
         free(imageData);
-        convert_color_to_bgra(bitmap.data.data(), bitmap.data.size());
+        convert_color_to_bgra(bitmap->data.data(), bitmap->data.size());
     }
 }
 
-BitmapData* BitmapData::parse(const void* data, uint32_t size) {
-    auto* bitmap_ptr = new BitmapData;
-    auto& bitmap = *bitmap_ptr;
+BitmapData* parse_bitmap_data(const uint8_t* data, uint32_t size) {
+    BitmapData* bitmap = new BitmapData;
 
-    input_memory_stream input{data, size};
+    calo_reader_t reader = {};
+    reader.p = (uint8_t*) data;
 
-    const auto sig = input.read<uint16_t>();
+    const uint16_t sig = read_u16(&reader);
     if (sig == SIGNATURE_ARGB) {
-        readBitmapARGB(input, bitmap);
+        readBitmapARGB(&reader, bitmap);
     } else if (sig == SIGNATURE_CLUT) {
-        readBitmapCLUT(input, bitmap);
+        readBitmapCLUT(&reader, bitmap);
     } else if (sig == SIGNATURE_JPEG) {
-        readBitmapJPEG(data, size, bitmap);
+        readBitmapJPEG(data, (int) size, bitmap);
     } else {
         log_error("unsupported dat");
     }
 
-    return bitmap_ptr;
-}
-
+    return bitmap;
 }
