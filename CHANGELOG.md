@@ -1,5 +1,13 @@
 # ekx
 
+## 0.0.3
+
+### Patch Changes
+
+- 3979fe1: replace python xcode project generation to swift xcodegen
+- 3979fe1: fix crashlytics script for ios
+- 3979fe1: fix bmfont export
+
 ## 0.0.2
 
 ### Patch Changes
