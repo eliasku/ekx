@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.19)
 
 add_subdirectory(headers)
-add_subdirectory(sokol)
 add_subdirectory(oboe)
 add_subdirectory(imgui)
 add_subdirectory(cairo)

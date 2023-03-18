@@ -6,7 +6,7 @@
 #define SOKOL_GFX_IMPL
 #define SOKOL_ASSERT(x) EK_ASSERT(x)
 #define SOKOL_LOG(msg) log_debug("sg: %s", msg);
-#include <sokol_gfx.h>
+#include <sokol/sokol_gfx.h>
 
 static void ek_gfx_log_backend() {
 #ifndef NDEBUG

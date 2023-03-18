@@ -4,7 +4,7 @@
 #include <ek/ds/PodArray.hpp>
 #include <ek/math.h>
 #include <cstring>
-#include <sokol_gfx.h>
+#include <sokol/sokol_gfx.h>
 #include <ek/hash.h>
 #include <ek/rr.h>
 

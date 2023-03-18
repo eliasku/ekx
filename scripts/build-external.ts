@@ -2,7 +2,6 @@ import box2d from "./external-recipes/box2d.js";
 import cairo from "./external-recipes/cairo.js";
 import freetype from "./external-recipes/freetype/freetype.js";
 import headers from "./external-recipes/headers.js";
-import sokol from "./external-recipes/sokol.js";
 import quickjs from "./external-recipes/quickjs.js";
 import pugixml from "./external-recipes/pugixml.js";
 import miniz from "./external-recipes/miniz.js";
@@ -25,7 +24,6 @@ const libs: { [key: string]: Lib } = {
     box2d,
     cairo,
     freetype,
-    sokol,
     quickjs,
     pugixml,
     miniz,

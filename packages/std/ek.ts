@@ -5,13 +5,8 @@ export async function setup(project: Project) {
         name: "std",
         cpp: "src",
         cpp_include: "include",
-        web: {
-            //cpp: "src-wasm",
-            //cpp_lib: "--import-memory"
-        }
     });
     await project.import(
-        "../../external/headers/ek.ts",
-        "../../external/sokol/ek.ts",
+        "../../external/headers/ek.ts"
     );
 }

@@ -1,8 +1,7 @@
 #include <ek/time.h>
 
 #define SOKOL_TIME_IMPL
-
-#include <sokol_time.h>
+#include <sokol/sokol_time.h>
 
 #include <time.h>
 

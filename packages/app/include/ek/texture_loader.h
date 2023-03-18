@@ -1,7 +1,7 @@
 #ifndef EK_TEXTURE_LOADER_H
 #define EK_TEXTURE_LOADER_H
 
-#include <sokol_gfx.h>
+#include <sokol/sokol_gfx.h>
 
 #ifdef __cplusplus
 extern "C" {

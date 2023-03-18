@@ -9,11 +9,11 @@
 #define SOKOL_IMGUI_IMPL
 #define SOKOL_IMGUI_NO_SOKOL_APP
 
-#include <util/sokol_imgui.h>
+#include <sokol/util/sokol_imgui.h>
 
 #define SOKOL_GFX_IMGUI_IMPL
 
-#include <util/sokol_gfx_imgui.h>
+#include <sokol/util/sokol_gfx_imgui.h>
 
 namespace ek {
 

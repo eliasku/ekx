@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ek/math.h>
-#include <sokol_gfx.h>
+#include <sokol/sokol_gfx.h>
 
 namespace ek {
 

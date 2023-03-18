@@ -37,6 +37,5 @@ export async function setup(project: Project) {
     });
     await project.import(
         "../std/ek.ts",
-        "../../external/sokol/ek.ts",
     );
 }

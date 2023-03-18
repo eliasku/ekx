@@ -42,7 +42,6 @@ target_link_options(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
         PUBLIC ekx::headers
-        PUBLIC sokol
         )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")

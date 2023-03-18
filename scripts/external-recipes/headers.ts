@@ -1,4 +1,4 @@
-import * as path from "path";
+import {join} from "node:path";
 import {rm} from "../../lib/utils/utils.js";
 import {downloadFiles} from "../../lib/utils/download.js";
 import {resolveEkxPath} from "../../lib/utils/dirs.js";
@@ -6,7 +6,7 @@ import {resolveEkxPath} from "../../lib/utils/dirs.js";
 const destPath = resolveEkxPath("external/headers");
 
 async function clean() {
-    await rm(path.join(destPath, "include"));
+    await rm(join(destPath, "include"));
 }
 
 function fetch() {
@@ -15,6 +15,7 @@ function fetch() {
         download_dr(),
         download_pocketmod(),
         download_fast_obj(),
+        download_sokol(),
     ]).then(_ => undefined);
 }
 
@@ -23,28 +24,14 @@ async function download_stb() {
     const repoUrl = `https://github.com/nothings/stb/raw/${branch}`;
     await downloadFiles({
         srcBaseUrl: repoUrl,
-        destPath: path.join(destPath, "include/stb"),
+        destPath: join(destPath, "include/stb"),
         fileList: [
-            "stb_c_lexer.h",
-            "stb_connected_components.h",
-            "stb_divide.h",
-            "stb_ds.h",
-            "stb_dxt.h",
-            "stb_easy_font.h",
-            "stb_herringbone_wang_tile.h",
-            "stb_hexwave.h",
             "stb_image.h",
-            "stb_image_resize.h",
             "stb_image_write.h",
-            "stb_include.h",
-            "stb_leakcheck.h",
-            "stb_rect_pack.h",
             "stb_sprintf.h",
-            "stb_textedit.h",
-            "stb_tilemap_editor.h",
             "stb_truetype.h",
             "stb_vorbis.c",
-            "stb_voxel_render.h"
+            "stb_rect_pack.h",
         ]
     });
 }
@@ -54,11 +41,10 @@ async function download_dr() {
     const repoUrl = `https://github.com/mackron/dr_libs/raw/${branch}`;
     await downloadFiles({
         srcBaseUrl: repoUrl,
-        destPath: path.join(destPath, "include/dr"),
+        destPath: join(destPath, "include/dr"),
         fileList: [
-            "dr_flac.h",
             "dr_mp3.h",
-            "dr_wav.h"
+            "dr_wav.h",
         ]
     });
 }
@@ -68,7 +54,7 @@ async function download_pocketmod() {
     const repoUrl = `https://github.com/rombankzero/pocketmod/raw/${branch}`;
     await downloadFiles({
         srcBaseUrl: repoUrl,
-        destPath: path.join(destPath, "include/pocketmod"),
+        destPath: join(destPath, "include/pocketmod"),
         fileList: [
             "pocketmod.h"
         ]
@@ -80,10 +66,26 @@ async function download_fast_obj() {
     const repoUrl = `https://github.com/thisistherk/fast_obj/raw/${branch}`;
     await downloadFiles({
         srcBaseUrl: repoUrl,
-        destPath: path.join(destPath, "include/fast_obj"),
+        destPath: join(destPath, "include/fast_obj"),
         fileList: [
             "fast_obj.h"
         ]
+    });
+}
+
+async function download_sokol() {
+    const branch = "master";
+    const repoUrl = `https://github.com/floooh/sokol/raw/${branch}`;
+    const destDir = join(destPath, "include/sokol");
+    await downloadFiles({
+        srcBaseUrl: repoUrl,
+        destPath: destDir,
+        fileList: [
+            "sokol_gfx.h",
+            "sokol_time.h",
+            "util/sokol_imgui.h",
+            "util/sokol_gfx_imgui.h",
+        ],
     });
 }
 

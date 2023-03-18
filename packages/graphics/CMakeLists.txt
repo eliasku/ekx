@@ -11,20 +11,16 @@ target_include_directories(${PROJECT_NAME} PUBLIC src)
 add_library(ekx::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME}
-        PUBLIC ekx::core
         PUBLIC ekx::app
-        PUBLIC sokol
+        PUBLIC ekx::headers
+        PUBLIC ekx::std
         )
 
 if (EKX_BUILD_DEV_TOOLS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE SOKOL_TRACE_HOOKS)
 endif ()
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-        C_STANDARD 11
-        CXX_STANDARD 17
-        CXX_STANDARD_REQUIRED YES
-        CXX_EXTENSIONS NO)
+set_target_properties(${PROJECT_NAME} PROPERTIES C_STANDARD 11)
 
 target_compile_options(${PROJECT_NAME} PRIVATE
         -g

@@ -7,9 +7,6 @@
 #define DR_WAV_IMPLEMENTATION
 #include <dr/dr_wav.h>
 
-#define DR_FLAC_IMPLEMENTATION
-#include <dr/dr_flac.h>
-
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
@@ -17,6 +14,8 @@
 #include <stb/stb_image_write.h>
 
 #include <stb/stb_vorbis.c>
+
+#include <sokol/sokol_gfx.h>
 
 int main(int argc, char* argv[]) {
 
