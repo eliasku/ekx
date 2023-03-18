@@ -30,11 +30,10 @@
     "update-lock": "rm -r node_modules && rm package-lock.json && npm i && git add package-lock.json",
     "release": "npm run build && changeset publish",
     "version": "changeset version && npm run update-lock",
-    "gen-calo": "ts-node packages/calo/lib/index.ts",
-    "test-calo": "ts-node packages/calo/lib/generated/test.ts"
+    "gen-calo": "ts-node packages/calo/lib/index.ts"
   },
   "dependencies": {
-    "@swc/core": "^1.3.40",
+    "@swc/core": "^1.3.41",
     "@types/decompress": "^4.2.4",
     "@types/gettext-parser": "^4.0.2",
     "@types/mustache": "^4.2.2",
@@ -43,7 +42,7 @@
     "@types/xmldoc": "^1.1.6",
     "colors": "^1.4.0",
     "decompress": "^4.2.1",
-    "esbuild": "^0.17.11",
+    "esbuild": "^0.17.12",
     "gettext-parser": "^6.0.0",
     "glob": "^9.3.0",
     "mustache": "^4.2.0",

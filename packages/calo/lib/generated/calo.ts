@@ -1,6 +1,4 @@
 import {logger} from "../../../../lib/cli/logger.js";
-import {len} from "../../../auph/web/src/webaudio/common.js";
-import {write_stream_sg_file} from "./gen_sg.js";
 import {writeFileSync} from "fs";
 
 export type char = number;

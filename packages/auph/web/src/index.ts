@@ -1,6 +1,6 @@
-import {AuphBuffer, AuphBus, AuphMixer, AuphVoice, f32, Flag, IAuph, Mixer, Param, Unit} from "./protocol/interface";
-import * as Null from "./null/index";
-import * as Browser from "./webaudio/index";
+import {AuphBuffer, AuphBus, AuphMixer, AuphVoice, f32, Flag, IAuph, Mixer, Param, Unit} from "./protocol/interface.js";
+import * as Null from "./null/index.js";
+import * as Browser from "./webaudio/index.js";
 
 function haveWebAudio(): boolean {
     return typeof window !== "undefined" && !!(window.AudioContext || (window as any).webkitAudioContext);
@@ -15,7 +15,7 @@ function loadDriver(): IAuph {
 
 const _ = loadDriver();
 
-export * from "./protocol/static";
+export * from "./protocol/static.js";
 export const setup = _.setup;
 export const shutdown = _.shutdown;
 export const set = _.set;

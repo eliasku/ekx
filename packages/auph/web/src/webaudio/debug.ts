@@ -1,4 +1,4 @@
-import {Message} from "../protocol/interface";
+import {Message} from "../protocol/interface.js";
 
 let lastStatus = 0;
 

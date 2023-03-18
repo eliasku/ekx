@@ -1,12 +1,13 @@
 import {
     audioContextPause,
     audioContextResume,
-    closeContext, defaultSampleRate,
+    closeContext,
+    defaultSampleRate,
     getAudioContextObject,
     getContext,
     getContextState,
     initContext
-} from "./Mixer";
+} from "./Mixer.js";
 import {
     _getVoiceObj,
     _voiceApplyPitch,
@@ -18,9 +19,9 @@ import {
     _voiceStop,
     createVoiceObj,
     voicePool
-} from "./Voice";
-import {_getBus, _getBusGain, _setBusConnected, busLine, initBusPool, termBusPool} from "./Bus";
-import {setError, warn} from "./debug";
+} from "./Voice.js";
+import {_getBus, _getBusGain, _setBusConnected, busLine, initBusPool, termBusPool} from "./Bus.js";
+import {setError, warn} from "./debug.js";
 import {
     AuphBuffer,
     AuphBus,
@@ -36,7 +37,7 @@ import {
     Type,
     u31,
     Unit
-} from "../protocol/interface";
+} from "../protocol/interface.js";
 import {
     _buffer_set_callback,
     _bufferDestroy,
@@ -45,8 +46,8 @@ import {
     _getBufferObj,
     buffers,
     getNextBufferObj
-} from "./Buffer";
-import {connectAudioNode, disconnectAudioNode, len, resize, setAudioParamValue} from "./common";
+} from "./Buffer.js";
+import {connectAudioNode, setAudioParamValue} from "./common.js";
 
 export function setup(): void {
     const ctx = initContext();
@@ -59,8 +60,8 @@ export function shutdown(): void {
     const ctx = getContext();
     if (ctx) {
         termBusPool();
-        resize(voicePool, 1);
-        resize(buffers, 1);
+        voicePool.length = 1;
+        buffers.length = 1;
         closeContext(ctx);
     }
 }
@@ -227,8 +228,7 @@ export function voice(buffer: AuphBuffer,
             //voiceObj.sn!.start();
             voiceObj.pr = processor;
         }
-    }
-    else {
+    } else {
         _voicePrepareBuffer(voiceObj, ctx, bufferObj.b as AudioBuffer);
         if (flags & Flag.Running) {
             _voiceStartBuffer(voiceObj);
@@ -255,7 +255,7 @@ export function stop(name: Name): void {
     } else if (type === Type.Buffer) {
         const obj = _getBufferObj(name);
         if (obj) {
-            for (let i = 1; i < len(voicePool); ++i) {
+            for (let i = 1; i < voicePool.length; ++i) {
                 const v = voicePool[i]!;
                 if (v.bf === name) {
                     _voiceStop(v);
@@ -433,8 +433,7 @@ export function vibrate(durationMillis: u31): u31 {
 /** private helpers **/
 function _countObjectsWithFlags(arr: ({ s: u31 } | null)[], mask: u31): u31 {
     let cnt = 0;
-    const size = len(arr);
-    for (let i = 1; i < size; ++i) {
+    for (let i = 1; i < arr.length; ++i) {
         const obj = arr[i];
         if (obj && (obj.s & mask) === mask) {
             ++cnt;

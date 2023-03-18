@@ -1,6 +1,6 @@
-import {error, log, warn} from "./debug";
-import {Flag, Message, u31} from "../protocol/interface";
-import {unlock} from "./Unlock";
+import {error, log, warn} from "./debug.js";
+import {Flag, Message, u31} from "../protocol/interface.js";
+import {unlock} from "./Unlock.js";
 
 let ctx: AudioContext | undefined | null;
 export let emptyAudioBuffer!: AudioBuffer;

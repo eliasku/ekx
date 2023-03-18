@@ -1,6 +1,6 @@
-import {AuphBuffer, Flag, iMask, Message, Type, u31} from "../protocol/interface";
-import {error} from "./debug";
-import {add, len, nextHandle, Obj} from "./common";
+import {AuphBuffer, Flag, iMask, Message, Type, u31} from "../protocol/interface.js";
+import {error} from "./debug.js";
+import {nextHandle, Obj} from "./common.js";
 
 export interface CallbackBuffer {
     b: AudioBuffer;
@@ -23,7 +23,7 @@ export let buffers: (BufferObj | null)[] = [null];
 const buffersMaxCount = 128;
 
 export function getNextBufferObj(): AuphBuffer | 0 {
-    const next = len(buffers);
+    const next = buffers.length;
     for (let i = 1; i < next; ++i) {
         const buffer = buffers[i]!;
         if (buffer.s === 0) {
@@ -32,7 +32,7 @@ export function getNextBufferObj(): AuphBuffer | 0 {
     }
     if (next < buffersMaxCount) {
         const b = new BufferObj(next | Type.Buffer, 0, null);
-        add(buffers, b);
+        buffers.push(b);
         return b.h;
     }
     return 0;

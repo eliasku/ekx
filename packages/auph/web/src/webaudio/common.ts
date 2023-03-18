@@ -1,4 +1,4 @@
-import {iMask, tMask, u31, vIncr, vMask} from "../protocol/interface";
+import {iMask, tMask, u31, vIncr, vMask} from "../protocol/interface.js";
 
 export interface Obj {
     h: u31;
@@ -19,16 +19,4 @@ export function disconnectAudioNode(node: AudioNode, dest?: AudioNode) {
 
 export function setAudioParamValue(param: AudioParam, value: number) {
     param.value = value;
-}
-
-export function len<T>(a: T[]): u31 {
-    return a.length;
-}
-
-export function resize<T>(a: T[], length: u31) {
-    a.length = length;
-}
-
-export function add<T>(a: T[], e: T) {
-    a.push(e);
 }

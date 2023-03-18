@@ -1,6 +1,6 @@
-import {getAudioContextObject} from "./Mixer";
-import {AuphBus, Flag, iMask, Type, Unit} from "../protocol/interface";
-import {add, connectAudioNode, disconnectAudioNode, len, Obj, resize} from "./common";
+import {getAudioContextObject} from "./Mixer.js";
+import {AuphBus, Flag, iMask, Type, Unit} from "../protocol/interface.js";
+import {connectAudioNode, disconnectAudioNode, Obj} from "./common.js";
 
 export class BusObj implements Obj {
     h = 0;
@@ -14,10 +14,10 @@ export class BusObj implements Obj {
 export const busLine: BusObj[] = [];
 
 export function createBusObj(ctx: AudioContext): BusObj {
-    const next = len(busLine);
+    const next = busLine.length;
     const obj = new BusObj(ctx.createGain());
     obj.h = next | Type.Bus;
-    add(busLine, obj);
+    busLine.push(obj);
     return obj;
 }
 
@@ -30,10 +30,10 @@ export function initBusPool(ctx: AudioContext) {
 }
 
 export function termBusPool() {
-    for (let i = 0; i < len(busLine); ++i) {
+    for (let i = 0; i < busLine.length; ++i) {
         disconnectAudioNode(busLine[i].g);
     }
-    resize(busLine, 0);
+    busLine.length = 0;
 }
 
 export function _getBus(bus: AuphBus): BusObj | null {

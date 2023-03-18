@@ -1,4 +1,4 @@
-import {Flag, Mixer, Param, Type} from "./interface";
+import {Flag, Mixer, Param, Type} from "./interface.js";
 
 /** Export Constants only for pre-bundled usage **/
 

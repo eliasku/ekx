@@ -1,6 +1,6 @@
-import {AuphBuffer, AuphBus, AuphVoice, Flag, iMask, Type, u31, Unit} from "../protocol/interface";
-import {connectAudioNode, disconnectAudioNode, len, nextHandle, Obj, setAudioParamValue} from "./common";
-import {emptyAudioBuffer} from "./Mixer";
+import {AuphBuffer, AuphBus, AuphVoice, Flag, iMask, Type, u31, Unit} from "../protocol/interface.js";
+import {connectAudioNode, disconnectAudioNode, nextHandle, Obj, setAudioParamValue} from "./common.js";
+import {emptyAudioBuffer} from "./Mixer.js";
 
 export class VoiceObj implements Obj {
     // handle passport
@@ -164,7 +164,7 @@ export function _getVoiceObj(handle: AuphVoice): VoiceObj | null {
 }
 
 export function createVoiceObj(ctx: AudioContext): AuphVoice {
-    const next = len(voicePool);
+    const next = voicePool.length;
     for (let i = 1; i < next; ++i) {
         const v = voicePool[i]!;
         if (v.s === 0) {

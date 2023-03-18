@@ -1,4 +1,4 @@
-import {AuphBuffer, AuphBus, AuphVoice, Name, Param, u31} from "../protocol/interface";
+import {AuphBuffer, AuphBus, AuphVoice, Name, Param, u31} from "../protocol/interface.js";
 
 export function setup(): void {
 }
