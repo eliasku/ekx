@@ -58,8 +58,8 @@ export class AudioAsset extends Asset {
             this._flags |= 2;
         }
 
-        const dev = this.desc.dev ?? false;
-        this._skip = dev && !this.owner.devMode;
+        // const dev = this.desc.dev ?? false;
+        // this._skip = dev && !this.owner.devMode;
 
         return null;
     }

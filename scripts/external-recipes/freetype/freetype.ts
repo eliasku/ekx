@@ -42,7 +42,7 @@ async function fetch() {
     await fs.promises.copyFile(path.join(patchDir, "ftmodule.h"), path.join(destDir, "include/freetype/config/ftmodule.h"));
     await fs.promises.copyFile(path.join(patchDir, "ft2build.h"), path.join(destDir, "include/ft2build.h"));
     await removeFilesGlob("src/tools");
-    await removeFilesGlob("src/**/*.mk");
+    await removeFilesGlob("src/**/*.{mk,rc,diff,freetype}");
     await removeFilesGlob("src/**/README");
     await rm(tempDir);
 }

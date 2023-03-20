@@ -28,18 +28,23 @@ AppBox::AppBox(AppBoxConfig config_) :
     // initialize translations
     // TODO: wtf
     lang_name_t lang = {};
+    lang_name_t default_lang = {};
+    default_lang.str[0] = 'e';
+    default_lang.str[1] = 'n';
+    default_lang.str[2] = 0;
     int n = ek_ls_get_s("selected_lang", lang.str, sizeof(lang_name_t));
     EK_ASSERT(sizeof(lang_name_t) <= sizeof(ek_app.lang));
     if (n < 2) {
         memcpy(lang.str, ek_app.lang, sizeof(lang_name_t));
     }
-    if (lang.str[0] == 0) {
-        lang.str[0] = 'e';
-        lang.str[1] = 'n';
-    }
     // trim to 2-wide code
     lang.str[2] = 0;
-    set_language(lang);
+    if (lang.str[0] == 0) {
+        lang = default_lang;
+    }
+    if(!set_language(lang)) {
+        set_language(default_lang);
+    }
 }
 
 void set_state_on_off(ecs::Entity e, bool enabled) {

@@ -176,7 +176,7 @@ export function generateTopModule(): BuildTop {
             dependencies: [{
                 type: "classpath",
                 name: "com.android.tools.build:gradle",
-                version: "7.4.1"
+                version: "7.4.2"
             }]
         },
         allprojects: {
@@ -247,7 +247,8 @@ export function generateNativeApp(): BaseModuleConfig {
         },
         dependencies: [
             `implementation fileTree(dir: 'libs', include: ['*.jar'])`,
-            {type: "implementation", name: "androidx.annotation:annotation", version: "1.5.0"},
+            `implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))`,
+            {type: "implementation", name: "androidx.annotation:annotation", version: "1.6.0"},
             {type: "implementation", name: "androidx.multidex:multidex", version: "2.0.1"},
             {type: "implementation", name: "com.getkeepsafe.relinker:relinker", version: "1.4.4"}
         ],

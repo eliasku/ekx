@@ -31,13 +31,21 @@ void play_sound(string_hash_t name, float vol, float pitch) {
             if (snd.id) {
                 auph_play_f(snd, vol, 0.0f, pitch, false, false, AUPH_BUS_SOUND);
             }
+            else {
+                // is not ready?
+                log_debug("audio: snd id is 0, %s", hsp_get(name));
+            }
+        }
+        else {
+            // no id
+            log_debug("audio: res is 0, %s", hsp_get(name));
         }
     }
 }
 
 void play_sound_at(string_hash_t name, const vec2_t position, float volume, float pitch) {
     if (g_audio.prefs & AUDIO_PREF_SOUND) {
-        auto relVolume = volume;
+        float relVolume = volume;
         //auto spatialPanning = -1 .. 1;
         play_sound(name, relVolume, pitch);
     }

@@ -71,7 +71,7 @@ export async function setup(project: Project) {
                 nativeSymbolUploadEnabled true
             }`,
             android_dependency: [
-                `implementation platform('com.google.firebase:firebase-bom:31.2.2')`,
+                `implementation platform('com.google.firebase:firebase-bom:31.2.3')`,
                 `implementation 'com.google.firebase:firebase-crashlytics-ndk'`,
                 `implementation 'com.google.firebase:firebase-analytics'`
             ]

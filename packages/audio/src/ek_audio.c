@@ -1,9 +1,5 @@
 #include <ek/audio.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct res_audio res_audio;
 
 void audio_setup(void) {
@@ -18,7 +14,3 @@ void audio_setup(void) {
     rr->num = 1;
     rr->data_size = sizeof(R->data[0]);
 }
-
-#ifdef __cplusplus
-}
-#endif

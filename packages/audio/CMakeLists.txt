@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.19)
 project(audio)
 
 add_library(${PROJECT_NAME} STATIC
-        src/ek_audio_auph.c
         src/ek_audio.c
+        src/ek_audio_auph.c
         )
 
 add_library(ekx::${PROJECT_NAME} ALIAS ${PROJECT_NAME})

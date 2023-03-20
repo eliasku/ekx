@@ -50,7 +50,15 @@ public:
         auto failed = !auph_is_active(buffer.id);
         auto completed = auph_is_buffer_loaded(buffer) || (flags & 2);
         if (failed || completed) {
+            if (failed) {
+                log_debug("failed to load sound %s", path_.c_str());
+            }
+            else {
+                log_debug("loaded audio sound %s", path_.c_str());
+            };
             state = AssetState::Ready;
+        } else {
+            log_debug("poll audio sound loading %s", path_.c_str());
         }
     }
 
@@ -210,9 +218,9 @@ public:
 
     void do_unload() override {
         sg_file_t* file = &REF_RESOLVE(res_sg, res);
-        arr_reset((void**)&file->library);
-        arr_reset((void**)&file->linkages);
-        arr_reset((void**)&file->scenes);
+        arr_reset((void**) &file->library);
+        arr_reset((void**) &file->linkages);
+        arr_reset((void**) &file->scenes);
     }
 
     R(SGFile) res;
@@ -279,7 +287,7 @@ public:
     void do_load() override {
         loader = ek_texture_loader_create();
         ek_texture_loader_set_path(&loader->basePath, manager_->base_path.c_str());
-        const int num = (int)arr_size(data_.images);
+        const int num = (int) arr_size(data_.images);
         EK_ASSERT(num > 0 && num <= EK_TEXTURE_LOADER_IMAGES_MAX_COUNT);
         for (int i = 0; i < num; ++i) {
             ek_texture_loader_set_path(loader->urls + i, data_.images[i]);
@@ -356,7 +364,8 @@ public:
         char lang_path[1024];
         for (int i = 0; i < total; ++i) {
             auto* loader = &loaders_[i];
-            ek_snprintf(lang_path, sizeof lang_path, "%s/%s/%s.mo", manager_->base_path.c_str(), name_.c_str(), loader->lang.str);
+            ek_snprintf(lang_path, sizeof lang_path, "%s/%s/%s.mo", manager_->base_path.c_str(), name_.c_str(),
+                        loader->lang.str);
             ek_local_res_load(
                     lang_path,
                     [](ek_local_res* lr) {
@@ -498,6 +507,7 @@ Asset* unpack_asset(calo_reader_t* r, string_hash_t type) {
         string_hash_t name = read_u32(r);
         uint32_t flags = read_u32(r);
         const char* path = read_stream_string(r);
+        log_debug("sound load: %s", path);
         return new AudioAsset(name, path, flags);
     } else if (type == H("scene")) {
         string_hash_t name = read_u32(r);
@@ -508,9 +518,9 @@ Asset* unpack_asset(calo_reader_t* r, string_hash_t type) {
         const char* path = read_stream_string(r);
         return new BitmapFontAsset(name, path);
     } else if (type == H("ttf")) {
-        string_hash_t name =read_u32(r);
-        const char* path =read_stream_string(r);
-        string_hash_t glyphCache =read_u32(r);
+        string_hash_t name = read_u32(r);
+        const char* path = read_stream_string(r);
+        string_hash_t glyphCache = read_u32(r);
         float baseFontSize = read_f32(r);
         return new TrueTypeFontAsset(name, path, glyphCache, baseFontSize);
     } else if (type == H("atlas")) {
@@ -518,8 +528,8 @@ Asset* unpack_asset(calo_reader_t* r, string_hash_t type) {
         uint32_t formatMask = read_u32(r);
         return new AtlasAsset(name, formatMask);
     } else if (type == H("dynamic_atlas")) {
-        string_hash_t name =read_u32(r);
-        uint32_t flags =read_u32(r);
+        string_hash_t name = read_u32(r);
+        uint32_t flags = read_u32(r);
         return new DynamicAtlasAsset(name, flags);
     } else if (type == H("model")) {
         const char* name = read_stream_string(r);
@@ -531,10 +541,10 @@ Asset* unpack_asset(calo_reader_t* r, string_hash_t type) {
     } else if (type == H("strings")) {
         const char* name = read_stream_string(r);
         uint32_t langs_num = read_u32(r);
-        lang_name_t langs[LANG_MAX_COUNT];
+        lang_name_t langs[LANG_MAX_COUNT] = {};
         // TODO:
-        memcpy(langs, r->p, sizeof langs);
-        r->p += sizeof langs;
+        memcpy(langs, r->p, (sizeof langs[0]) * langs_num);
+        r->p += (sizeof langs[0]) * langs_num;
 
         return new StringsAsset(name, langs, langs_num);
     } else if (type == H("pack")) {
@@ -566,14 +576,13 @@ void PackAsset::do_load() {
                     read_calo(&reader);
                     while (reader.p < end) {
                         string_hash_t type = read_u32(&reader);
-                        if(type) {
+                        if (type) {
                             Asset* asset = unpack_asset(&reader, type);
                             if (asset) {
                                 this_->assets.push_back(asset);
                                 this_->manager_->add(asset);
                             }
-                        }
-                        else {
+                        } else {
                             break;
                         }
                     }

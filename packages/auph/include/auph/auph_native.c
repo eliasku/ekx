@@ -317,11 +317,14 @@ auph_buffer auph_load(const char* filepath, int flags) {
     const auph_buffer buff = auph_get_next_buffer();
     if (buff.id) {
         auph_buffer_obj* buf = auph_get_buffer_obj(buff.id);
-        if (buf && auph_buffer_obj_load(buf, filepath, flags)) {
-            return buff;
+        if (!buf) {
+            return (auph_buffer) {0};
+        }
+        if(!auph_buffer_obj_load(buf, filepath, flags)) {
+            return (auph_buffer) {0};
         }
     }
-    return (auph_buffer) {0};
+    return buff;
 }
 
 auph_mix_sample* auph_play_buffer_callback(auph_mix_sample* mix,
