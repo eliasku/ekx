@@ -1,4 +1,3 @@
-
 #ifdef __cplusplus
 
 inline static color2f_t operator-(const color2f_t a, const color2f_t b) {

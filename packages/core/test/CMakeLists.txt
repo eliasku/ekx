@@ -21,7 +21,4 @@ target_compile_options(${PROJECT_NAME} PRIVATE
         -Wstrict-aliasing=2
         )
 
-target_link_libraries(${PROJECT_NAME}
-        PUBLIC ekx::core
-        PUBLIC ekx::unit
-        )
+target_link_libraries(${PROJECT_NAME} PUBLIC ekx::core)

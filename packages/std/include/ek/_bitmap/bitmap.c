@@ -2,10 +2,6 @@
 #include <ek/log.h>
 #include <ek/assert.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void bitmap_alloc(bitmap_t* bitmap, int width, int height) {
     EK_ASSERT(bitmap != 0);
     EK_ASSERT(width > 0);
@@ -92,12 +88,6 @@ void bitmap_unpremultiply(bitmap_t* bitmap) {
     }
 }
 
-#include <ek/log.h>
-#include <ek/bitmap.h>
-
-//extern stbi_uc* stbi_load_from_memory(stbi_uc const* buffer, int len, int* x, int* y, int* channels_in_file,
-//                                      int desired_channels) ;
-//
 void bitmap_decode(bitmap_t* bitmap, const void* data, uint32_t size, bool pma) {
     log_debug("decode bitmap: canvas_begin");
     EK_ASSERT(size > 0);
@@ -228,7 +218,3 @@ void bitmap_blit(bitmap_t dest, const bitmap_t src) {
         }
     }
 }
-
-#ifdef __cplusplus
-}
-#endif

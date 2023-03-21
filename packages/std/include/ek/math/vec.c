@@ -1,7 +1,3 @@
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 ivec2_t ivec2(int x, int y) {
     return (ivec2_t) {{x, y}};
 }
@@ -310,7 +306,3 @@ bool almost_eq_vec4(const vec4_t a, const vec4_t b, const float eps) {
 VEC_T_REFLECT_IMPL(vec2)
 
 VEC_T_REFLECT_IMPL(vec3)
-
-#ifdef __cplusplus
-}
-#endif

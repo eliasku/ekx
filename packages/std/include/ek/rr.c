@@ -1,10 +1,6 @@
 #include <ek/rr.h>
 #include <ek/assert.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef NDEBUG
 
 uint16_t rr_verify_id(rr_man_t* man, res_id id) {
@@ -82,8 +78,3 @@ res_id rr_named(rr_man_t* man, string_hash_t name) {
     }
     return next;
 }
-
-#ifdef __cplusplus
-}
-#endif
-

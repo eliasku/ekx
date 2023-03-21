@@ -1,7 +1,3 @@
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 color_t color_u32(uint32_t rgba) {
     return (color_t) {.value = rgba};
 }
@@ -283,7 +279,3 @@ vec4_t vec4_color(const color_t color) {
     v.w = (float) color.a / 255.0f;
     return v;
 }
-
-#ifdef __cplusplus
-}
-#endif

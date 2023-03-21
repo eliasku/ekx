@@ -1,7 +1,3 @@
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 static float back(float t) {
     return ease_back(t, 1.70158f);
 }
@@ -97,8 +93,3 @@ IMPL_EASE_FUNC(sine)
 IMPL_EASE_FUNC(bounce)
 
 IMPL_EASE_FUNC(expo)
-
-#ifdef __cplusplus
-}
-#endif
-

@@ -1,9 +1,3 @@
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
 rect_t rect(float x, float y, float w, float h) {
     return (rect_t) {{x, y, w, h}};
 }
@@ -181,7 +175,3 @@ rect_t aabb2_get_rect(aabb2_t bb) {
 bool aabb2_is_empty(aabb2_t bb) {
     return bb.x0 >= bb.x1 || bb.y0 >= bb.y1;
 }
-
-#ifdef __cplusplus
-}
-#endif

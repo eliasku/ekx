@@ -2,10 +2,6 @@
 #include <ek/assert.h>
 #include <string.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef NDEBUG
 
 static void ids_sanitize_state(ids_t h) {
@@ -105,7 +101,3 @@ void id_destroy(ids_t h, uint32_t id, id_data_t layout) {
         }
     }
 }
-
-#ifdef __cplusplus
-}
-#endif

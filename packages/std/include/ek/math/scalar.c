@@ -1,9 +1,3 @@
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
 /** scalar utilities **/
 float to_radians(float degrees) {
     return degrees * MATH_PI / 180.0f;
@@ -85,7 +79,3 @@ float unorm_f32_from_u32(uint32_t value) {
     EK_ASSERT_R2(f < 1.0f);
     return f;
 }
-
-#ifdef __cplusplus
-}
-#endif

@@ -1,8 +1,3 @@
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /** mat2 **/
 
 mat2_t mat2_scale_skew(vec2_t scale, vec2_t skew) {
@@ -690,7 +685,3 @@ vec3_t vec3_mul_mat4(vec3_t v, mat4_t m) {
                 v.x * m.m01 + v.y * m.m11 + v.z * m.m21 + m.m31,
                 v.x * m.m02 + v.y * m.m12 + v.z * m.m22 + m.m32);
 }
-
-#ifdef __cplusplus
-}
-#endif

@@ -1,8 +1,3 @@
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /** quaternion functions **/
 quat_t quat_euler_angles(vec3_t angles) {
     vec3_t c = vec3(
@@ -244,7 +239,3 @@ mat4_t mat4_rotation_transform_quat(const quat_t q) {
     m.m22 = 1.0f - 2 * (qxx + qyy);
     return m;
 }
-
-#ifdef __cplusplus
-}
-#endif

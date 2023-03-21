@@ -15,13 +15,12 @@ if (EKX_BUILD_TESTS OR EKX_BUILD_EXTERNAL_TESTS)
     endif ()
 endif ()
 
-include(packages/unit/cmake/code-coverage.cmake)
+include(packages/std/cmake/code-coverage.cmake)
 
 add_library(${PROJECT_NAME} INTERFACE)
 
 add_subdirectory(external)
 
-add_subdirectory(packages/unit)
 add_subdirectory(packages/std)
 add_subdirectory(packages/calo)
 add_subdirectory(packages/core)

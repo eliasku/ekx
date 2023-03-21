@@ -32,7 +32,4 @@ target_compile_options(${PROJECT_NAME}
         PUBLIC -Wstrict-aliasing=2
         )
 
-target_link_libraries(${PROJECT_NAME}
-        PUBLIC ekx::std
-        PUBLIC ekx::unit
-        )
+target_link_libraries(${PROJECT_NAME} PUBLIC ekx::std)

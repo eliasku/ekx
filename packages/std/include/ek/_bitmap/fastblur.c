@@ -5,10 +5,6 @@
 
 // Exponential blur, Jani Huhtanen, 2006
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define APREC 12
 #define ZPREC 10
 
@@ -93,7 +89,3 @@ void bitmap_blur_gray(uint8_t* data, int width, int height, int stride, float ra
         saturate_alpha(data, width, height, stride, strength);
     }
 }
-
-#ifdef __cplusplus
-}
-#endif
