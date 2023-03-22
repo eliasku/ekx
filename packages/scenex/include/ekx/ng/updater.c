@@ -15,7 +15,7 @@ void updater_set(entity_t e, updater_callback_t callback) {
     state->time_layer = 0;
 }
 
-void updater_update() {
+void updater_update(void) {
     for (uint32_t i = 1; i < updater_comp_type.size; ++i) {
         entity_idx_t ei = updater_comp_type.handleToEntity[i];
         updater_state s = ((updater_state*) updater_comp_type.data[0])[i];

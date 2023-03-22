@@ -162,9 +162,9 @@ void auph_pause(int name);
 
 void auph_resume(int name);
 
-void auph_mute_push();
+void auph_mute_push(void);
 
-void auph_mute_pop();
+void auph_mute_pop(void);
 
 #ifdef __cplusplus
 }

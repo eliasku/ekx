@@ -22,7 +22,7 @@ static float update_time_layer(time_layer_state_t* layer, float dt) {
     return dt1;
 }
 
-void init_time_layers() {
+void init_time_layers(void) {
     for (uint32_t i = 0; i < TIME_LAYER_MAX_COUNT; ++i) {
         g_time_layers[i].scale = 1.0f;
     }

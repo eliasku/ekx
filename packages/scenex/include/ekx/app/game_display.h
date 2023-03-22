@@ -41,7 +41,7 @@ void game_display_dev_end(game_display* display);
 void game_display_screenshot(const game_display* display, const char* filename);
 
 // prints app's global display/window metrics: size and insets
-void log_app_display_info();
+void log_app_display_info(void);
 
 #ifdef __cplusplus
 }

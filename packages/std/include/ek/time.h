@@ -26,7 +26,7 @@ uint32_t ek_time_seed32(void);
 // Timer System
 void ek_timers_init(void);
 
-void ek_timers_update();
+void ek_timers_update(void);
 
 typedef struct ek_timer_callback {
     void (* action)(void* userdata);

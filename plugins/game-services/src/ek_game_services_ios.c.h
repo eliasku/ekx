@@ -17,7 +17,7 @@ UIViewController* GC_rootViewController;
 GameCenterDelegate* game_center_delegate;
 
 /** Game Center **/
-void GC_authenticateLocalPlayer() {
+void GC_authenticateLocalPlayer(void) {
     game_center_delegate = [GameCenterDelegate new];
     GC_rootViewController = ek_app_delegate.window.rootViewController;
     GKLocalPlayer* localPlayer = [GKLocalPlayer localPlayer];
@@ -47,12 +47,12 @@ void GC_authenticateLocalPlayer() {
     };
 }
 
-void ek_game_services_init() {
+void ek_game_services_init(void) {
     log_debug("game-services initialize");
     GC_authenticateLocalPlayer();
 }
 
-void ek_leaderboard_show(const char*) {
+void ek_leaderboard_show(const char* ignored) {
     if (GC_leaderboardIdentifier != nil) {
         GKGameCenterViewController* gcViewController = [[GKGameCenterViewController alloc] init];
         gcViewController.gameCenterDelegate = game_center_delegate;
@@ -65,7 +65,7 @@ void ek_leaderboard_show(const char*) {
     }
 }
 
-void ek_leaderboard_submit(const char*, int score) {
+void ek_leaderboard_submit(const char* ignored, int score) {
     if (GC_leaderboardIdentifier != nil) {
         GKScore* gkScore = [[GKScore alloc] initWithLeaderboardIdentifier:GC_leaderboardIdentifier];
         gkScore.value = score;

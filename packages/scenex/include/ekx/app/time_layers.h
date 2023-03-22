@@ -26,7 +26,7 @@ typedef uint8_t TimeLayer;
 
 extern time_layer_state_t g_time_layers[TIME_LAYER_MAX_COUNT];
 
-void init_time_layers();
+void init_time_layers(void);
 void update_time_layers(float raw_dt);
 
 #ifdef __cplusplus

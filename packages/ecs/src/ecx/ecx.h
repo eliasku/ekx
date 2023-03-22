@@ -53,8 +53,8 @@ typedef struct entity_t {
 
 /**
  * Constructs entity structure by known numerical ID
- * @param id
- * @return
+ * @param id entity's id
+ * @return entity structure
  */
 entity_t entity_id(entity_id_t id);
 

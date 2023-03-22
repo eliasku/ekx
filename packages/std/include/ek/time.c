@@ -65,7 +65,7 @@ void ek_timers_init(void) {
     memset(ek_timers, 0, sizeof(ek_timers));
 }
 
-void ek_timers_update() {
+void ek_timers_update(void) {
     uint64_t now = ek_ticks(0);
     for (int i = 0; i < ek_timers_length; ++i) {
         ek_timer_state* state = ek_timers + i;

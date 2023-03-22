@@ -43,7 +43,7 @@ void string_catalog_free(string_catalog* catalog);
 bool set_language(lang_name_t name);
 bool set_language_index(uint32_t index);
 
-lang_name_t current_lang_name();
+lang_name_t current_lang_name(void);
 
 const char* localize(const char* str);
 

@@ -26,6 +26,8 @@ export interface CxxConfig {
      */
     cpp?: UserArray<string>;
 
+    c_sources?: UserArray<string>;
+
     /**
      * Include directory: adds this directory to headers search path (-I compiler option) and allow to use that root
      * for `#include <header>` code
@@ -48,12 +50,14 @@ export interface CppFlags {
 type CppName =
     "cpp"
     | "cpp_include"
+    | "c_sources"
     | "cpp_flags"
     | "cpp_define"
     | "cpp_lib";
 const cpp_names: CppName[] = [
     "cpp",
     "cpp_include",
+    "c_sources",
     "cpp_flags",
     "cpp_define",
     "cpp_lib",

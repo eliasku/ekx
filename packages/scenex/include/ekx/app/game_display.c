@@ -187,7 +187,7 @@ void game_display_screenshot(const game_display* display, const char* filename) 
 #endif
 }
 
-void log_app_display_info() {
+void log_app_display_info(void) {
 #ifndef NDEBUG
     log_info("Display: %d x %d", (int) ek_app.viewport.width, (int) ek_app.viewport.height);
     log_info("Insets: %d, %d, %d, %d",

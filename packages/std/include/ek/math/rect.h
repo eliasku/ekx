@@ -119,11 +119,11 @@ rect_t rect_translate(rect_t a, vec2_t t);
 
 /**
  * Transforms rectangle points to calculate it's axis-aligned bounds
- * @param rect
- * @param matrix
+ * @param rect input rectangle
+ * @param matrix transformation
  * @return axis-aligned bounding rect of transformed rectangle shape
  */
-rect_t rect_transform(rect_t a, mat3x2_t matrix);
+rect_t rect_transform(rect_t rect, mat3x2_t matrix);
 
 bool rect_contains(rect_t rc, vec2_t point);
 bool rect_is_empty(rect_t a);

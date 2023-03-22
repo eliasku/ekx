@@ -21,7 +21,7 @@ void updater_init(void);
 
 void updater_set(entity_t e, updater_callback_t callback);
 
-void updater_update();
+void updater_update(void);
 
 void updater_remove(entity_t e);
 

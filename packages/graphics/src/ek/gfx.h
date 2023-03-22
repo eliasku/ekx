@@ -106,7 +106,7 @@ extern struct res_image res_image;
 #define R_IMAGE(name) REF_NAME(res_image, name)
 #define R_SHADER(name) REF_NAME(res_shader, name)
 
-void ek_gfx_res_setup();
+void ek_gfx_res_setup(void);
 
 #ifdef __cplusplus
 }

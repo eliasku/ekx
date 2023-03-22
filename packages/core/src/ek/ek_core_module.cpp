@@ -1,6 +1,6 @@
 
 
-static void ek_legacy_core_stub() {}
+static void ek_legacy_core_stub(void) {}
 
 #include "core_dbg.h"
 

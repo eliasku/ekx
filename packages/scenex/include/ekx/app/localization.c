@@ -106,7 +106,7 @@ bool set_language_index(uint32_t index) {
     return false;
 }
 
-lang_name_t current_lang_name() {
+lang_name_t current_lang_name(void) {
     const localization_t l = s_localization;
     return l.lang_index < l.lang_num ? l.languages[l.lang_index].name : (lang_name_t) {};
 }

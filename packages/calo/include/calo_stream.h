@@ -27,9 +27,8 @@ const char* map_stream_string(calo_reader_t* r);
 
 /**
  *
- * @param table destination table structure
- * @param data pointer to table data
- * @return pointer when parsing is ended
+ * @param r reader
+ * @param table table structure
  */
 void map_table(calo_reader_t* r, vla_table_t* table);
 
