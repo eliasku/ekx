@@ -1,5 +1,13 @@
 # ekx
 
+## 0.0.4
+
+### Patch Changes
+
+- 437d31c: fix select default localization (crash)
+- 437d31c: android: up deps
+- 437d31c: external: filter files in freetype sources
+
 ## 0.0.3
 
 ### Patch Changes
