@@ -119,7 +119,7 @@ static void log__default(log_msg_t msg) {
     struct timespec ts;
 #if defined(__MINGW32__) || defined(__APPLE__)
     clock_gettime(CLOCK_REALTIME, &ts);
-#elif
+#else
     timespec_get(&ts, TIME_UTC);
 #endif
     strftime(time, sizeof time, "%Y-%m-%d %H:%M:%S", gmtime(&ts.tv_sec));
