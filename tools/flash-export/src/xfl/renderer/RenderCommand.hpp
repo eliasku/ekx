@@ -24,7 +24,7 @@ struct RenderCommand {
     double v[8]{};
     const FillStyle* fill{};
     const StrokeStyle* stroke{};
-    const BitmapData* bitmap{};
+    const bitmap_data_t* bitmap{};
 
     explicit RenderCommand(Operation operation) :
             op{operation} {

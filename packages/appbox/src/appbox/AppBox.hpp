@@ -3,7 +3,6 @@
 #include <ek/ds/String.hpp>
 #include <ecx/ecx.hpp>
 #include <ek/admob.h>
-#include <ek/util/Type.hpp>
 #include "Ads.hpp"
 
 namespace ek {
@@ -11,24 +10,22 @@ namespace ek {
 struct AppBoxConfig {
     const char* version_name = "1.0.0";
     const char* version_code = "";
-    String privacyPolicyURL{"https://eliasku-games.web.app/privacy-policy/"};
-    Ads::Config ads{};
+    const char* privacy_policy_url = "https://eliasku-games.web.app/privacy-policy";
+    ads_premium_config ads{};
     ek_admob_config admob{nullptr, nullptr, nullptr, EK_ADMOB_CHILD_DIRECTED_UNSPECIFIED};
-    String billingKey{};
+    const char* billing_key = "";
 
     // used for sharing results or app for link in the end of the message
     // TODO: could be better to share link object with text description
-    String appLinkURL{};
+    const char* app_link_url = "";
 
     // currently only for manual "rate us" feature
-    String appID{};
+    const char* app_id = "";
 
-    struct DownloadAppURLs {
-        String googlePlay;
-        String appStore;
-    };
-
-    DownloadAppURLs downloadApp;
+    struct {
+        const char* google_play = nullptr;
+        const char* app_store = nullptr;
+    } download_app;
 };
 
 class AppBox {
@@ -45,26 +42,10 @@ public:
 
     void initLanguageButton(ecs::Entity e);
 
-    void showAchievements();
-
 public:
     AppBoxConfig config;
 
 private:
-};
-
-class Achievement {
-public:
-
-    Achievement() = delete;
-
-    explicit Achievement(const char* code, int count);
-
-    void run() const;
-
-private:
-    const char* code_;
-    int count_;
 };
 
 }

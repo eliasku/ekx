@@ -183,21 +183,21 @@ DynamicAtlas::~DynamicAtlas() {
     }
 }
 
-DynamicAtlasSprite DynamicAtlas::addBitmap(int width, int height, const uint8_t* pixels, size_t pixelsSize) {
+DynamicAtlasSprite DynamicAtlas::addBitmap(int width, int height, const uint8_t* pixels, size_t pixels_size) {
     int bpp = alphaMap ? 1 : 4;
-    EK_ASSERT(pixelsSize >= width * height * bpp);
+    EK_ASSERT(pixels_size >= width * height * bpp);
     EK_ASSERT(width < pageWidth && height < pageHeight);
 
     DynamicAtlasSprite sprite;
     for (auto* page : pages_) {
-        if (page->add(width, height, pixels, pixelsSize, sprite)) {
+        if (page->add(width, height, pixels, pixels_size, sprite)) {
             return sprite;
         }
     }
     auto* newPage = new Page(pageWidth, pageHeight, alphaMap, mipmaps);
     newPage->reset();
     pages_.push_back(newPage);
-    if (!newPage->add(width, height, pixels, pixelsSize, sprite)) {
+    if (!newPage->add(width, height, pixels, pixels_size, sprite)) {
         // how come?
         EK_ASSERT(false);
     }

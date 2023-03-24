@@ -6,7 +6,7 @@ typedef struct _cairo cairo_t;
 typedef struct _cairo_pattern cairo_pattern_t;
 typedef struct _cairo_surface cairo_surface_t;
 
-typedef struct BitmapData;
+typedef struct bitmap_data bitmap_data_t;
 
 namespace ek::xfl {
 
@@ -22,7 +22,7 @@ public:
 
     void set_transform(const TransformModel& transform);
 
-    void draw_bitmap(const BitmapData* bitmap);
+    void draw_bitmap(const bitmap_data_t* bitmap);
 
 private:
     cairo_t* ctx_;

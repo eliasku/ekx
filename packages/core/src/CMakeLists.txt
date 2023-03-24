@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.19)
 project(core)
 
 add_library(${PROJECT_NAME} STATIC
-        ek/ek_core_module.cpp
+        ek/core_dbg.c
 
         ek/serialize/streams.hpp
         ek/serialize/core.hpp
@@ -11,8 +11,6 @@ add_library(${PROJECT_NAME} STATIC
         ek/serialize/serialize.hpp
 
         ek/util/Signal.hpp
-        ek/util/StringUtil.hpp
-
         ek/util/StaticStorage.hpp
 
         ek/ds/FixedArray.hpp

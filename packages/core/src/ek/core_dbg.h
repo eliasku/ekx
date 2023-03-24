@@ -1,8 +1,6 @@
 #ifndef EK_CORE_DBG_H
 #define EK_CORE_DBG_H
 
-#include "ek/log.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

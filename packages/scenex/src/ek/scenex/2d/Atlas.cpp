@@ -92,7 +92,7 @@ void load_atlas_meta(Atlas* atlas, ek_local_res* lr) {
         const char* page_image_path = page->image_path;
         log_debug("Load atlas page %s/%s", atlas->base_path.c_str(), page_image_path);
 
-        const uint32_t index = page - atlas_info.pages;
+        const uint32_t index = (uint32_t)(page - atlas_info.pages);
         ek_texture_loader* loader = atlas->loaders[index];
         loader->formatMask = atlas->formatMask;
         ek_texture_loader_set_path(&loader->basePath, atlas->base_path.c_str());

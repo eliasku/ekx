@@ -163,7 +163,7 @@ struct ShadowMapRes {
         const vec3_t light_target = vec3(0, 0, 0);
 //    auto light_dir = normalize(light_target - light_position);
 
-        auto bb = get_shadow_map_box(cameraProjection, cameraView, view);
+        //auto bb = get_shadow_map_box(cameraProjection, cameraView, view);
         const float shadow_zone_size = 200.0f;
         view = mat4_look_at_rh(light_position, light_target, vec3(0, 0, 1));
         projection = mat4_orthographic_rh(-shadow_zone_size,

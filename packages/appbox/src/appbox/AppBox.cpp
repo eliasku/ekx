@@ -20,7 +20,7 @@ AppBox::AppBox(AppBoxConfig config_) :
 
     // unlock abort()
 
-    billing::initialize(config.billingKey.c_str());
+    billing::initialize(config.billing_key);
     ek_admob_init(config.admob);
     ads_init(config.ads);
     ek_game_services_init();
@@ -42,7 +42,7 @@ AppBox::AppBox(AppBoxConfig config_) :
     if (lang.str[0] == 0) {
         lang = default_lang;
     }
-    if(!set_language(lang)) {
+    if (!set_language(lang)) {
         set_language(default_lang);
     }
 }
@@ -59,7 +59,11 @@ void AppBox::initDefaultControls(ecs::Entity e) {
         // VERSION
         auto e_version = find(e, H("version"));
         if (e_version.id) {
+#ifndef NDEBUG
+            set_text_f(e_version, "DEBUG %s #%s", config.version_name, config.version_code);
+#else
             set_text_f(e_version, "%s #%s", config.version_name, config.version_code);
+#endif
         }
     }
     {
@@ -76,7 +80,7 @@ void AppBox::initDefaultControls(ecs::Entity e) {
             ecs::add<Interactive>(e_pp);
             ecs::add<Button>(e_pp);
             ecs::add<NodeEventHandler>(e_pp).on(BUTTON_EVENT_CLICK, [](const NodeEventData& ) {
-                ek_app_open_url(g_app_box->config.privacyPolicyURL.c_str());
+                ek_app_open_url(g_app_box->config.privacy_policy_url);
             });
         }
     }
@@ -146,25 +150,21 @@ void AppBox::initDefaultControls(ecs::Entity e) {
 }
 
 void AppBox::shareWithAppLink(const String& text) {
-    auto msg = text;
-    if (!config.appLinkURL.empty()) {
-        msg += ' ';
-        msg += config.appLinkURL;
-    }
+    auto msg = text + " " + config.app_link_url;
     ek_app_share(msg.c_str());
 }
 
 void AppBox::rateUs() const {
 #ifdef __ANDROID__
     char buf[1024];
-    ek_snprintf(buf, 1024, "market://details?id=%s", config.appID.c_str());
+    ek_snprintf(buf, 1024, "market://details?id=%s", config.app_id);
     ek_app_open_url(buf);
 #endif // __ANDROID__
 
 #ifdef __APPLE__
     char buf[1024];
     ek_snprintf(buf, 1024, "itms-apps://itunes.apple.com/us/app/apple-store/id%s?mt=8&action=write-review",
-                config.appID.c_str());
+                config.app_id);
     ek_app_open_url(buf);
 #endif // __APPLE__
 }
@@ -208,19 +208,6 @@ void AppBox::initLanguageButton(ecs::Entity e) {
             }
         });
     }
-}
-
-void AppBox::showAchievements() {
-    ek_achievement_show();
-}
-
-Achievement::Achievement(const char* code, int count) :
-        code_{code},
-        count_{count} {
-}
-
-void Achievement::run() const {
-    ek_achievement_update(code_, count_);
 }
 
 }

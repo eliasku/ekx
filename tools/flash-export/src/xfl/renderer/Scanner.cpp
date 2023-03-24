@@ -120,7 +120,7 @@ rect_t transform(const mat3x2_t m, const rect_t rc) {
     return rect_transform(rc, m);
 }
 
-bool Scanner::render(const BitmapData* bitmap, const TransformModel& world) {
+bool Scanner::render(const bitmap_data_t* bitmap, const TransformModel& world) {
     RenderCommandsBatch batch{};
     batch.transform = world;
     RenderCommand cmd{Op::bitmap};

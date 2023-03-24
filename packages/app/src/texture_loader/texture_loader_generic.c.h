@@ -5,22 +5,22 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static int ek_texture_loader__load_bytes(const char* basePath, const char* url, void** outBuffer, size_t* outSize) {
-    char pathBuffer[1024];
-    pathBuffer[0] = 0;
+static int ek_texture_loader__load_bytes(const char* base_path, const char* url, void** out_buffer, uint32_t* out_size) {
+    char path_buffer[1024];
+    path_buffer[0] = 0;
 
-    if (basePath) {
-        const size_t len = strlen(basePath);
-        strcat(pathBuffer, basePath);
-        if (len > 0 && pathBuffer[len - 1] != '/') {
-            pathBuffer[len] = '/';
-            pathBuffer[len + 1] = 0;
+    if (base_path && base_path[0]) {
+        const size_t len = strlen(base_path);
+        strcat(path_buffer, base_path);
+        if (len > 0 && path_buffer[len - 1] != '/') {
+            path_buffer[len] = '/';
+            path_buffer[len + 1] = 0;
         }
     }
-    strcat(pathBuffer, url);
+    strcat(path_buffer, url);
 #if defined(__APPLE__)
     char file_path_buffer[1024];
-    const char* file_path = ek_app_ns_bundle_path(pathBuffer, file_path_buffer, sizeof(file_path_buffer));
+    const char* file_path = ek_app_ns_bundle_path(path_buffer, file_path_buffer, sizeof(file_path_buffer));
 #else
     const char* file_path = pathBuffer;
 #endif
@@ -30,22 +30,27 @@ static int ek_texture_loader__load_bytes(const char* basePath, const char* url, 
         return 1;
     }
     fseek(stream, 0, SEEK_END);
-    size_t size = (size_t) ftell(stream);
-    *outSize = size;
-    *outBuffer = malloc(size);
-    fseek(stream, 0, SEEK_SET);
+    const uint32_t size = (uint32_t) ftell(stream);
+    *out_size = size;
+    if (size) {
+        void* buffer = malloc(size);
+        if (buffer) {
+            fseek(stream, 0, SEEK_SET);
 
-    fread(*outBuffer, size, 1u, stream);
+            fread(buffer, size, 1u, stream);
 
-    bool success = ferror(stream) == 0;
-    fclose(stream);
+            bool success = ferror(stream) == 0;
+            fclose(stream);
 
-    if (success) {
-        return 0;
+            if (success) {
+                *out_buffer = buffer;
+                return 0;
+            }
+            free(buffer);
+            *out_buffer = NULL;
+        }
+        *out_size = 0;
     }
-    free(*outBuffer);
-    *outBuffer = NULL;
-    *outSize = 0;
     return 2;
 }
 
@@ -85,13 +90,13 @@ void ek_texture_loader_update(ek_texture_loader* loader) {
         const int idx = loader->imagesStartLoading++;
         log_debug("poll loading image #%d / %d", idx, loader->imagesToLoad);
         void* buffer = NULL;
-        size_t bufferSize = 0;
-        int result = ek_texture_loader__load_bytes(loader->basePath.path, loader->urls[idx].path, &buffer, &bufferSize);
+        uint32_t buffer_size = 0;
+        int result = ek_texture_loader__load_bytes(loader->basePath.path, loader->urls[idx].path, &buffer, &buffer_size);
         if (result == 0) {
             ++loader->imagesLoaded;
             loader->progress = (float) loader->imagesLoaded / (float) loader->imagesToLoad;
             bitmap_t bitmap = {0};
-            bitmap_decode(&bitmap, buffer, bufferSize, loader->premultiplyAlpha);
+            bitmap_decode(&bitmap, buffer, buffer_size, loader->premultiplyAlpha);
             if (bitmap.pixels) {
                 loader->imageData.subImages[idx].data = bitmap.pixels;
                 loader->imageData.subImages[idx].width = (int) bitmap.w;

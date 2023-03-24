@@ -87,7 +87,7 @@ size_t ekUncompress(calo_reader_t* r, uint8_t* dest, size_t dest_size) {
     return sz;
 }
 
-void readBitmapARGB(calo_reader_t* r, BitmapData* bitmap) {
+void readBitmapARGB(calo_reader_t* r, bitmap_data_t* bitmap) {
     BitmapItemHeader desc = read_bitmap_item_header(r);
     const uint8_t compressed = read_u8(r);
     EK_ASSERT(desc.width_tw == desc.width * 20u);
@@ -112,7 +112,7 @@ void readBitmapARGB(calo_reader_t* r, BitmapData* bitmap) {
     reverse_color_components(bm_data, bm_size);
 }
 
-void readBitmapCLUT(calo_reader_t* r, BitmapData* bitmap) {
+void readBitmapCLUT(calo_reader_t* r, bitmap_data_t* bitmap) {
     BitmapItemHeader desc = read_bitmap_item_header(r);
     EK_ASSERT(desc.width_tw == desc.width * 20u);
     EK_ASSERT(desc.height_tw == desc.height * 20u);
@@ -152,7 +152,7 @@ void readBitmapCLUT(calo_reader_t* r, BitmapData* bitmap) {
     }
 }
 
-void readBitmapJPEG(const uint8_t* data, int size, BitmapData* bitmap) {
+void readBitmapJPEG(const uint8_t* data, int size, bitmap_data_t* bitmap) {
     int w = 0, h = 0, channels = 0;
     stbi_uc* imageData = stbi_load_from_memory(data, size,
                                                &w, &h, &channels, 4);
@@ -169,8 +169,8 @@ void readBitmapJPEG(const uint8_t* data, int size, BitmapData* bitmap) {
     }
 }
 
-BitmapData* parse_bitmap_data(const uint8_t* data, uint32_t size) {
-    BitmapData* bitmap = new BitmapData;
+bitmap_data_t* parse_bitmap_data(const uint8_t* data, uint32_t size) {
+    bitmap_data_t* bitmap = new bitmap_data_t;
 
     calo_reader_t reader = {};
     reader.p = (uint8_t*) data;

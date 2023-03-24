@@ -25,7 +25,7 @@ public:
     String(const char* cstr) noexcept: _buffer{nullptr} {
         ek_core_dbg_inc(EK_CORE_DBG_STRING);
         if (cstr && *cstr != '\0') {
-            const auto sz = strlen(cstr) + 1;
+            const uint32_t sz = (uint32_t)(strlen(cstr) + 1);
             arr_reinit(_buffer, sz);
             memcpy(_buffer, cstr, sz);
         }
@@ -56,7 +56,7 @@ public:
     }
 
     String& operator=(const char* str) {
-        arr_init_from((void**) &_buffer, 1, str, strlen(str) + 1);
+        arr_init_from((void**) &_buffer, 1, str, (uint32_t)(strlen(str) + 1));
         return *this;
     }
 

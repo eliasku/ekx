@@ -1,8 +1,11 @@
 #include <ek/log.h>
 #include <ek/assert.h>
 #include <ek/print.h>
+
 #if defined(__ANDROID__)
 #include <android/log.h>
+#elif defined(__APPLE__)
+#include <TargetConditionals.h>
 #endif
 
 enum {
@@ -93,23 +96,21 @@ static void log__default(log_msg_t msg) {
 #include <stdio.h>
 #include <time.h>
 
-#define RESET   "\033[0m"
-//#define BLACK   "\033[30m"      /* Black */
-//#define RED     "\033[31m"      /* Red */
-//#define GREEN   "\033[32m"      /* Green */
-//#define YELLOW  "\033[33m"      /* Yellow */
-#define BLUE    "\033[34m"      /* Blue */
-//#define MAGENTA "\033[35m"      /* Magenta */
-#define CYAN    "\033[36m"      /* Cyan */
-#define WHITE   "\033[37m"      /* White */
-//#define BOLDBLACK   "\033[1m\033[30m"      /* Bold Black */
-#define BOLDRED     "\033[1m\033[31m"      /* Bold Red */
-//#define BOLDGREEN   "\033[1m\033[32m"      /* Bold Green */
-#define BOLDYELLOW  "\033[1m\033[33m"      /* Bold Yellow */
-//#define BOLDBLUE    "\033[1m\033[34m"      /* Bold Blue */
-//#define BOLDMAGENTA "\033[1m\033[35m"      /* Bold Magenta */
-//#define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
-//#define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
+#if defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
+#define RESET       ""
+#define BLUE        ""
+#define CYAN        ""
+#define WHITE       ""
+#define BOLDRED     ""
+#define BOLDYELLOW  ""
+#else
+#define RESET       "\033[0m"
+#define BLUE        "\033[34m"
+#define CYAN        "\033[36m"
+#define WHITE       "\033[37m"
+#define BOLDRED     "\033[1m\033[31m"
+#define BOLDYELLOW  "\033[1m\033[33m"
+#endif
 
 static void log__default(log_msg_t msg) {
     // system

@@ -14,14 +14,14 @@ const bool useAdMobSimulator = true;
 const bool useAdMobSimulator = false;
 #endif
 
-Ads::Ads(Ads::Config config) :
-        config_{std::move(config)},
+Ads::Ads(ads_premium_config config_) :
+        config{config_},
         wrapper{AdMobWrapper::create(useAdMobSimulator)} {
     billing::context.onPurchaseChanged += [this](auto purchase) {
         this->onPurchaseChanged(purchase);
     };
     billing::context.onProductDetails += [this](const billing::ProductDetails& details) {
-        if (details.sku == config_.skuRemoveAds) {
+        if (details.sku == config.sku_remove_ads) {
             price = details.price;
             onProductLoaded();
         }
@@ -38,7 +38,6 @@ Ads::Ads(Ads::Config config) :
 }
 
 void Ads::onStart() {
-    const auto sku = config_.skuRemoveAds;
     // just wait billing service a little, TODO: billing initialized promise
     ek_timer_callback cb;
     cb.action = [](void* sku_) {
@@ -46,12 +45,12 @@ void Ads::onStart() {
         billing::getDetails({(const char*) sku_});
     };
     cb.cleanup = nullptr;
-    cb.userdata = (void*) config_.skuRemoveAds.c_str();
+    cb.userdata = (void*) config.sku_remove_ads;
     ek_set_timeout(cb, 3);
 }
 
 void Ads::onPurchaseChanged(const billing::PurchaseData& purchase) {
-    if (!removed && purchase.productID == config_.skuRemoveAds && purchase.state == 0) {
+    if (!removed && purchase.productID == config.sku_remove_ads && purchase.state == 0) {
         onRemoveAdsPurchased();
         if (!purchase.token.empty()) {
             // non-consumable
@@ -60,17 +59,17 @@ void Ads::onPurchaseChanged(const billing::PurchaseData& purchase) {
 }
 
 void Ads::purchaseRemoveAds() const {
-    billing::purchase(config_.skuRemoveAds, "");
+    billing::purchase(config.sku_remove_ads, "");
 }
 
 void Ads::setRemoveAdsPurchaseCache(bool adsRemoved) const {
-    ek_ls_set_i(config_.key0.c_str(), adsRemoved ? config_.val0 : 0);
-    ek_ls_set_i(config_.key1.c_str(), adsRemoved ? config_.val1 : 1);
+    ek_ls_set_i(config.key0, adsRemoved ? config.val0 : 0);
+    ek_ls_set_i(config.key1, adsRemoved ? config.val1 : 1);
 }
 
 bool Ads::checkRemoveAdsPurchase() const {
-    return ek_ls_get_i(config_.key0.c_str(), 0) == config_.val0 &&
-           ek_ls_get_i(config_.key1.c_str(), 0) == config_.val1;
+    return ek_ls_get_i(config.key0, 0) == config.val0 &&
+           ek_ls_get_i(config.key1, 0) == config.val1;
 }
 
 void Ads::onRemoveAdsPurchased() {
@@ -117,7 +116,7 @@ Ads::~Ads() {
 }
 
 ek::Ads* g_ads = nullptr;
-void ads_init(ek::Ads::Config config) {
+void ads_init(ads_premium_config config) {
     EK_ASSERT(g_ads == nullptr);
-    g_ads = new ek::Ads(std::move(config));
+    g_ads = new ek::Ads(config);
 }

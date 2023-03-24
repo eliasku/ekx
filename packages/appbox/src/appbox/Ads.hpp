@@ -5,24 +5,23 @@
 #include <ek/scenex/app/GameAppListener.hpp>
 #include <functional>
 
+typedef struct ads_premium_config {
+    const char* sku_remove_ads = "remove_ads";
+    const char* key0 = "ads_key_0";
+    int val0 = 1111;
+    const char* key1 = "ads_key_1";
+    int val1 = 2222;
+} ads_premium_config;
+
 namespace ek {
 
 class AdMobWrapper;
 
 class Ads : public GameAppListener {
 public:
-
-    struct Config {
-        String skuRemoveAds = "remove_ads";
-        String key0 = "ads_key_0";
-        int val0 = 1111;
-        String key1 = "ads_key_1";
-        int val1 = 2222;
-    };
-
     void onStart() override;
 
-    explicit Ads(Config config);
+    explicit Ads(ads_premium_config config_);
     ~Ads() override;
 
     void onPurchaseChanged(const billing::PurchaseData& purchase);
@@ -45,7 +44,7 @@ public:
 
     String price{};
     bool removed = false;
-    Config config_;
+    ads_premium_config config;
     AdMobWrapper* wrapper = nullptr;
 private:
     void setRemoveAdsPurchaseCache(bool adsRemoved) const;
@@ -58,4 +57,4 @@ private:
 }
 
 extern ek::Ads* g_ads;
-void ads_init(ek::Ads::Config config);
+void ads_init(ads_premium_config config);

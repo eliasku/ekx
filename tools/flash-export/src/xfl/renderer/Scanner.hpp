@@ -35,7 +35,7 @@ public:
 
     bool render(const RenderCommandsBatch& batch);
 
-    bool render(const BitmapData* bitmap, const TransformModel& world);
+    bool render(const bitmap_data_t* bitmap, const TransformModel& world);
 
     bool renderShapeObject(const Element& el, const TransformModel& world);
 

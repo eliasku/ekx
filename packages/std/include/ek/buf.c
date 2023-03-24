@@ -99,10 +99,10 @@ void* ek_buf_pop_(void* ptr, uint32_t elementSize) {
 
 /**
  * ensure buffer size and copy `len` elements from `src` memory (count * el_size)
- * @param buf
- * @param element_size
- * @param src
- * @param len
+ * @param arr array
+ * @param element_size single element size
+ * @param src data source
+ * @param len data source byte length
  */
 void arr_init_from(void** arr, uint32_t element_size, const void* src, uint32_t len) {
     ek_buf_set_size(arr, element_size, len, len);

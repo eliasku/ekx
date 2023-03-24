@@ -62,7 +62,7 @@ struct FixedArray {
         EK_ASSERT_R2(_size > 0);
         EK_ASSERT_R2(el);
         EK_ASSERT_R2(el >= _data);
-        erase_at(el - _data);
+        erase_at((uint32_t)(el - _data));
     }
 
     [[nodiscard]]

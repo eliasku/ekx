@@ -1,14 +1,9 @@
-
-
-static void ek_legacy_core_stub(void) {}
-
-#include "core_dbg.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <ek/core_dbg.h>
 
 #ifndef NDEBUG
+
+#include <ek/log.h>
+
 int _core_dbg_stats[EK_CORE_DBG_MAX_COUNT];
 
 void ek_core_dbg_inc(int m) {
@@ -22,10 +17,10 @@ void ek_core_dbg_dec(int m) {
 int ek_core_dbg_get(int m) {
     return _core_dbg_stats[m];
 }
-#endif
+#else
 
-#ifdef __cplusplus
-}
+static void ek_legacy_core_stub(void) {}
+
 #endif
 
 ////#ifdef EK_ALLOCATION_TRACKER

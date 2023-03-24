@@ -85,6 +85,7 @@ export async function setup(project: Project) {
                 `script_phase name: 'Run Firebase Crashlytics',
         shell_path: '/bin/sh',
         script: '"\${PODS_ROOT}/FirebaseCrashlytics/run"',
+        execution_position: :after_compile,
         input_files: ['$(SRCROOT)/$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)','\${DWARF_DSYM_FOLDER_PATH}/\${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/\${TARGET_NAME}']`
             ],
             cpp_flags: {

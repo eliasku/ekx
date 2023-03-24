@@ -131,7 +131,7 @@ void CairoRenderer::close() {
     }
 }
 
-void CairoRenderer::draw_bitmap(const BitmapData* bitmap) {
+void CairoRenderer::draw_bitmap(const bitmap_data_t* bitmap) {
     const int sx = 0;
     const int sy = 0;
     const int sw = bitmap->width;

@@ -51,7 +51,7 @@ uint32_t add_data(vla_table_t* table, const void* data, uint32_t length) {
 
 uint32_t add_string(vla_table_t* table, const char* str) {
     const uint32_t max_length = 1024;
-    const uint32_t data_length = strnlen(str, max_length);
+    const uint32_t data_length = (uint32_t)strnlen(str, max_length);
     // no null-terminator is invalid
     if (data_length == max_length) {
         // exceeded string max length

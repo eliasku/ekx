@@ -121,7 +121,7 @@ calo_writer_t new_writer(uint32_t reserved) {
 }
 
 void ensure_writer_space(calo_writer_t* w, uint32_t bytes_to_write) {
-    uint32_t pos = w->p - (uint8_t*) w->data;
+    uint32_t pos = (uint32_t)(w->p - (uint8_t*) w->data);
     uint32_t new_len = pos + bytes_to_write;
     uint32_t cap = w->cap;
     if (new_len > cap) {

@@ -8,16 +8,16 @@
 #include <memory>
 #include <optional>
 
-struct BitmapData {
+typedef struct bitmap_data {
     int width = 0;
     int height = 0;
     int bpp = 4;
     bool alpha = true;
     ek::Array<uint8_t> data;
-};
+} bitmap_data_t;
 
 // TODO: data is data, remove string usage
-BitmapData* parse_bitmap_data(const uint8_t* data, uint32_t size);
+bitmap_data_t* parse_bitmap_data(const uint8_t* data, uint32_t size);
 
 namespace ek::xfl {
 
@@ -181,7 +181,7 @@ struct FillStyle {
     Array<GradientEntry> entries{};
     mat3x2_t matrix = mat3x2_identity();
     String bitmapPath;
-    std::shared_ptr<BitmapData> bitmap;
+    std::shared_ptr<bitmap_data_t> bitmap;
 };
 
 struct StrokeStyle {
@@ -455,7 +455,7 @@ struct Element {
     bool isJPEG;
     int quality;
 
-    std::shared_ptr<BitmapData> bitmap = nullptr;
+    std::shared_ptr<bitmap_data_t> bitmap = nullptr;
 
     /// FONT ITEM
     String font;

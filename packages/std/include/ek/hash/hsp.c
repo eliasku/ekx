@@ -54,7 +54,7 @@ string_hash_t hsp_hash_debug(const char* str) {
     }
     uint16_t new_id = ++hsp.last;
     const uint32_t max_length = sizeof(hsp.table) / sizeof(hsp.table[0]);
-    const uint32_t str_buf_size = strlen(str) + 1;
+    const uint32_t str_buf_size = (uint32_t)(strlen(str) + 1);
     if (str_buf_size > max_length) {
         log_error("got string length %d (maximum length is %d)", str_buf_size, max_length);
         EK_ASSERT(0);
