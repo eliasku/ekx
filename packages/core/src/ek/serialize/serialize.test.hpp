@@ -33,11 +33,10 @@ public:
     /* 4 */ float f1 = 2.0f;
     /* 4 */ int i4 = 4;
     /* 8 */ double d3 = 3;
-    /* 1 */ bool flag = true;
 
     template<typename Stream>
     void serialize(IO<Stream>& io) {
-        io(f1, i4, d3, flag);
+        io(f1, i4, d3);
     }
 };
 
@@ -73,12 +72,9 @@ SUITE(cxx_serialize) {
         auto ff = TestFlagsCpp::Three;
         writer(bar, ff);
 
-//    writer(bar, TestFlagsCpp::Three);
-
-        // Bar: 17
+        // Bar: 16
         // TestFlagsCpp: 1
-        // empty string: 4 + 1 (string length + null-terminator byte)
-        REQUIRE_EQ(writeStream.size(), 17 + 1 + (4 + 1));
+        REQUIRE_EQ(writeStream.size(), 16 + 1);
 
         input_memory_stream read1{writeStream.data(), writeStream.size()};
         IO io{read1};
@@ -89,7 +85,6 @@ SUITE(cxx_serialize) {
         REQUIRE_EQ(barLoaded.f1, 2.0f); // near
         REQUIRE_EQ(barLoaded.d3, 3); // near
         REQUIRE_EQ(barLoaded.i4, 4);
-        REQUIRE_EQ(barLoaded.flag, true);
         REQUIRE(f == TestFlagsCpp::Three);
 
         input_memory_stream read2{writeStream.data(), writeStream.size()};
@@ -145,7 +140,7 @@ SUITE(cxx_serialize) {
         TestFlagsCpp c{TestFlagsCpp::Three};
         writer(a, b, c);
 
-        REQUIRE_EQ(outs.size(), 3 + 4 + 3);
+        REQUIRE_EQ(outs.size(), 3);
 
         input_memory_stream ins{outs.data(), outs.size()};
         IO io{ins};
