@@ -24,7 +24,7 @@ target_compile_options(${PROJECT_NAME}
         PRIVATE -Wall
         PRIVATE -Wextra
         #PRIVATE -Wno-c99-compat
-        PRIVATE -std=c18
+#        PRIVATE -std=c18
         PRIVATE -fno-strict-aliasing
         PRIVATE -fno-exceptions
         PRIVATE -fno-rtti
