@@ -22,7 +22,7 @@ static int ek_texture_loader__load_bytes(const char* base_path, const char* url,
     char file_path_buffer[1024];
     const char* file_path = ek_app_ns_bundle_path(path_buffer, file_path_buffer, sizeof(file_path_buffer));
 #else
-    const char* file_path = pathBuffer;
+    const char* file_path = path_buffer;
 #endif
 
     FILE* stream = fopen(file_path, "rb");
@@ -113,8 +113,8 @@ void ek_texture_loader_update(ek_texture_loader* loader) {
         ek_texture_loader__setup_image_desc(&loader->imageData, &loader->desc);
         loader->image = sg_make_image(&loader->desc);
         for (int i = 0; i < EK_TEXTURE_LOADER_IMAGES_MAX_COUNT; ++i) {
-            const void* subImageData = loader->imageData.subImages[i].data;
-            free((void*) subImageData);
+            const void* sub_image_data = loader->imageData.subImages[i].data;
+            free((void*) sub_image_data);
             memset(&loader->imageData.subImages[i], 0, sizeof(ek_texture_loader_sub_image));
         }
         loader->progress = 1.0f;
