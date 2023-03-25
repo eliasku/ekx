@@ -71,7 +71,7 @@
     "CHANGELOG.md",
     "tools",
     "packages",
-    "packages/auph/js",
+    "packages/audio/js",
     "packages/app/js",
     "lib",
     "plugins",
