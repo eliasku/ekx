@@ -17,22 +17,19 @@ target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 target_compile_options(${PROJECT_NAME}
         PRIVATE -g
-#        PRIVATE -flto
+        #PRIVATE -flto
         PRIVATE -Os
         PRIVATE -Wall
         PRIVATE -Wextra
-        #PRIVATE -std=c18
         PRIVATE -fno-strict-aliasing
         PRIVATE -fno-exceptions
         PRIVATE -fno-rtti
         PRIVATE -ffast-math
-#        PRIVATE -mstackrealign
-#        PRIVATE -fshort-enums
         )
 
 target_link_options(${PROJECT_NAME}
         PRIVATE -g
-#        PRIVATE -flto
+        #PRIVATE -flto
         PRIVATE -Os
         PRIVATE -fno-strict-aliasing
         PRIVATE -fno-exceptions
@@ -40,9 +37,7 @@ target_link_options(${PROJECT_NAME}
         PRIVATE -ffast-math
         )
 
-target_link_libraries(${PROJECT_NAME}
-        PUBLIC ekx::headers
-        )
+target_link_libraries(${PROJECT_NAME} PUBLIC ekx::headers)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "iOS")

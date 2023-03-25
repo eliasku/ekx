@@ -5,11 +5,6 @@ project(core)
 add_library(${PROJECT_NAME} STATIC
         ek/core_dbg.c
 
-        ek/serialize/streams.hpp
-        ek/serialize/core.hpp
-        ek/serialize/types.hpp
-        ek/serialize/serialize.hpp
-
         ek/util/Signal.hpp
         ek/util/StaticStorage.hpp
 

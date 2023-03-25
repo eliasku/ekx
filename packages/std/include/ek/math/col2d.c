@@ -1,6 +1,6 @@
 /** Collision test functions **/
-inline static float vec2_sign(const vec2_t p1, const vec2_t p2, const vec2_t p3) {
-    return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+inline static float vec2_sign(const vec2_t p0, const vec2_t p1, const vec2_t p2) {
+    return (p0.x - p2.x) * (p1.y - p2.y) - (p1.x - p2.x) * (p0.y - p2.y);
 }
 
 bool test_point_triangle(const vec2_t point, const vec2_t v0, const vec2_t v1, const vec2_t v2) {

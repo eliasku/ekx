@@ -11,31 +11,25 @@ add_library(${PROJECT_NAME} STATIC
 
 add_library(ekx::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-        C_STANDARD 11
-        )
+set_target_properties(${PROJECT_NAME} PROPERTIES C_STANDARD 11)
 
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 target_compile_options(${PROJECT_NAME}
         PRIVATE -g
-        #        PRIVATE -flto
+        #PRIVATE -flto
         PRIVATE -Os
         PRIVATE -Wall
         PRIVATE -Wextra
-        #PRIVATE -Wno-c99-compat
-#        PRIVATE -std=c18
         PRIVATE -fno-strict-aliasing
         PRIVATE -fno-exceptions
         PRIVATE -fno-rtti
         PRIVATE -ffast-math
-        #        PRIVATE -mstackrealign
-        #        PRIVATE -fshort-enums
         )
 
 target_link_options(${PROJECT_NAME}
         PRIVATE -g
-        #        PRIVATE -flto
+        #PRIVATE -flto
         PRIVATE -Os
         PRIVATE -fno-strict-aliasing
         PRIVATE -fno-exceptions
@@ -43,9 +37,7 @@ target_link_options(${PROJECT_NAME}
         PRIVATE -ffast-math
         )
 
-target_link_libraries(${PROJECT_NAME}
-        PRIVATE ekx::std
-        )
+target_link_libraries(${PROJECT_NAME} PUBLIC ekx::std)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
     target_link_options(${PROJECT_NAME}

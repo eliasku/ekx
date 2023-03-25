@@ -15,6 +15,7 @@ typedef struct {
 } calo_reader_t;
 
 void read_calo(calo_reader_t* r);
+void read_span(calo_reader_t* r, void* dest, uint32_t size);
 uint8_t read_u8(calo_reader_t* r);
 uint16_t read_u16(calo_reader_t* r);
 uint32_t read_u32(calo_reader_t* r);
