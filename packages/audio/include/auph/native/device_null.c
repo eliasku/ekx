@@ -1,9 +1,3 @@
-#ifndef AUPH_NATIVE_DEVICE_NULL_IMPL
-#define AUPH_NATIVE_DEVICE_NULL_IMPL
-#else
-#error You should implement auph once
-#endif
-
 #include "native.h"
 
 struct auph_audio_device {
@@ -35,4 +29,3 @@ bool auph_audio_device_stop(auph_audio_device* device) {
 void auph_audio_device_term(auph_audio_device* device) {
     (void) device;
 }
-

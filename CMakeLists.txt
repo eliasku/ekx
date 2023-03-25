@@ -29,7 +29,6 @@ add_subdirectory(packages/physics-arcade)
 add_subdirectory(packages/ecs)
 add_subdirectory(packages/graphics)
 add_subdirectory(packages/audio)
-add_subdirectory(packages/auph)
 add_subdirectory(packages/scenex)
 add_subdirectory(packages/appbox)
 

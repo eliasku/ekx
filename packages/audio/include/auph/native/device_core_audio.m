@@ -1,9 +1,3 @@
-#ifndef AUPH_NATIVE_DEVICE_CORE_AUDIO_IMPL
-#define AUPH_NATIVE_DEVICE_CORE_AUDIO_IMPL
-#else
-#error You should implement auph once
-#endif
-
 #include "native.h"
 #include <TargetConditionals.h>
 #import <AudioToolbox/AudioToolbox.h>

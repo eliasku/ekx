@@ -1,9 +1,3 @@
-#ifndef AUPH_NATIVE_DEVICE_OBOE_IMPL
-#define AUPH_NATIVE_DEVICE_OBOE_IMPL
-#else
-#error You should implement auph once
-#endif
-
 #include "native.h"
 #include <oboe/Oboe.h>
 #include <android/log.h>
@@ -299,4 +293,3 @@ jint Java_ek_Auph_restart(JNIEnv* env, jclass clazz) {
     return 0;
 #endif
 }
-

@@ -11,7 +11,7 @@ await esbuild.build({
     target: "es2020",
     bundle: true,
     sourcemap: true,
-    outfile: path.join(__dirname, "../js/pre/auph.js"),
+    outfile: path.join(__dirname, "../js/pre/audio.js"),
     define: {
         "process.env.NODE_ENV":'"production"'
     }

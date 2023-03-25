@@ -1,3 +1,16 @@
+#if 0
+// for refactoring enable other formats
+#define AUPH_WAV
+#define AUPH_OGG
+#define AUPH_FORCE_NATIVE_NULL_DEVICE
+#endif
+
+#define AUPH_MP3
+
+#include <auph/auph.c>
+
+// resources
+
 #include <ek/audio.h>
 
 struct res_audio res_audio;

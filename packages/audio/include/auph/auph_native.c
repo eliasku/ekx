@@ -8,7 +8,7 @@
 #include "native/device.c"
 #include "native/mixer.c"
 
-#if defined(__ANDROID__) && defined(AUPH_SETUP_EK_APP)
+#if defined(__ANDROID__)
 #include <ek/app_native.h>
 #endif
 
@@ -113,7 +113,7 @@ auph_bus_obj* auph_get_bus_obj(int name) {
 }
 
 void auph_setup(void) {
-#if defined(__ANDROID__) && defined(AUPH_SETUP_EK_APP)
+#if defined(__ANDROID__)
     auph_android_setup(ek_android_jni, ek_android_activity(), ek_android_assets_object());
 #endif
 

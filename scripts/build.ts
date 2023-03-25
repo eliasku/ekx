@@ -4,7 +4,7 @@ import {logger} from "../lib/cli/logger.js";
 
 // run build files
 import "../packages/app/web/build.js";
-import "../packages/auph/web/build.js";
+import "../packages/audio/web/build.js";
 import "../packages/graphics/build.js";
 import "../plugins/firebase/build.js";
 
@@ -14,8 +14,8 @@ UtilityConfig.verbose = true;
 const filesToVerify = [
     "packages/app/js/lib/app.js",
     "packages/app/js/pre/app.js",
-    "packages/auph/js/pre/auph.js",
-    "packages/auph/js/pre/auph.js.map",
+    "packages/audio/js/pre/audio.js",
+    "packages/audio/js/pre/audio.js.map",
 ];
 
 let missFiles = 0;
