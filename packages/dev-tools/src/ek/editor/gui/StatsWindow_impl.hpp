@@ -1,8 +1,8 @@
 #pragma once
 
 #include <ek/scenex/app/basic_application.hpp>
-#include <ek/scenex/base/Node.hpp>
-#include <ek/scenex/InteractionSystem.hpp>
+#include <ek/scenex/base/node.h>
+#include <ek/scenex/interaction_system.h>
 #include <ek/canvas.h>
 
 #include <ek/editor/imgui/imgui.hpp>

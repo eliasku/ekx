@@ -145,7 +145,7 @@ void draw_mesh3d_info(void* asset) {
 
 void draw_rr_items(const char* type_name, rr_man_t* rr, void (* fn)(void* item)) {
     char buff[128];
-    sprintf(buff, "%s (%u / %u)###%s", type_name, rr->num, rr->max, type_name);
+    snprintf(buff, sizeof buff, "%s (%u / %u)###%s", type_name, rr->num, rr->max, type_name);
     if (ImGui::BeginTabItem(buff)) {
         uint8_t* item_data = (uint8_t*) rr->data;
         for (uint32_t i = 0; i < rr->num; ++i) {

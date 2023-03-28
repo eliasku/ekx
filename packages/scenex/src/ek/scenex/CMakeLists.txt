@@ -5,15 +5,13 @@ target_sources(${PROJECT_NAME} PRIVATE
         ekx_app.cpp
         ekx_app.c
 
-        base/Node.hpp
+        base/node.h
         base/Node.cpp
-        base/Interactive.hpp
-        base/Interactive.cpp
+        base/interactiv.cpp
         base/NodeEvents.hpp
         base/NodeEvents.cpp
-        base/Tween.hpp
-        base/DestroyTimer.hpp
-        base/module.cpp
+        base/tween.h
+        base/destroy_timer.h
 
         3d/Transform3D.cpp
         3d/Transform3D.hpp
@@ -51,8 +49,8 @@ target_sources(${PROJECT_NAME} PRIVATE
         text/FontImplBase.hpp
         text/TextEngine.cpp
 
-        InteractionSystem.cpp
-        InteractionSystem.hpp
+        interaction_system.cpp
+        interaction_system.h
 
         particles/Particle.cpp
         particles/Particle.hpp
@@ -72,6 +70,6 @@ target_sources(${PROJECT_NAME} PRIVATE
 
         asset2/Assets.cpp
 
-        SceneFactory.hpp
-        SceneFactory.cpp
+        scene_factory.h
+        scene_factory.cpp
         )

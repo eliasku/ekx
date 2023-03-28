@@ -111,7 +111,7 @@ void arr_init_from(void** arr, uint32_t element_size, const void* src, uint32_t 
     }
 }
 
-void arr_resize(void** p_arr, uint32_t element_size, uint32_t new_len) {
+void arr_resize_(void** p_arr, uint32_t element_size, uint32_t new_len) {
     const uint32_t cap = arr_capacity(*p_arr);
     if (new_len > cap) {
         arr_grow(p_arr, new_len, element_size);

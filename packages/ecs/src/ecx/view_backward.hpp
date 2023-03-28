@@ -52,12 +52,12 @@ public:
             return true;
         }
 
-        inline Entity operator*() const {
-            return Entity{entity_at(ent_)};
+        inline entity_t operator*() const {
+            return entity_at(ent_);
         }
 
-        inline Entity operator*() {
-            return Entity{entity_at(ent_)};
+        inline entity_t operator*() {
+            return entity_at(ent_);
         }
 
     private:
@@ -113,8 +113,8 @@ public:
             return it_ != other.it_;
         }
 
-        inline Entity operator*() const noexcept {
-            return Entity{entity_at(type<C>()->handleToEntity[it_])};
+        inline entity_t operator*() const noexcept {
+            return entity_at(type<C>()->handleToEntity[it_]);
         }
 
     private:

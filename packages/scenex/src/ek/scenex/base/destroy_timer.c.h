@@ -1,8 +1,7 @@
-#include "DestroyTimer.hpp"
+#include "destroy_timer.h"
 
-#include <ek/scenex/base/Node.hpp>
+#include "node.h"
 #include <ek/time.h>
-#include <ek/ds/Array.hpp>
 
 destroy_manager_t g_destroy_manager;
 
@@ -12,24 +11,21 @@ void destroy_later(entity_t e, float delay, TimeLayer timer) {
         t.entity = e;
         t.delay = delay;
         t.time_layer = timer;
-        g_destroy_manager.timers.push_back(t);
-        //e.reassign<DestroyTimer>(delay, timer);
+        arr_push(g_destroy_manager.timers, t);
     }
 }
 
 void destroy_children_later(entity_t e, float delay, TimeLayer timer) {
-    auto it = ek::get_first_child(e);
+    entity_t it = get_first_child(e);
     while (it.id) {
-        //it.reassign<DestroyTimer>(delay, timer);
         destroy_later(it, delay, timer);
-        it = ek::get_next_child(it);
+        it = get_next_child(it);
     }
 }
 
 void update_destroy_queue() {
-    using namespace ek;
     uint32_t i = 0;
-    uint32_t end = g_destroy_manager.timers.size();
+    uint32_t end = arr_size(g_destroy_manager.timers);
     while(i < end) {
         destroy_timer_t* timer = &g_destroy_manager.timers[i];
         entity_t e = timer->entity;
@@ -40,7 +36,7 @@ void update_destroy_queue() {
                 continue;
             }
 
-            if (ecs::has<Node>(e)) {
+            if (ecs::has<node_t>(e)) {
                 destroy_node(e);
             } else {
                 destroy_entity(e);
@@ -52,22 +48,7 @@ void update_destroy_queue() {
             g_destroy_manager.timers[i] = g_destroy_manager.timers[end];
         }
     }
-    if(end < g_destroy_manager.timers.size()) {
-        g_destroy_manager.timers.resize(end);
+    if(end < arr_size(g_destroy_manager.timers)) {
+        arr_resize(g_destroy_manager.timers, end);
     }
-//        c.delay -= g_time_layers[c.timer].dt;
-//        if (c.delay <= 0.0f && num != 4096) {
-//            destroy_queue.push_back(e);
-//            ++num;
-//        }
-//    }
-//    for (auto e: destroy_queue) {
-//        if (e.is_alive()) {
-//            if (ecs::has<Node>(e)) {
-//                destroy_node(e);
-//            } else {
-//                ecs::destroy(e);
-//            }
-//        }
-//    }
 }

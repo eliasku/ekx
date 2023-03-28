@@ -2,10 +2,6 @@
 
 #include <ek/assert.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 time_layer_state_t g_time_layers[TIME_LAYER_MAX_COUNT];
 
 #define TIME_LAYER_DELTA_TIME_MAX (0.3f)
@@ -37,8 +33,3 @@ void update_time_layers(float raw_dt) {
     update_time_layer(g_time_layers + 2, dt);
     update_time_layer(g_time_layers + 3, dt);
 }
-
-
-#ifdef __cplusplus
-}
-#endif

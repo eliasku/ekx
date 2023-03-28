@@ -126,7 +126,7 @@ void ConsoleWindow::onDraw() {
             }
         }
         info.count = count;
-        sprintf(tmpBuffer, "%s %u###console_verbosity_%i", info.icon, count, i);
+        snprintf(tmpBuffer, sizeof tmpBuffer, "%s %u###console_verbosity_%i", info.icon, count, i);
         ImGui::PushStyleColor(ImGuiCol_Button, info.show ? 0x44FF7722 : 0x0);
         ImGui::PushStyleColor(ImGuiCol_Text, info.show ? info.iconColor : 0x3FFFFFFF);
         if (ImGui::Button(tmpBuffer)) {

@@ -1,22 +1,23 @@
 #include "AppBox.hpp"
 
+#include <ek/ds/String.hpp>
 #include <ek/app.h>
-#include <ek/scenex/base/Node.hpp>
+#include <ek/scenex/base/node.h>
 #include <ek/scenex/2d/Display2D.hpp>
 #include <ek/scenex/2d/Button.hpp>
-#include <ek/scenex/base/Interactive.hpp>
+#include <ek/scenex/base/interactiv.h>
 #include <billing.hpp>
 #include <ekx/app/audio_manager.h>
-#include <utility>
 #include <ek/game_services.h>
 #include <ekx/app/localization.h>
 #include "Ads.hpp"
 #include "ek/scenex/base/NodeEvents.hpp"
+#include "ek/local_storage.h"
 
 namespace ek {
 
 AppBox::AppBox(AppBoxConfig config_) :
-        config{std::move(config_)} {
+        config{config_} {
 
     // unlock abort()
 
@@ -47,14 +48,14 @@ AppBox::AppBox(AppBoxConfig config_) :
     }
 }
 
-void set_state_on_off(ecs::Entity e, bool enabled) {
+void set_state_on_off(entity_t e, bool enabled) {
     auto on = find(e, H("state_on"));
     auto off = find(e, H("state_off"));
     set_visible(on, enabled);
     set_visible(off, !enabled);
 }
 
-void AppBox::initDefaultControls(ecs::Entity e) {
+void AppBox::initDefaultControls(entity_t e) {
     {
         // VERSION
         auto e_version = find(e, H("version"));
@@ -68,16 +69,16 @@ void AppBox::initDefaultControls(ecs::Entity e) {
     }
     {
         // PRIVACY POLICY
-        ecs::Entity e_pp = find(e, H("privacy_policy"));
-        if (e_pp) {
-            auto lbl = find(e_pp, H("label"));
+        entity_t e_pp = find(e, H("privacy_policy"));
+        if (e_pp.id) {
+            entity_t lbl = find(e_pp, H("label"));
             if (lbl.id) {
                 auto* txt = ecs::try_get<Text2D>(lbl);
                 if (txt) {
                     txt->hitFullBounds = true;
                 }
             }
-            ecs::add<Interactive>(e_pp);
+            interactive_add(e_pp);
             ecs::add<Button>(e_pp);
             ecs::add<NodeEventHandler>(e_pp).on(BUTTON_EVENT_CLICK, [](const NodeEventData& ) {
                 ek_app_open_url(g_app_box->config.privacy_policy_url);
@@ -115,28 +116,28 @@ void AppBox::initDefaultControls(ecs::Entity e) {
     // Settings
     {
         {
-            ecs::Entity btn = find(e, H("sound"));
-            if (btn) {
+            entity_t btn = find(e, H("sound"));
+            if (btn.id) {
                 ecs::add<NodeEventHandler>(btn).on(BUTTON_EVENT_CLICK, [](const NodeEventData& event) {
-                    set_state_on_off(ecs::Entity{event.source}, audio_toggle_pref(AUDIO_PREF_SOUND));
+                    set_state_on_off(event.source, audio_toggle_pref(AUDIO_PREF_SOUND));
                 });
                 set_state_on_off(btn, g_audio.prefs & AUDIO_PREF_SOUND);
             }
         }
         {
-            ecs::Entity btn = find(e, H("music"));
-            if (btn) {
+            entity_t btn = find(e, H("music"));
+            if (btn.id) {
                 ecs::add<NodeEventHandler>(btn).on(BUTTON_EVENT_CLICK, [](const NodeEventData& event) {
-                    set_state_on_off(ecs::Entity{event.source}, audio_toggle_pref(AUDIO_PREF_MUSIC));
+                    set_state_on_off(event.source, audio_toggle_pref(AUDIO_PREF_MUSIC));
                 });
                 set_state_on_off(btn, g_audio.prefs & AUDIO_PREF_MUSIC);
             }
         }
         {
-            ecs::Entity btn = find(e, H("vibro"));
-            if (btn) {
+            entity_t btn = find(e, H("vibro"));
+            if (btn.id) {
                 ecs::add<NodeEventHandler>(btn).on(BUTTON_EVENT_CLICK, [](const NodeEventData& event) {
-                    set_state_on_off(ecs::Entity{event.source}, audio_toggle_pref(AUDIO_PREF_VIBRO));
+                    set_state_on_off(event.source, audio_toggle_pref(AUDIO_PREF_VIBRO));
                     if (g_audio.prefs & AUDIO_PREF_VIBRO) {
                         vibrate(50);
                     }
@@ -149,8 +150,10 @@ void AppBox::initDefaultControls(ecs::Entity e) {
     }
 }
 
-void AppBox::shareWithAppLink(const String& text) {
-    auto msg = text + " " + config.app_link_url;
+void AppBox::shareWithAppLink(const char* text) {
+    String msg = text;
+    msg += " ";
+    msg += config.app_link_url;
     ek_app_share(msg.c_str());
 }
 
@@ -171,8 +174,8 @@ void AppBox::rateUs() const {
 
 /// download app feature
 
-void wrap_button(ecs::Entity e, string_hash_t tag, const char* link) {
-    ecs::Entity x = find(e, tag);
+void wrap_button(entity_t e, string_hash_t tag, const char* link) {
+    entity_t x = find(e, tag);
     if (link && *link) {
         ecs::add<Button>(x);
         ecs::add<NodeEventHandler>(x).on(BUTTON_EVENT_CLICK, [link](const NodeEventData& ) {
@@ -183,7 +186,7 @@ void wrap_button(ecs::Entity e, string_hash_t tag, const char* link) {
     }
 }
 
-void AppBox::initDownloadAppButtons(ecs::Entity) {
+void AppBox::initDownloadAppButtons(entity_t) {
 //    auto banner = sg_create("gfx", "cross_banner");
 //    setName(banner, "banner");
 //    layout_wrapper{banner}.aligned(0.5f, 0.0f, 1.0f, 0.0f);
@@ -194,9 +197,9 @@ void AppBox::initDownloadAppButtons(ecs::Entity) {
 //    append(e, banner);
 }
 
-void AppBox::initLanguageButton(ecs::Entity e) {
-    ecs::Entity btn = find(e, H("language"));
-    if (btn) {
+void AppBox::initLanguageButton(entity_t e) {
+    entity_t btn = find(e, H("language"));
+    if (btn.id) {
         ecs::add<NodeEventHandler>(btn).on(BUTTON_EVENT_CLICK, [](const NodeEventData& ) {
             uint32_t index = s_localization.lang_index;
             uint32_t num = s_localization.lang_num;

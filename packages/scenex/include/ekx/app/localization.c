@@ -2,10 +2,6 @@
 #include <ek/log.h>
 #include <ek/assert.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 inline static int cmp_key(const void* a, const void* b) {
     const char* ka = ((const str_pair_t*) a)->k;
     const char* kb = ((const str_pair_t*) b)->k;
@@ -130,7 +126,3 @@ bool is_localized(const char* text) {
 }
 
 localization_t s_localization;
-
-#ifdef __cplusplus
-}
-#endif

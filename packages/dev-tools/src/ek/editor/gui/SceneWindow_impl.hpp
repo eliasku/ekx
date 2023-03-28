@@ -166,9 +166,9 @@ void SceneWindow::onDraw() {
         }
     }
 
-    if (root.valid() && canSelectObjects) {
+    if (is_entity(root) && canSelectObjects) {
         const auto wp = view.getMouseWorldPos();
-        auto target = hitTest(root, wp);
+        entity_t target = hitTest(root, wp);
         hoverTarget = target;
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
             g_editor->hierarchy.select(target);
@@ -286,7 +286,7 @@ void SceneWindow::onPreRender() {
 }
 
 void SceneWindow::drawScene() {
-    if (!root.valid()) {
+    if (!is_entity(root)) {
         root = g_game_app->root;
     }
 
@@ -305,15 +305,15 @@ void SceneWindow::drawScene() {
     canvas_end();
 }
 
-ecs::Entity SceneWindow::hitTest(ecs::Entity e, vec2_t worldPos) {
+entity_t SceneWindow::hitTest(entity_t e, vec2_t worldPos) {
     const auto& node = ecs::get<Node>(e);
     if (node.flags & (NODE_HIDDEN | NODE_UNTOUCHABLE)) {
-        return nullptr;
+        return NULL_ENTITY;
     }
-    auto it = get_last_child(e);
+    entity_t it = get_last_child(e);
     while (it.id) {
-        auto t = hitTest(it, worldPos);
-        if (t) {
+        entity_t t = hitTest(it, worldPos);
+        if (t.id) {
             return t;
         }
         it = get_prev_child(it);
@@ -329,7 +329,7 @@ ecs::Entity SceneWindow::hitTest(ecs::Entity e, vec2_t worldPos) {
             }
         }
     }
-    return nullptr;
+    return NULL_ENTITY;
 }
 
 void SceneWindow::drawToolbar() {
@@ -389,8 +389,8 @@ void SceneWindow::drawToolbar() {
 
 void SceneWindow::manipulateObject2D() {
     auto& selection = g_editor->hierarchy.selection;
-    if (selection.size() > 0 && selection[0].valid()) {
-        ecs::Entity sel = selection[0];
+    if (selection.size() > 0 && is_entity(entity_id(selection[0]))) {
+        entity_t sel = entity_id(selection[0]);
         auto worldMatrix2D = ecs::get<WorldTransform2D>(sel).matrix;
         mat4_t worldMatrix3D = matrix2Dto3D(worldMatrix2D);
         ImGuizmo::OPERATION op = ImGuizmo::OPERATION::BOUNDS;
@@ -424,8 +424,8 @@ void SceneWindow::manipulateObject2D() {
 
 void SceneWindow::manipulateObject3D() {
     auto& selection = g_editor->hierarchy.selection;
-    if (selection.size() > 0 && selection[0].valid()) {
-        ecs::Entity sel = selection[0];
+    if (selection.size() > 0 && is_entity(entity_id(selection[0]))) {
+        entity_t sel = entity_id(selection[0]);
         auto worldMatrix2D = ecs::get<WorldTransform2D>(sel).matrix;
         mat4_t worldMatrix3D = matrix2Dto3D(worldMatrix2D);
         ImGuizmo::OPERATION op = ImGuizmo::OPERATION::BOUNDS;

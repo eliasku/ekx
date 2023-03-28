@@ -40,7 +40,7 @@ void Editor::drawGUI() {
                                               &settings.notifyAssetsOnScaleFactorChanged);
             ///
             ImGui::Separator();
-            ImGui::MenuItem("Emulate Touch Input", nullptr, &g_input_state.emulateTouch);
+            ImGui::MenuItem("Emulate Touch Input", nullptr, &g_input_state.emulate_touch);
             ///
             ImGui::Separator();
             if (g_game_app) {

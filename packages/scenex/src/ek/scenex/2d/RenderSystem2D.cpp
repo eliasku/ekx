@@ -4,7 +4,7 @@
 #include "Camera2D.hpp"
 
 #include <ek/canvas.h>
-#include <ek/scenex/base/Node.hpp>
+#include <ek/scenex/base/node.h>
 
 namespace ek {
 

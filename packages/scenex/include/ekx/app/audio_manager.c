@@ -1,11 +1,12 @@
 #include "audio_manager.h"
+#include "ek/local_storage.h"
 
 void play_music(string_hash_t name) {
     res_id next_music = name ? R_AUDIO(name) : 0;
     if (g_audio.music_ != next_music) {
         if (auph_is_active(g_audio.musicVoice_.id)) {
             auph_stop(g_audio.musicVoice_.id);
-            g_audio.musicVoice_ = {};
+            g_audio.musicVoice_ = (auph_voice){0};
         }
 
         if (next_music) {
@@ -74,11 +75,6 @@ void update_audio_manager() {
     }
 }
 
-void audio_disable_all() {
-    // do not save, it's like dev option
-    g_audio.prefs = 0;
-}
-
 void set_music_params(float volume, float pitch) {
     g_audio.musicVolume_ = volume;
     g_audio.musicPitch_ = pitch;
@@ -90,32 +86,15 @@ void set_music_params(float volume, float pitch) {
 
 audio_manager_t g_audio;
 
+#define AUDIO_FLAGS_KEY "audio"
 void init_audio_manager(void) {
-    if (ek_ls_get_i("sound", 1)) g_audio.prefs |= AUDIO_PREF_SOUND;
-    if (ek_ls_get_i("music", 1)) g_audio.prefs |= AUDIO_PREF_MUSIC;
-    if (ek_ls_get_i("vibro", 1)) g_audio.prefs |= AUDIO_PREF_VIBRO;
+    g_audio.prefs = ek_ls_get_i(AUDIO_FLAGS_KEY, AUDIO_PREF_SOUND | AUDIO_PREF_MUSIC | AUDIO_PREF_VIBRO);
     g_audio.musicVolume_ = 1.0f;
     g_audio.musicPitch_ = 1.0f;
 }
 
 bool audio_toggle_pref(uint32_t pref) {
     g_audio.prefs ^= pref;
-    const bool enabled = g_audio.prefs & pref;
-    const char* pref_name = NULL;
-    switch (pref) {
-        case AUDIO_PREF_SOUND:
-            pref_name = "sound";
-            break;
-        case AUDIO_PREF_MUSIC:
-            pref_name = "music";
-            break;
-        case AUDIO_PREF_VIBRO:
-            pref_name = "vibro";
-            break;
-    }
-
-    if (pref_name) {
-        ek_ls_set_i(pref_name, enabled ? 1 : 0);
-    }
-    return enabled;
+    ek_ls_set_i(AUDIO_FLAGS_KEY, (int)g_audio.prefs);
+    return g_audio.prefs & pref;
 }

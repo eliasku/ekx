@@ -1,20 +1,20 @@
 #include "main_flow.hpp"
+#include "ek/scenex/base/interactiv.h"
 
 #include <ekx/ng/updater.h>
 #include <ekx/app/audio_manager.h>
 #include <ek/scenex/particles/ParticleSystem.hpp>
-#include <ek/scenex/InteractionSystem.hpp>
-#include <ek/scenex/base/DestroyTimer.hpp>
-#include <ek/goodies/Shake.hpp>
+#include <ek/scenex/interaction_system.h>
+#include <ek/scenex/base/destroy_timer.h>
+#include <ek/goodies/camera_shaker.h>
 #include <ek/goodies/helpers/Trail2D.hpp>
-#include <ek/goodies/bubble_text.hpp>
+#include <ek/goodies/bubble_text.h>
 #include <ek/goodies/PopupManager.hpp>
 #include <ek/scenex/2d/Camera2D.hpp>
 #include <ek/scenex/2d/LayoutRect.hpp>
 #include <ek/scenex/2d/Button.hpp>
-#include <ek/scenex/2d/Viewport.hpp>
 #include <ek/scenex/2d/MovieClip.hpp>
-#include <ek/scenex/base/Tween.hpp>
+#include <ek/scenex/base/tween.h>
 #include <ek/goodies/GameScreen.hpp>
 #include <ek/scenex/2d/DynamicAtlas.hpp>
 #include <ek/scenex/2d/Atlas.hpp>
@@ -35,10 +35,10 @@ void scene_pre_update(entity_t root, float dt) {
     }
 
     LayoutRect::updateAll();
-    update_tweens();
-    Shaker::updateAll();
+    tween_update();
+    camera_shaker_update();
 
-    BubbleText::updateAll();
+    bubble_text_update();
     update_popup_manager();
 
     Button::updateAll();
@@ -55,7 +55,7 @@ void scene_post_update(entity_t root) {
     update_particles();
     update_camera2d_queue();
 
-    complete_frame_interaction_system();
+    interactive_clear_all_events();
 }
 
 void scene_render(entity_t root) {

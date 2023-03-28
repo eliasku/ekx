@@ -1,28 +1,18 @@
-#pragma once
+#ifndef SCENEX_NODE_API_H
+#define SCENEX_NODE_API_H
 
-#include <ecx/ecx.hpp>
+#include <ecx/ecx.h>
 #include <ek/assert.h>
 #include <ek/hash.h>
-#include <ek/ds/PodArray.hpp>
 
 enum node_flags_t {
     NODE_HIDDEN = 1,
-    NODE_UNTOUCHABLE = 2
+    NODE_UNTOUCHABLE = 2,
 };
 
-namespace ek {
-
-struct Node {
-
-    entity_t parent = NULL_ENTITY;
-    entity_t child_first = NULL_ENTITY;
-    entity_t sibling_next = NULL_ENTITY;
-    entity_t child_last = NULL_ENTITY;
-    entity_t sibling_prev = NULL_ENTITY;
-
-    uint32_t flags = 0;
-    string_hash_t tag = 0;
-};
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 uint32_t get_node_depth(entity_t e);
 
@@ -30,21 +20,13 @@ entity_t find_root(entity_t e);
 
 entity_t find_lower_common_ancestor(entity_t e1, entity_t e2);
 
-inline entity_t get_first_child(entity_t e) {
-    return ecs::get<Node>(e).child_first;
-}
+entity_t get_first_child(entity_t e);
 
-inline entity_t get_next_child(entity_t e) {
-    return ecs::get<Node>(e).sibling_next;
-}
+entity_t get_next_child(entity_t e);
 
-inline entity_t get_last_child(entity_t e) {
-    return ecs::get<Node>(e).child_last;
-}
+entity_t get_last_child(entity_t e);
 
-inline entity_t get_prev_child(entity_t e) {
-    return ecs::get<Node>(e).sibling_prev;
-}
+entity_t get_prev_child(entity_t e);
 
 /**
     Delete all children and sub-children of entity `e`
@@ -126,33 +108,17 @@ entity_t get_child_at(entity_t e, int index);
 
 /** utility functions **/
 
-inline void set_tag(entity_t e, string_hash_t tag) {
-    ecs::add<Node>(e).tag = tag;
-}
+void set_tag(entity_t e, string_hash_t tag);
 
-inline string_hash_t get_tag(entity_t e) {
-    return ecs::get_or_default<Node>(e).tag;
-}
+string_hash_t get_tag(entity_t e);
 
-inline bool is_visible(entity_t e) {
-    Node* node = ecs::try_get<Node>(e);
-    return node && !(node->flags & NODE_HIDDEN);
-}
+bool is_visible(entity_t e);
 
-inline void set_visible(entity_t e, bool v) {
-    Node* node = ecs::try_get<Node>(e);
-    node->flags = v ? (node->flags & ~NODE_HIDDEN) : (node->flags | NODE_HIDDEN);
-}
+void set_visible(entity_t e, bool v);
 
-inline bool is_touchable(entity_t e) {
-    Node* node = ecs::try_get<Node>(e);
-    return node && !(node->flags & NODE_UNTOUCHABLE);
-}
+bool is_touchable(entity_t e);
 
-inline void set_touchable(entity_t e, bool v) {
-    Node* node = ecs::try_get<Node>(e);
-    node->flags = v ? (node->flags & ~NODE_UNTOUCHABLE) : (node->flags | NODE_UNTOUCHABLE);
-}
+void set_touchable(entity_t e, bool v);
 
 /** components searching **/
 
@@ -162,9 +128,9 @@ inline void set_touchable(entity_t e, bool v) {
 // Returns `NULL` if no component found
 void* find_component_in_parent(ecx_component_type* type, entity_t e);
 
-void foreach_child(entity_t e, void(*callback)(entity_t child));
+void foreach_child(entity_t e, void(* callback)(entity_t child));
 
-void foreach_child_reverse(entity_t e, void(*callback)(entity_t child));
+void foreach_child_reverse(entity_t e, void(* callback)(entity_t child));
 
 /** search functions **/
 
@@ -176,4 +142,8 @@ uint32_t find_many(entity_t* out, entity_t e, ...);
 
 entity_t get_parent(entity_t e);
 
+#ifdef __cplusplus
 }
+#endif
+
+#endif // SCENEX_NODE_API_H

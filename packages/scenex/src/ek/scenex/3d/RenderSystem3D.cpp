@@ -10,7 +10,7 @@
 #include <ek/time.h>
 #include <ek/canvas.h>
 #include <ek/app.h>
-#include <ek/scenex/base/Node.hpp>
+#include <ek/scenex/base/node.h>
 
 #include <cstring>
 

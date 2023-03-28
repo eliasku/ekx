@@ -121,7 +121,7 @@ public:
     }
 
     void resize(uint32_t new_size) {
-        arr_resize((void**) &buffer, sizeof(T), new_size);
+        arr_resize_((void**) &buffer, sizeof(T), new_size);
     }
 
     void erase_ptr(T* el) {

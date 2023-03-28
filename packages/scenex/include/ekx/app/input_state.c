@@ -1,11 +1,10 @@
 #include "input_state.h"
 #include "game_display.h"
-#include <ek/scenex/InteractionSystem.hpp>
 
 input_state_t g_input_state;
 
 touch_t* get_or_create_touch(uint64_t id) {
-    touch_t* touches = g_input_state.touches_;
+    touch_t* touches = g_input_state.touches;
     for (uint32_t i = 0; i < g_input_state.touches_num; ++i) {
         if (touches[i].id == id) {
             return &touches[i];
@@ -16,15 +15,15 @@ touch_t* get_or_create_touch(uint64_t id) {
         t->id = id;
         return t;
     }
-    return nullptr;
+    return NULL;
 }
 
 vec2_t coord_screen_to_game_display(const game_display_info* display_info, const vec2_t screenPos) {
-    const auto size = display_info->destinationViewport.size;
-    const auto offset = display_info->destinationViewport.position;
-    const auto displaySize = display_info->size;
+    const vec2_t size = display_info->destinationViewport.size;
+    const vec2_t offset = display_info->destinationViewport.position;
+    const vec2_t displaySize = display_info->size;
     const float invScale = 1.0f / fminf(size.x / displaySize.x, size.y / displaySize.y);
-    return invScale * (screenPos - offset);
+    return scale_vec2(sub_vec2(screenPos, offset), invScale);
 }
 
 void emulate_mouse_as_touch(const ek_app_event* event, touch_t* data, vec2_t pos) {
@@ -77,14 +76,19 @@ void update_touch(const ek_app_event* event, touch_t* data, vec2_t pos) {
     data->state = new_state;
 }
 
+void interaction_system_handle_touch(const ek_app_event* event, vec2_t position);
+void interaction_system_handle_mouse(const ek_app_event* event, vec2_t position);
+void interaction_system_handle_pause(void);
+void interaction_system_send_back_button(void);
+
 void input_state_process_event(const ek_app_event* event, game_display_info* display_info) {
     switch (event->type) {
         case EK_APP_EVENT_TOUCH_START:
         case EK_APP_EVENT_TOUCH_MOVE:
         case EK_APP_EVENT_TOUCH_END: {
-            const vec2_t pos = coord_screen_to_game_display(display_info, {event->touch.x, event->touch.y});
+            const vec2_t pos = coord_screen_to_game_display(display_info, vec2(event->touch.x, event->touch.y));
             if (!g_input_state.hovered_by_editor_gui) {
-                g_interaction_system.handle_touch_event(event, pos);
+                interaction_system_handle_touch(event, pos);
             }
             update_touch(event, get_or_create_touch(event->touch.id), pos);
         }
@@ -94,11 +98,11 @@ void input_state_process_event(const ek_app_event* event, game_display_info* dis
         case EK_APP_EVENT_MOUSE_MOVE:
         case EK_APP_EVENT_MOUSE_ENTER:
         case EK_APP_EVENT_MOUSE_EXIT: {
-            const vec2_t pos = coord_screen_to_game_display(display_info, {event->mouse.x, event->mouse.y});
+            const vec2_t pos = coord_screen_to_game_display(display_info, vec2(event->mouse.x, event->mouse.y));
             if (!g_input_state.hovered_by_editor_gui) {
-                g_interaction_system.handle_mouse_event(event, pos);
+                interaction_system_handle_mouse(event, pos);
             }
-            if (g_input_state.emulateTouch) {
+            if (g_input_state.emulate_touch) {
                 emulate_mouse_as_touch(event, get_or_create_touch(1u), pos);
             }
         }
@@ -108,10 +112,10 @@ void input_state_process_event(const ek_app_event* event, game_display_info* dis
         case EK_APP_EVENT_KEY_UP:
         case EK_APP_EVENT_KEY_DOWN:
             if (event->type == EK_APP_EVENT_KEY_DOWN && event->key.code == EK_KEYCODE_ESCAPE) {
-                g_interaction_system.sendBackButton();
+                interaction_system_send_back_button();
             }
             if (event->key.code != EK_KEYCODE_UNKNOWN) {
-                uint8_t state = g_input_state.keys_[(uint32_t)event->key.code];
+                uint8_t state = g_input_state.keys[(uint32_t)event->key.code];
                 if (event->type == EK_APP_EVENT_KEY_DOWN) {
                     bool pressed = state & KEY_STATE_ACTIVE;
                     uint8_t new_state = KEY_STATE_ACTIVE;
@@ -119,18 +123,19 @@ void input_state_process_event(const ek_app_event* event, game_display_info* dis
                     if(!pressed) {
                         new_state |= KEY_STATE_DOWN;
                     }
-                    g_input_state.keys_[(uint32_t)event->key.code] = new_state;
+                    g_input_state.keys[(uint32_t)event->key.code] = new_state;
                 } else if (event->type == EK_APP_EVENT_KEY_UP) {
-                    g_input_state.keys_[(uint32_t)event->key.code] = KEY_STATE_UP;
+                    g_input_state.keys[(uint32_t)event->key.code] = KEY_STATE_UP;
                     //modifiers = none;
                 }
             }
             break;
         case EK_APP_EVENT_BACK_BUTTON:
-            g_interaction_system.sendBackButton();
+            interaction_system_send_back_button();
             break;
         case EK_APP_EVENT_PAUSE:
-            g_interaction_system.handle_system_pause();
+            interaction_system_send_back_button();
+            interaction_system_handle_pause();
             break;
         default:
             break;
@@ -139,54 +144,54 @@ void input_state_process_event(const ek_app_event* event, game_display_info* dis
 
 bool is_key(ek_key_code code) {
     if (code != EK_KEYCODE_UNKNOWN && code < _EK_KEYCODE_NUM) {
-        return g_input_state.keys_[code] & KEY_STATE_ACTIVE;
+        return g_input_state.keys[code] & KEY_STATE_ACTIVE;
     }
     return false;
 }
 
 bool is_key_down(ek_key_code code) {
     if (code != EK_KEYCODE_UNKNOWN && code < _EK_KEYCODE_NUM) {
-        return g_input_state.keys_[code] & KEY_STATE_DOWN;
+        return g_input_state.keys[code] & KEY_STATE_DOWN;
     }
     return false;
 }
 
 bool is_key_up(ek_key_code code) {
     if (code != EK_KEYCODE_UNKNOWN && code < _EK_KEYCODE_NUM) {
-        return g_input_state.keys_[code] & KEY_STATE_UP;
+        return g_input_state.keys[code] & KEY_STATE_UP;
     }
     return false;
 }
 
 void input_state_post_update() {
     // update keyboard state
-    if (g_input_state.reset_keys_) {
-        memset(g_input_state.keys_, 0, sizeof(g_input_state.keys_));
-        g_input_state.reset_keys_ = false;
+    if (g_input_state.reset_keys) {
+        memset(g_input_state.keys, 0, sizeof(g_input_state.keys));
+        g_input_state.reset_keys = false;
     }
     else {
         for (uint32_t i = 0; i < _EK_KEYCODE_NUM; ++i) {
             // clear up and down triggers
-            g_input_state.keys_[i] &= KEY_STATE_ACTIVE;
+            g_input_state.keys[i] &= KEY_STATE_ACTIVE;
         }
     }
 
     // update touches info
     unsigned i = 0;
     while (i < g_input_state.touches_num) {
-        if (g_input_state.touches_[i].state & TOUCH_STATE_ACTIVE) {
+        if (g_input_state.touches[i].state & TOUCH_STATE_ACTIVE) {
             ++i;
         } else {
             --g_input_state.touches_num;
             if(g_input_state.touches_num != i) {
-                g_input_state.touches_[i] = g_input_state.touches_[g_input_state.touches_num];
+                g_input_state.touches[i] = g_input_state.touches[g_input_state.touches_num];
             }
-            g_input_state.touches_[g_input_state.touches_num] = {};
+            g_input_state.touches[g_input_state.touches_num] = (touch_t){0};
         }
     }
 }
 
 void reset_keyboard() {
-    g_input_state.reset_keys_ = true;
+    g_input_state.reset_keys = true;
 }
 

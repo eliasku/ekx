@@ -29,8 +29,8 @@ struct ScreenTransitionState {
     bool nextPlayStarted = false;
     bool nextPlayCompleted = false;
 
-    ecs::Entity prev;
-    ecs::Entity next;
+    entity_t prev = NULL_ENTITY;
+    entity_t next = NULL_ENTITY;
 
     float duration = 0.65f;
     float delay = 0.15f;
@@ -55,9 +55,9 @@ struct ScreenTransitionState {
 };
 
 struct GameScreenManager {
-    ecs::Entity layer;
+    entity_t layer = NULL_ENTITY;
 
-    PodArray<ecs::Entity> stack;
+    PodArray<entity_t> stack;
 
     ScreenTransitionState transition;
 
@@ -68,7 +68,7 @@ struct GameScreenManager {
     void setScreen(string_hash_t name);
 
     [[nodiscard]]
-    ecs::Entity findScreen(string_hash_t name) const;
+    entity_t findScreen(string_hash_t name) const;
 
     void changeScreen(string_hash_t name);
 
@@ -80,7 +80,7 @@ struct GameScreenManager {
 
 };
 
-void init_game_screen(ecs::Entity e, string_hash_t name = 0);
+void init_game_screen(entity_t e, string_hash_t name = 0);
 
 }
 

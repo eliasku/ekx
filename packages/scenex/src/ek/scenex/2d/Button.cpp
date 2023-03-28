@@ -1,6 +1,6 @@
 #include "Button.hpp"
 
-#include <ek/scenex/base/Interactive.hpp>
+#include <ek/scenex/base/interactiv.h>
 #include <ek/math.h>
 #include <ek/rnd.h>
 #include <ek/scenex/2d/Transform2D.hpp>
@@ -9,12 +9,12 @@
 
 //#include <ek/firebase/Firebase.h>
 #include <ek/scenex/base/NodeEvents.hpp>
-#include <ek/scenex/InteractionSystem.hpp>
+#include <ek/scenex/interaction_system.h>
 
 namespace ek {
 
 static inline void play_button_sound(string_hash_t id) {
-    play_sound(id);
+    play_sound(id, 1, 1);
 }
 
 void start_post_tween(Button& btn) {
@@ -106,13 +106,13 @@ void apply_skin(const ButtonSkin& skin, const Button& btn, Transform2D& transfor
     transform.color.offset = btn.baseColor.offset + color_4f(h, h, h, 0);
 }
 
-void update_movie_frame(entity_t entity, const Interactive& interactive) {
+void update_movie_frame(entity_t entity, const interactive_t* interactive) {
     MovieClip* mc = ecs::try_get<MovieClip>(entity);
     if (mc) {
         int frame = 0;
-        if (interactive.over || interactive.pushed) {
+        if (interactive->over || interactive->pushed) {
             frame = 1;
-            if (interactive.pushed && interactive.over) {
+            if (interactive->pushed && interactive->over) {
                 frame = 2;
             }
         }
@@ -120,7 +120,7 @@ void update_movie_frame(entity_t entity, const Interactive& interactive) {
     }
 }
 
-void update_button_events(Interactive* interactive, Button* button, entity_t e, entity_t* queue, uint32_t* queue_num) {
+void update_button_events(interactive_t* interactive, Button* button, entity_t e, entity_t* queue, uint32_t* queue_num) {
     if(interactive->ev_over) {
         const auto& skin = get_skin(*button);
         play_button_sound(skin.sfxOver);
@@ -158,7 +158,7 @@ void Button::updateAll() {
     FixedArray<entity_t, 64> tap_events;
     for(auto e : ecs::view<Button>()) {
         Button* btn = ecs::try_get<Button>(e);
-        Interactive* interactive = ecs::try_get<Interactive>(e);
+        interactive_t* interactive = interactive_get(e);
         Transform2D* transform = ecs::try_get<Transform2D>(e);
         if(interactive && transform) {
             float dt = g_time_layers[btn->time].dt;
@@ -187,7 +187,7 @@ void Button::updateAll() {
             btn->timePost = reach(btn->timePost, 0.0f, 2.0f * dt);
 
             apply_skin(skin, *btn, *transform);
-            update_movie_frame(e, *interactive);
+            update_movie_frame(e, interactive);
         }
     }
 

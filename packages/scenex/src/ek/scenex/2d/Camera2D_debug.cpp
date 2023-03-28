@@ -1,7 +1,7 @@
 #include <ek/canvas.h>
-#include <ek/scenex/InteractionSystem.hpp>
+#include <ek/scenex/interaction_system.h>
 
-#include <ek/scenex/base/Node.hpp>
+#include <ek/scenex/base/node.h>
 #include <ekx/app/time_layers.h>
 #include "Camera2D.hpp"
 #include "Viewport.hpp"

@@ -57,8 +57,8 @@ public:
     game_display display = {};
     SceneView view{};
 
-    ecs::Entity root{};
-    entity_t hoverTarget{};
+    entity_t root = NULL_ENTITY;
+    entity_t hoverTarget = NULL_ENTITY;
 
     int currentTool = 0;
     int localGlobal = 0;
@@ -70,7 +70,7 @@ public:
     static void drawSceneNode(entity_t e);
     void drawSceneNodeBounds(entity_t e);
 
-    ecs::Entity hitTest(ecs::Entity e, vec2_t worldPos);
+    entity_t hitTest(entity_t e, vec2_t worldPos);
 
     void drawToolbar();
 

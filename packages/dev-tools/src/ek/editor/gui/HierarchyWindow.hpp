@@ -5,10 +5,10 @@
 #include <ek/ds/Hash.hpp>
 
 // components
-#include <ek/scenex/base/Node.hpp>
+#include <ek/scenex/base/node.h>
 #include <ek/scenex/2d/Display2D.hpp>
 #include <ek/scenex/2d/Transform2D.hpp>
-#include <ek/scenex/base/Interactive.hpp>
+#include <ek/scenex/base/interactiv.h>
 #include <ek/scenex/3d/Light3D.hpp>
 #include <ek/scenex/2d/MovieClip.hpp>
 #include <ek/scenex/2d/Button.hpp>
@@ -27,11 +27,11 @@ public:
 
     ~HierarchyWindow() override = default;
 
-    PodArray<ecs::Entity> selection{};
+    PodArray<entity_id_t> selection{};
     ImGuiTextFilter filter{};
-    ecs::Entity root{};
-    Hash<ecs::Entity> openList{};
-    Hash<ecs::Entity> scrollToList{};
+    entity_t root = NULL_ENTITY;
+    Hash<entity_t> openList{};
+    Hash<entity_t> scrollToList{};
 
     void onDraw() override;
 

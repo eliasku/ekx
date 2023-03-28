@@ -3,10 +3,6 @@
 #include <ek/time.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 static bool frame_timer_update_from_display_ts(struct frame_timer_t* ft, double* delta) {
     if (ek_app.frame_callback_timestamp > 0) {
         const double ts = ek_app.frame_callback_timestamp;
@@ -30,6 +26,3 @@ double update_frame_timer(frame_timer_t* timer) {
     return dt;
 }
 
-#ifdef __cplusplus
-}
-#endif

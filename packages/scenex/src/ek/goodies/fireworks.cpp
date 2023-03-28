@@ -1,10 +1,10 @@
 #include "fireworks.h"
 
-#include <ek/scenex/SceneFactory.hpp>
+#include <ek/scenex/scene_factory.h>
 #include <ek/scenex/particles/ParticleSystem.hpp>
 #include <ekx/app/audio_manager.h>
 #include <ek/scenex/2d/LayoutRect.hpp>
-#include <ek/scenex/base/Node.hpp>
+#include <ek/scenex/base/node.h>
 
 static fireworks_state_t fireworks;
 
@@ -13,7 +13,6 @@ void start_fireworks(entity_t e) {
     using ek::ParticleRenderer2D;
     using ek::ParticleEmitter2D;
     using ek::Display2D;
-    using ek::set_touchable;
 
     ecs::add<ParticleLayer2D>(e);
     ek::particle_renderer2d_setup(e)->target = e;
@@ -44,7 +43,7 @@ void update_fireworks() {
         rect.h *= 0.5f;
 
         emitter.position = rect.position + rect.size * vec2(random_f(), random_f());
-        play_sound(H("sfx/firework"), random_range_f(0.5f, 1.0f));
+        play_sound(H("sfx/firework"), random_range_f(0.5f, 1.0f), 1);
         ParticleDecl* part = &RES_NAME_RESOLVE(res_particle, H("firework_star"));
         switch (random_n(4)) {
             case 0:

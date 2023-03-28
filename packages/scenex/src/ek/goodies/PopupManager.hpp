@@ -13,7 +13,7 @@ struct PopupManager {
     float fade_progress;
     float fade_duration;
     float fade_alpha;
-    FixedArray<entity_t, 8> active;
+    FixedArray<entity_id_t, 8> active;
 };
 
 void init_basic_popup(entity_t e);

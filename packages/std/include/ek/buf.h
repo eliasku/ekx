@@ -41,7 +41,7 @@ void* ek_buf_pop_(void* ptr, uint32_t elementSize);
 // pod array impl
 void arr_init_from(void** arr, uint32_t element_size, const void* src, uint32_t len);
 
-void arr_resize(void** p_arr, uint32_t element_size, uint32_t new_len);
+void arr_resize_(void** p_arr, uint32_t element_size, uint32_t new_len);
 
 void arr_grow(void** p_arr, uint32_t capacity, uint32_t element_size);
 
@@ -73,6 +73,7 @@ void* arr_add_(void** p_arr, uint32_t element_size);
 
 #define arr_push_(p_arr, T, el) (*((T*)arr_add_((void**)(p_arr), sizeof(T))) = (el))
 #define arr_push(arr, el) ((__typeof__ (arr))arr_add_((void**)&(arr), sizeof (arr)[0]))[0] = (el)
+#define arr_resize(arr, cnt) (arr_resize_((void**)&(arr), sizeof (arr)[0], (cnt)))
 #define arr_begin(arr) (arr)
 #define arr_end(arr) ((arr) + arr_size(arr))
 #define arr_back(arr) ((arr) ? (arr_end(arr) - 1) : 0)

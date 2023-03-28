@@ -1,6 +1,6 @@
 #include "LayoutRect.hpp"
 #include "Display2D.hpp"
-#include <ek/scenex/base/Node.hpp>
+#include <ek/scenex/base/node.h>
 
 namespace ek {
 

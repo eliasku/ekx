@@ -3,7 +3,7 @@
 
 
 #include <ek/scenex/2d/Transform2D.hpp>
-#include <ek/scenex/base/Node.hpp>
+#include <ek/scenex/base/node.h>
 #include <ek/log.h>
 #include <ek/scenex/2d/LayoutRect.hpp>
 #include <ekx/app/time_layers.h>
@@ -11,8 +11,8 @@
 namespace ek {
 
 /** GameScreen component **/
-void init_game_screen(ecs::Entity e, string_hash_t name) {
-    if(name) {
+void init_game_screen(entity_t e, string_hash_t name) {
+    if (name) {
         set_tag(e, name);
     }
     set_visible(e, false);
@@ -42,13 +42,13 @@ void ScreenTransitionState::checkStates() {
 
 void emit_screen_event(entity_t e, string_hash_t type) {
     auto* eh = ecs::try_get<NodeEventHandler>(e);
-    if(eh) {
+    if (eh) {
         eh->emit({type, e, {nullptr}, e});
     }
 }
 
 void ScreenTransitionState::beginPrev() {
-    if (prev) {
+    if (prev.id) {
         //ecs::get<GameScreen>(prev).onExitBegin();
         emit_screen_event(prev, GAME_SCREEN_EVENT_EXIT_BEGIN);
         //broadcast(screenPrev, GameScreen::ExitBegin);
@@ -57,20 +57,20 @@ void ScreenTransitionState::beginPrev() {
 }
 
 void ScreenTransitionState::completePrev() {
-    if (prev) {
+    if (prev.id) {
         set_visible(prev, false);
         set_touchable(prev, false);
         //ecs::get<GameScreen>(prev).onExit();
         emit_screen_event(prev, GAME_SCREEN_EVENT_EXIT);
         //broadcast(prev, GameScreen::Exit);
     }
-    prev = nullptr;
+    prev = NULL_ENTITY;
     prevPlayCompleted = true;
 }
 
 void ScreenTransitionState::beginNext() {
     nextPlayStarted = true;
-    if (next) {
+    if (next.id) {
         set_visible(next, true);
         set_touchable(next, true);
         //ecs::get<GameScreen>(next).onEnterBegin();
@@ -81,13 +81,13 @@ void ScreenTransitionState::beginNext() {
 }
 
 void ScreenTransitionState::completeNext() {
-    if (next) {
+    if (next.id) {
         emit_screen_event(next, GAME_SCREEN_EVENT_ENTER);
         //ecs::get<GameScreen>(next).onEvent.emit(GameScreenEvent::Enter);
         //ecs::get<GameScreen>(next).onEnter();
         //broadcast(next, GameScreen::Enter);
     }
-    next = nullptr;
+    next = NULL_ENTITY;
     nextPlayCompleted = true;
 }
 
@@ -116,8 +116,8 @@ void GameScreenManager::setScreen(string_hash_t name) {
 
     stack.clear();
 
-    auto e = findScreen(name);
-    if (e) {
+    entity_t e = findScreen(name);
+    if (e.id) {
         stack.push_back(e);
 
         set_visible(e, true);
@@ -144,9 +144,9 @@ void GameScreenManager::setScreen(string_hash_t name) {
     }
 }
 
-ecs::Entity GameScreenManager::findScreen(string_hash_t name) const {
+entity_t GameScreenManager::findScreen(string_hash_t name) const {
     auto e = find(layer, name);
-    if(!e.id) {
+    if (!e.id) {
         log_debug("could not find screen %s (%08X)", hsp_get(name), name);
     }
     return e;
@@ -171,7 +171,7 @@ void GameScreenManager::changeScreen(string_hash_t name) {
     }
 
     transition.next = findScreen(name);
-    if (transition.next) {
+    if (transition.next.id) {
         stack.push_back(transition.next);
 
         // bring to the top
@@ -223,7 +223,7 @@ void GameScreenManager::defaultTransitionEffect(GameScreenManager* gsm) {
     const auto next = state.next;
     const auto prev = state.prev;
 
-    if (prev) {
+    if (prev.id) {
         const auto t = state.getPrevProgress();
         auto& transform = ecs::get<Transform2D>(prev);
         float r = ease_p2_in(t);
@@ -235,7 +235,7 @@ void GameScreenManager::defaultTransitionEffect(GameScreenManager* gsm) {
         transform.set_position({}, {}, rect_center(state.screenRect));
     }
 
-    if (next) {
+    if (next.id) {
         const auto t = state.getNextProgress();
         auto& transform = ecs::get<Transform2D>(next);
         float r = ease_p2_out(t);
@@ -249,6 +249,7 @@ void GameScreenManager::defaultTransitionEffect(GameScreenManager* gsm) {
 }
 
 ek::GameScreenManager* g_game_screen_manager = nullptr;
+
 void init_game_screen_manager(void) {
     EK_ASSERT(!g_game_screen_manager);
     g_game_screen_manager = new ek::GameScreenManager();

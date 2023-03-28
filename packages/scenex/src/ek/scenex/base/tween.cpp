@@ -1,35 +1,32 @@
-#include "Tween.hpp"
-#include "DestroyTimer.hpp"
+#include "tween.h"
+#include "destroy_timer.h"
 #include <ek/math.h>
 
-namespace ek {
-
-void handle_end(entity_t e, Tween* tween) {
+void handle_end(entity_t e, tween_t* tween) {
     if (tween->destroy_entity) {
-        destroy_later(e);
+        destroy_later(e, 0, 0);
     } else if (!tween->keep) {
-        ecs::remove<Tween>(e);
+        ecs::remove<tween_t>(e);
     }
 }
 
-void on_tween_completed(entity_t e, Tween* tween) {
+void on_tween_completed(entity_t e, tween_t* tween) {
     if(tween->completed) {
         tween->completed(e);
         tween->completed = nullptr;
     }
 }
 
-
-void update_frame(entity_t e, Tween* tween) {
+void update_frame(entity_t e, tween_t* tween) {
     if (tween->advanced) {
         const float t = saturate(tween->time / tween->duration);
         tween->advanced(e, t);
     }
 }
 
-void update_tweens() {
-    for (auto e: ecs::view_backward<Tween>()) {
-        Tween* tween = (Tween* )get_component(ecs::type<Tween>(), e);
+void tween_update() {
+    for (auto e: ecs::view_backward<tween_t>()) {
+        tween_t* tween = (tween_t* )get_component(ecs::type<tween_t>(), e);
         auto dt = g_time_layers[tween->timer].dt;
         if (tween->delay > 0.0f) {
             tween->delay -= dt;
@@ -51,8 +48,8 @@ void update_tweens() {
     }
 }
 
-Tween& Tween::reset(entity_t e) {
-    auto& tween = ecs::add<Tween>(e);
+tween_t* tween_reset(entity_t e) {
+    tween_t& tween = ecs::add<tween_t>(e);
     if (tween.time > 0.0f && tween.time < tween.duration) {
         tween.time = tween.duration;
         update_frame(e, &tween);
@@ -62,7 +59,5 @@ Tween& Tween::reset(entity_t e) {
     tween.destroy_entity = false;
     tween.keep = false;
     tween.time = 0.0f;
-    return tween;
-}
-
+    return &tween;
 }

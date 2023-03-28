@@ -21,8 +21,8 @@ public:
     Array <uint16_t> next{};
     uint16_t* grid;
 
-    Hash <entity_t> filter{};
-    Array <entity_t> query{};
+    Hash <entity_idx_t> filter{};
+    Array <entity_idx_t> query{};
 
     RegularGrid(irect_t bounds_, uint32_t power_) :
             bounds{bounds_},
@@ -89,7 +89,7 @@ public:
         query.clear();
     }
 
-    const Array <entity_t>& search(const rect_t rc) {
+    const Array <entity_idx_t>& search(const rect_t rc) {
         return search((irect_t) {{
                                          (int) rc.x,
                                          (int) rc.y,
@@ -98,7 +98,7 @@ public:
                                  }});
     }
 
-    const Array <entity_t>& search(const irect_t rc) {
+    const Array <entity_idx_t>& search(const irect_t rc) {
         if (!irect_overlaps(bounds, rc)) {
             return query;
         }
@@ -120,9 +120,9 @@ public:
                 auto it = grid[index];
                 while (it != 0) {
                     const auto entity = refs[it];
-                    if (!filter.has(entity.id)) {
-                        query.push_back(entity);
-                        filter.set(entity.id, entity);
+                    if (!filter.has(entity.idx)) {
+                        query.push_back(entity.idx);
+                        filter.set(entity.idx, entity.idx);
                     }
                     it = next[it];
                 }

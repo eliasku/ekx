@@ -1,5 +1,5 @@
 #include "NodeEvents.hpp"
-#include "Node.hpp"
+#include "node.h"
 
 namespace ek {
 

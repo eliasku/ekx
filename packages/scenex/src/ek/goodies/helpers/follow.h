@@ -3,16 +3,17 @@
 #include <ecx/ecx.hpp>
 #include <ek/math.h>
 
+enum follow_integration_mode {
+    FOLLOW_INTEGRATION_EXP = 0,
+    FOLLOW_INTEGRATION_STEPS = 1,
+    FOLLOW_INTEGRATION_NONE = 2,
+};
+
 struct target_follow_comp {
-    enum class integration_mode {
-        Exp = 0,
-        Steps = 1,
-        None = 2,
-    };
 
     vec2_t offset = {};
     vec2_t target = {};
-    ecs::Entity target_entity{};
+    entity_t target_entity = NULL_ENTITY;
 
     float k = 0.1f;
     float fixed_frame_rate = 60.0f;
@@ -24,7 +25,7 @@ struct target_follow_comp {
     int frame = 0;
     int reset_in = 100;
 
-    integration_mode integration = integration_mode::Exp;
+    follow_integration_mode integration = FOLLOW_INTEGRATION_EXP;
 };
 
 struct mouse_follow_comp {};

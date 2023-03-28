@@ -5,7 +5,7 @@
 
 #include <ek/canvas.h>
 #include <ek/scenex/app/basic_application.hpp>
-#include <ek/scenex/base/Node.hpp>
+#include <ek/scenex/base/node.h>
 
 namespace ek {
 

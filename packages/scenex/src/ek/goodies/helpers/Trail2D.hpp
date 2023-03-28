@@ -98,7 +98,7 @@ public:
     void draw();
 
 public:
-    ecs::Entity target{};
+    entity_t target = NULL_ENTITY;
     // max width
     float width = 20.0f;
     float minWidth = 5.0f;

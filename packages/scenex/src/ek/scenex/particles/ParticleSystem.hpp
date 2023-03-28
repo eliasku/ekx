@@ -18,14 +18,14 @@ struct ParticleLayer2D {
 struct ParticleEmitter2D {
     typedef void SpawnCallback(entity_t, Particle&);
 
-    EmitterData data;
-    vec2_t position = {};
-    vec2_t velocity = {};
+    EmitterData data = {};
+    vec2_t position = vec2(0, 0);
+    vec2_t velocity = vec2(0, 0);
     SpawnCallback* on_spawn = nullptr;
-    R(ParticleDecl) particle;
-    entity_t layer = {};
+    R(ParticleDecl) particle = 0;
+    entity_t layer = NULL_ENTITY;
     float time = 0.0f;
-    TimeLayer timer;
+    TimeLayer timer = 0;
     bool enabled = true;
 };
 

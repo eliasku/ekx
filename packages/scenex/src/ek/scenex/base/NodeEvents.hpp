@@ -4,7 +4,7 @@
 #include <ek/util/Signal.hpp>
 #include <ecx/ecx.hpp>
 #include <ek/ds/String.hpp>
-#include "Node.hpp"
+#include "node.h"
 
 namespace ek {
 

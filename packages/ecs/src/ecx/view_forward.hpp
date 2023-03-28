@@ -64,12 +64,12 @@ public:
             return true;
         }
 
-        inline Entity operator*() const noexcept {
-            return Entity{entity_at(table_[0]->handleToEntity[it_])};
+        inline entity_t operator*() const noexcept {
+            return entity_at(table_[0]->handleToEntity[it_]);
         }
 
-        inline Entity operator*() noexcept {
-            return Entity{entity_at(table_[0]->handleToEntity[it_])};
+        inline entity_t operator*() noexcept {
+            return entity_at(table_[0]->handleToEntity[it_]);
         }
 
     private:
@@ -139,8 +139,8 @@ public:
             return it_ != other.it_;
         }
 
-        inline Entity operator*() const noexcept {
-            return Entity{entity_at(type<C>()->handleToEntity[it_])};
+        inline entity_t operator*() const noexcept {
+            return entity_at(type<C>()->handleToEntity[it_]);
         }
 
     private:

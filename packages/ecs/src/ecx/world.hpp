@@ -89,10 +89,10 @@ inline const C& get_or_default(entity_t e) {
 }
 
 template<typename ...Cn>
-inline ecs::Entity create() {
+inline entity_t create() {
     entity_t e = create_entity();
     add<Cn...>(e);
-    return Entity{e};
+    return e;
 }
 
 template<typename C>

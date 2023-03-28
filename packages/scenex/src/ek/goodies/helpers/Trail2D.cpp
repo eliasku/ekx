@@ -159,7 +159,7 @@ void TrailRenderer2D::draw() {
 }
 
 void trail_renderer2d_draw(entity_t e) {
-    ecs::Entity{e}.get<TrailRenderer2D>().draw();
+    ecs::get<TrailRenderer2D>(e).draw();
 }
 
 }

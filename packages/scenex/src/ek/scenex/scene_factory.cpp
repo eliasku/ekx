@@ -1,12 +1,13 @@
-#include "SceneFactory.hpp"
+#include "scene_factory.h"
 
 #include <ek/scenex/2d/Sprite.hpp>
-#include <ek/scenex/base/Node.hpp>
+#include <ek/scenex/base/node_api.h>
+#include <ek/scenex/base/node.h>
 #include <ek/scenex/2d/Transform2D.hpp>
 #include <ek/scenex/2d/Display2D.hpp>
 #include <ek/scenex/2d/MovieClip.hpp>
 #include <ek/scenex/2d/Button.hpp>
-#include <ek/scenex/base/Interactive.hpp>
+#include <ek/scenex/base/interactiv.h>
 #include <ek/log.h>
 #include <ek/assert.h>
 #include <ekx/app/localization.h>
@@ -24,16 +25,14 @@ void setup_res_sg(void) {
     rr->data_size = sizeof(R->data[0]);
 }
 
-namespace ek {
-
-entity_t createNode2D(string_hash_t tag) {
-    auto e = ecs::create<Node, Transform2D, WorldTransform2D>();
-    ecs::get<Node>(e).tag = tag;
+entity_t create_node2d(string_hash_t tag) {
+    entity_t e = ecs::create<node_t, transform2d_t, world_transform2d_t>();
+    ecs::get<node_t>(e).tag = tag;
     return e;
 }
 
-entity_t createNode2D(entity_t parent, string_hash_t tag, int index) {
-    auto e = createNode2D(tag);
+entity_t create_node2d_in(entity_t parent, string_hash_t tag, int index) {
+    entity_t e = create_node2d(tag);
     if (index == -1) {
         append(parent, e);
     } else if (index == 0) {
@@ -69,12 +68,13 @@ const sg_node_data_t * sg_get(const sg_file_t* sg, string_hash_t library_name) {
 }
 
 void apply(entity_t e, const sg_node_data_t* data) {
+    using namespace ek;
     if (data->movie_target_id >= 0) {
         ecs::add<MovieClipTargetIndex>(e).key = data->movie_target_id;
     }
 
     {
-        auto& transform = ecs::get<Transform2D>(e);
+        auto& transform = ecs::get<transform2d_t>(e);
         transform.setMatrix(data->matrix);
         transform.color.scale = color_vec4(data->color.scale);
         transform.color.offset = color_vec4(data->color.offset);
@@ -106,7 +106,7 @@ void apply(entity_t e, const sg_node_data_t* data) {
             format.layers[i].strength = layer.strength;
         }
 
-        auto* dtext = text2d_setup(e);
+        Text2D* dtext = text2d_setup(e);
 
         dtext->c_str = dynamic_text->text;
         dtext->flags = ((dtext->flags >> 2) << 2);
@@ -157,7 +157,7 @@ void apply(entity_t e, const sg_node_data_t* data) {
     }
 
     if (data->flags & SG_NODE_BUTTON) {
-        ecs::add<Interactive>(e).cursor = EK_MOUSE_CURSOR_BUTTON;
+        interactive_add(e)->cursor = EK_MOUSE_CURSOR_BUTTON;
         ecs::add<Button>(e);
     }
 }
@@ -165,7 +165,8 @@ void apply(entity_t e, const sg_node_data_t* data) {
 entity_t create_and_merge(const sg_file_t* sg,
                           const sg_node_data_t * data,
                           const sg_node_data_t* over = nullptr) {
-    auto e = ecs::create<Node, Transform2D, WorldTransform2D>();
+    using namespace ek;
+    auto e = ecs::create<node_t, transform2d_t, world_transform2d_t>();
     if (data) {
         apply(e, data);
     }
@@ -199,6 +200,7 @@ void extend_bounds(const sg_file_t* file, const sg_node_data_t* data, aabb2_t* b
 }
 
 entity_t sg_create(string_hash_t library, string_hash_t name, entity_t parent) {
+    using namespace ek;
     entity_t result = NULL_ENTITY;
     R(SGFile) file_ref = R_SG(library);
     if (file_ref) {
@@ -230,6 +232,4 @@ rect_t sg_get_bounds(string_hash_t library, string_hash_t name) {
         }
     }
     return {};
-}
-
 }

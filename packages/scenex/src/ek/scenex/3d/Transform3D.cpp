@@ -1,6 +1,6 @@
 #include "Transform3D.hpp"
 #include <ecx/ecx.hpp>
-#include <ek/scenex/base/Node.hpp>
+#include <ek/scenex/base/node.h>
 
 //ecx_component_type COMP_Transform3D;
 //
@@ -27,7 +27,7 @@ static void updateWorldMatrix3D(entity_t e, const mat4_t* parent) {
         auto it = node->child_first;
         while (it.id) {
             updateWorldMatrix3D(it, parent);
-            it = ek::get_next_child(it);
+            it = get_next_child(it);
         }
     }
 }
@@ -48,8 +48,8 @@ void update_world_transform3d() {
                 );
     }
     static mat4_t identity = mat4_identity();
-    for (auto e: ecs::view<Transform3D>()) {
-        auto* node = e.try_get<ek::Node>();
+    for (entity_t e: ecs::view<Transform3D>()) {
+        node_t* node = ecs::try_get<node_t>(e);
         if (!node || !node->parent.id) {
             updateWorldMatrix3D(e, &identity);
         }

@@ -3,10 +3,10 @@
 
 #include "HierarchyWindow.hpp"
 #include <ek/editor/imgui/imgui.hpp>
-#include <ek/scenex/base/Node.hpp>
+#include <ek/scenex/base/node.h>
 #include <ek/scenex/2d/Display2D.hpp>
 #include <ek/scenex/2d/Transform2D.hpp>
-#include <ek/scenex/base/Interactive.hpp>
+#include <ek/scenex/base/interactiv.h>
 #include <ek/scenex/3d/Light3D.hpp>
 #include <ek/scenex/2d/MovieClip.hpp>
 #include <ek/scenex/2d/Button.hpp>
@@ -26,7 +26,7 @@ const char* HierarchyWindow::getEntityIcon(entity_t e) {
     if (ecs::has<Viewport>(e)) return ICON_FA_TV;
     if (ecs::has<Bounds2D>(e)) return ICON_FA_EXPAND;
     if (ecs::has<Button>(e)) return ICON_FA_HAND_POINTER;
-    if (ecs::has<Interactive>(e)) return ICON_FA_FINGERPRINT;
+    if (interactive_get(e)) return ICON_FA_FINGERPRINT;
     if (ecs::has<MovieClip>(e)) return ICON_FA_FILM;
     if (ecs::has<Sprite2D>(e)) return ICON_FA_IMAGE;
     if (ecs::has<NinePatch2D>(e)) return ICON_FA_COMPRESS;
@@ -56,10 +56,9 @@ void getEntityTitle(entity_t e, char buffer[64]) {
     }
 }
 
-bool HierarchyWindow::isSelectedInHierarchy(entity_t e) {
-    const ecs::Entity ref{e};
-    auto it = std::find(selection.begin(), selection.end(), ref);
-    return it != selection.end();
+bool HierarchyWindow::isSelectedInHierarchy(entity_t ref) {
+    const entity_id_t* it = selection.find(ref.id);
+    return it != nullptr;
 }
 
 bool HierarchyWindow::hasChildren(entity_t e) {
@@ -155,7 +154,7 @@ void HierarchyWindow::drawEntityInTree(entity_t e, bool parentedVisible, bool pa
 
     if (ImGui::IsItemClicked()) {
         selection.clear();
-        selection.push_back(e);
+        selection.push_back(e.id);
     }
 
     drawVisibleTouchControls(node, parentedVisible, parentedTouchable);
@@ -212,7 +211,7 @@ void HierarchyWindow::drawEntityFiltered(entity_t e, bool parentedVisible, bool 
 
         if (ImGui::IsItemClicked()) {
             selection.clear();
-            selection.push_back(e);
+            selection.push_back(e.id);
         }
 
         drawVisibleTouchControls(node, parentedVisible, parentedTouchable);
@@ -268,7 +267,7 @@ void HierarchyWindow::onDraw() {
 void HierarchyWindow::validateSelection() {
     unsigned i = 0;
     while (i < selection.size()) {
-        if (is_entity(selection[i])) {
+        if (is_entity(entity_id(selection[i]))) {
             ++i;
         } else {
             selection.erase_at(i);
@@ -279,7 +278,7 @@ void HierarchyWindow::validateSelection() {
 void HierarchyWindow::select(entity_t e) {
     selection.clear();
     if (e.id) {
-        selection.push_back(e);
+        selection.push_back(e.id);
     }
 }
 

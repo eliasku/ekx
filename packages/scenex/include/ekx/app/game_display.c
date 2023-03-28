@@ -9,10 +9,6 @@
 #include <stb/stb_image_write.h>
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 bool game_display_begin(game_display* display, sg_pass_action* passAction, const char* debugLabel) {
     const int w = (int) display->info.size.x;
     const int h = (int) display->info.size.y;
@@ -197,7 +193,3 @@ void log_app_display_info(void) {
              (int) ek_app.viewport.insets[3]);
 #endif
 }
-
-#ifdef __cplusplus
-}
-#endif

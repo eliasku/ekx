@@ -209,8 +209,8 @@ SUITE(ecs) {
         ecx_shutdown();
     }
 
-    constexpr Entity null{};
-    constexpr Entity nullRef{};
+    constexpr entity_t null = NULL_ENTITY;
+    constexpr entity_t nullRef = NULL_ENTITY;
 
     IT("entity_value, basic") {
         CHECK_EQ(null.idx, 0u);

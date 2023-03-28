@@ -44,47 +44,6 @@ inline auto view_backward() {
     return ViewBackward<Cn...>();
 }
 
-/** Entity methods impl **/
-
-inline bool Entity::valid() const {
-    return is_entity(*this);
-}
-
-template<typename C>
-inline C& Entity::add() const {
-    return ecs::add<C>(*this);
-}
-
-template<typename C1, typename C2, typename ...Cn>
-inline void Entity::add() const {
-    ecs::add<C1, C2, Cn...>(*this);
-}
-
-template<typename C>
-[[nodiscard]] inline bool Entity::has() const {
-    return ecs::has<C>(*this);
-}
-
-template<typename C>
-inline C& Entity::get() const {
-    return ecs::get<C>(*this);
-}
-
-template<typename C>
-inline C* Entity::try_get() const {
-    return ecs::try_get<C>(*this);
-}
-
-template<typename C>
-inline const C& Entity::get_or_default() const {
-    return ecs::get_or_default<C>(*this);
-}
-
-template<typename C>
-inline bool Entity::remove() const {
-    return ecs::remove<C>(*this);
-}
-
 }
 
 #ifndef ECX_COMPONENT

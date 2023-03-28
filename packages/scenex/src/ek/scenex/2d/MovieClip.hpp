@@ -2,7 +2,7 @@
 
 #include <ecx/ecx_fwd.hpp>
 #include <gen_sg.h>
-#include <ek/scenex/SceneFactory.hpp>
+#include <ek/scenex/scene_factory.h>
 
 #include <ek/ds/String.hpp>
 #include <ekx/app/time_layers.h>

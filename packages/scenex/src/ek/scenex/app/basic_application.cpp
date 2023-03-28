@@ -5,14 +5,14 @@
 
 /** resource managers include **/
 #include <ek/scenex/particles/ParticleDecl.hpp>
-#include <ek/scenex/SceneFactory.hpp>
+#include <ek/scenex/scene_factory.h>
 #include <ek/scenex/text/Font.hpp>
 #include <ek/scenex/2d/DynamicAtlas.hpp>
 #include <ek/scenex/2d/Atlas.hpp>
 #include <ek/scenex/particles/ParticleSystem.hpp>
 
 /** systems **/
-#include <ek/scenex/InteractionSystem.hpp>
+#include <ek/scenex/interaction_system.h>
 #include <ekx/app/audio_manager.h>
 #include <ek/scenex/2d/Viewport.hpp>
 #include <ek/scenex/2d/LayoutRect.hpp>
@@ -25,13 +25,13 @@
 #include <ek/scenex/2d/Button.hpp>
 #include <ek/scenex/2d/MovieClip.hpp>
 #include <ek/scenex/2d/Display2D.hpp>
-#include <ek/scenex/base/Tween.hpp>
-#include <ek/goodies/Shake.hpp>
+#include <ek/scenex/base/tween.h>
+#include <ek/goodies/camera_shaker.h>
 #include <ek/goodies/PopupManager.hpp>
-#include <ek/goodies/bubble_text.hpp>
-#include <ek/scenex/base/Interactive.hpp>
+#include <ek/goodies/bubble_text.h>
+#include <ek/scenex/base/interactiv.h>
 #include <ek/goodies/helpers/Trail2D.hpp>
-#include <ek/scenex/base/DestroyTimer.hpp>
+#include <ek/scenex/base/destroy_timer.h>
 #include <ek/scenex/base/NodeEvents.hpp>
 
 ek::basic_application* g_game_app = nullptr;
@@ -102,10 +102,10 @@ void registerSceneXComponents() {
     ECX_COMPONENT(LayoutRect);
     ECX_COMPONENT(Viewport);
     ECX_COMPONENT(Button);
-    ECX_COMPONENT(Interactive);
-    ECX_COMPONENT(Tween);
-    ECX_COMPONENT(Shaker);
-    ECX_COMPONENT(BubbleText);
+    interactive_init();
+    ECX_COMPONENT(tween_t);
+    camera_shaker_init();
+    ECX_COMPONENT(bubble_text_t);
     ECX_COMPONENT(Trail2D);
     ECX_COMPONENT(TrailRenderer2D);
     ECX_COMPONENT(NodeEventHandler);
@@ -123,7 +123,7 @@ void basic_application::initialize() {
     game_display_update(&display);
 
     log_debug("base application: initialize scene root");
-    root = createNode2D(H("root"));
+    root = create_node2d(H("root"));
 
     const vec2_t baseResolution = vec2(ek_app.config.width, ek_app.config.height);
     ecs::add<Viewport>(root).options.baseResolution = baseResolution;
@@ -140,7 +140,7 @@ void basic_application::initialize() {
     init_audio_manager();
 
     log_debug("base application: initialize Scene");
-    auto camera = createNode2D(H("camera"));
+    auto camera = create_node2d(H("camera"));
     auto& defaultCamera = ecs::add<Camera2D>(camera);
     defaultCamera.root = root;
     defaultCamera.order = 1;

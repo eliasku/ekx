@@ -2,6 +2,7 @@
 
 #include <ecx/ecx.hpp>
 #include <ek/math.h>
+#include "transform_api.h"
 
 namespace ek {
 
@@ -210,82 +211,7 @@ struct Transform2D {
     }
 };
 
-vec2_t transform_up(entity_t it, entity_t top, vec2_t pos);
-
-vec2_t transform_down(entity_t top, entity_t it, vec2_t pos);
-
-vec2_t local_to_local(entity_t src, entity_t dst, vec2_t pos);
-
-vec2_t local_to_global(entity_t local, vec2_t localPos);
-
-vec2_t global_to_local(entity_t local, vec2_t globalPos);
-
-// these functions just helpers and use calculated world matrices, so use it only:
-// - after transform invalidation phase
-// - if node has own Transform2D components
-void fast_local_to_local(entity_t src, entity_t dst, vec2_t pos, vec2_t* out);
-
-/** system to invalidate matrix and color in world space **/
-void update_world_transform_2d(entity_t root);
-
-/** utility functions **/
-
-inline void set_alpha(entity_t e, uint8_t alpha) {
-    ecs::add<Transform2D>(e).color.scale.a = alpha;
 }
 
-inline void set_alpha_f(entity_t e, float alpha) {
-    ecs::add<Transform2D>(e).color.scale.a = unorm8_f32_clamped(alpha);
-}
-
-inline void set_color_additive_f(entity_t e, float additive) {
-    ecs::add<Transform2D>(e).color.offset.a = unorm8_f32_clamped(additive);
-}
-
-inline void set_color(entity_t e, color_t color) {
-    ecs::add<Transform2D>(e).color.scale = color;
-}
-
-inline void set_color_offset(entity_t e, color_t offset) {
-    ecs::add<Transform2D>(e).color.offset = offset;
-}
-
-inline void set_x(entity_t e, float x) {
-    ecs::add<Transform2D>(e).setX(x);
-}
-
-inline void set_y(entity_t e, float y) {
-    ecs::add<Transform2D>(e).setY(y);
-}
-
-inline void set_position(entity_t e, vec2_t pos) {
-    ecs::add<Transform2D>(e).set_position(pos);
-}
-
-inline vec2_t get_position(entity_t e) {
-    return ecs::get_or_default<Transform2D>(e).getPosition();
-}
-
-inline void set_rotation(entity_t e, float radians) {
-    ecs::add<Transform2D>(e).set_rotation(radians);
-}
-
-inline float get_rotation(entity_t e) {
-    return ecs::get_or_default<Transform2D>(e).getRotation();
-}
-
-inline void set_scale(entity_t e, vec2_t sc) {
-    ecs::add<Transform2D>(e).set_scale(sc);
-}
-
-inline void set_scale_f(entity_t e, float xy) {
-    ecs::add<Transform2D>(e).set_scale(vec2(xy, xy));
-}
-
-inline vec2_t get_scale(entity_t e) {
-    return ecs::get_or_default<Transform2D>(e).getScale();
-}
-
-}
-
-
+typedef ek::Transform2D transform2d_t;
+typedef ek::WorldTransform2D world_transform2d_t;

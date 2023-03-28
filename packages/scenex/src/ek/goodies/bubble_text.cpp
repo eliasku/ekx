@@ -1,28 +1,26 @@
-#include "bubble_text.hpp"
+#include "bubble_text.h"
 
-#include <ek/scenex/base/DestroyTimer.hpp>
+#include <ek/scenex/base/destroy_timer.h>
 #include <ek/scenex/2d/Transform2D.hpp>
 #include <ek/scenex/2d/Display2D.hpp>
-#include <ek/scenex/base/Node.hpp>
-#include <ek/scenex/SceneFactory.hpp>
+#include <ek/scenex/base/node_api.h>
+#include <ek/scenex/scene_factory.h>
 
 #include <ek/rnd.h>
 #include <ekx/app/time_layers.h>
 #include <ek/math.h>
 
-namespace ek {
-
-float ease_back5(float t) {
+inline float ease_back5(float t) {
     return ease_back(t, 5);
 }
 
-void BubbleText::updateAll() {
+void bubble_text_update(void) {
     float dt = g_time_layers[TIME_LAYER_HUD].dt;
     const float time_max = 2.0f;
     const float delta_y = -100.0f;
 
-    for (auto e: ecs::view<BubbleText>()) {
-        auto& state = ecs::get<BubbleText>(e);
+    for (auto e: ecs::view<bubble_text_t>()) {
+        auto& state = ecs::get<bubble_text_t>(e);
 
         if (state.delay > 0.0f) {
             state.delay -= dt;
@@ -40,7 +38,7 @@ void BubbleText::updateAll() {
             off = state.offset * ease_p3_out(sct);
         }
 
-        auto& transform = ecs::get<Transform2D>(e);
+        auto& transform = ecs::get<transform2d_t>(e);
         transform.set_scale(sc);
         vec2_t fly_pos = vec2(0, delta_y * ease_p3_out(r));
         transform.set_position(state.start + off + fly_pos);
@@ -48,27 +46,30 @@ void BubbleText::updateAll() {
         transform.color.offset.a = unorm8_f32_clamped(r * r * r);
 
         if (state.time >= time_max) {
-            destroy_later(e);
+            destroy_later(e, 0, 0);
         }
     }
 }
 
-entity_t BubbleText::create(string_hash_t fontName, vec2_t pos, float delay) {
-    auto e = createNode2D();
-    auto& c = ecs::add<BubbleText>(e);
+entity_t bubble_text_entity(string_hash_t fontName, vec2_t pos, float delay) {
+    const float spread = 10.0f;
+    const float font_size = 32.0f;
+
+    entity_t e = create_node2d(0);
+    bubble_text_t& c = ecs::add<bubble_text_t>(e);
     c.delay = delay;
+    c.time = 0.0f;
     c.start = pos;
-    float spread = 10.0f;
-    c.offset.x = random_range_f(-spread, spread);
-    TextFormat format{fontName, 32.0f};
-    format.setAlignment(Alignment::Center);
+    c.offset = vec2(random_range_f(-spread, spread), 0.0f);
+    ek::TextFormat format{fontName, font_size};
+    format.setAlignment(ek::Alignment::Center);
     format.setTextColor(COLOR_WHITE);
     format.addShadow(COLOR_BLACK, 4, vec2(0.0f, 1.5f));
 
     text2d_setup_ex(e, format);
 
     set_touchable(e, false);
-    set_scale(e, vec2(0,0));
+    set_scale(e, vec2(0, 0));
     return e;
 }
 
@@ -91,4 +92,3 @@ entity_t BubbleText::create(string_hash_t fontName, vec2_t pos, float delay) {
         }
     }
  */
-}

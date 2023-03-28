@@ -232,7 +232,7 @@ inline void set_text_f(entity_t e, const char* fmt, ...) {
     va_list va;
     va_start(va, fmt);
 
-    auto* txt = ecs::try_get<Text2D>(e);
+    Text2D* txt = ecs::try_get<Text2D>(e);
     if (txt) {
         ek_vsnprintf(txt->buffer, sizeof(txt->buffer), fmt, va);
         text2d__set_str_mode(txt, TEXT2D_INPLACE);
