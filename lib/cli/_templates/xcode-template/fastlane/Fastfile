@@ -13,5 +13,6 @@ platform :ios do
       xcargs: "-allowProvisioningUpdates"
     )
     upload_to_testflight
+    upload_symbols_to_crashlytics(gsp_path: "./GoogleService-Info.plist")
   end
 end
