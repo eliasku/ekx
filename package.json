@@ -43,7 +43,7 @@
     "@types/xmldoc": "^1.1.6",
     "colors": "^1.4.0",
     "decompress": "^4.2.1",
-    "esbuild": "^0.17.14",
+    "esbuild": "^0.17.15",
     "gettext-parser": "^6.0.0",
     "glob": "^9.3.2",
     "mustache": "^4.2.0",
