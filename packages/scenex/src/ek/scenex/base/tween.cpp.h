@@ -24,7 +24,7 @@ void update_frame(entity_t e, tween_t* tween) {
     }
 }
 
-void tween_update() {
+void tween_update(void) {
     for (auto e: ecs::view_backward<tween_t>()) {
         tween_t* tween = (tween_t* )get_component(ecs::type<tween_t>(), e);
         auto dt = g_time_layers[tween->timer].dt;
