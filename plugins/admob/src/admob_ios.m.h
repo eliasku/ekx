@@ -55,7 +55,7 @@ void reloadRewardedAd(void);
 
 @implementation InterstitialAdDelegate
 
-- (void)adDidPresentFullScreenContent:(id)ad {
+- (void)adWillPresentFullScreenContent:(id)ad {
     NSLog(@"Interstitial Ad did present full screen content.");
 }
 
@@ -79,7 +79,7 @@ void reloadRewardedAd(void);
 
 @implementation RewardedAdDelegate
 
-- (void)adDidPresentFullScreenContent:(id)ad {
+- (void)adWillPresentFullScreenContent:(id)ad {
     NSLog(@"Rewarded ad presented");
 }
 
