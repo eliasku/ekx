@@ -99,8 +99,8 @@ typedef struct {
 } ecx_component_type_decl;
 
 typedef struct {
-    ek_sparse_array entityToHandle; // 0
-    entity_idx_t* handleToEntity; // 4
+    ek_sparse_array entity_to_handle; // 0
+    entity_idx_t* handle_to_entity; // 4
     // entities associated with this component, from 1 to MAX_ENTITIES,
     // 0 - is not initialized, because required at least zero-handle is allocated
     uint16_t size; // 8
@@ -121,10 +121,7 @@ typedef struct {
      */
     uint16_t index; // 44
     uint16_t lock_counter; // 46
-    uint16_t __pad[9]; // 46 .. 64
 } ecx_component_type;
-
-//static_assert(sizeof(ecx_component_type) == 64);
 
 // C-API
 

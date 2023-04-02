@@ -1,4 +1,4 @@
-#include "PopupManager.hpp"
+#include "popup_manager.h"
 #include <ek/canvas.h>
 
 #include <ek/scenex/base/destroy_timer.h>
@@ -8,18 +8,22 @@
 #include <ek/scenex/2d/Button.hpp>
 #include <ek/scenex/2d/LayoutRect.hpp>
 
-
 #include <ek/scenex/base/tween.h>
 #include <ek/scenex/2d/Display2D.hpp>
 #include <ek/scenex/base/NodeEvents.hpp>
 
-namespace ek {
-
-using namespace ecs;
-
 const float tweenDelay = 0.05f;
 const float tweenDuration = 0.3f;
 const float animationVertDistance = 200.0f;
+
+static entity_t* find_entity(entity_t* entities, uint32_t n, entity_t entity) {
+    for (uint32_t i = 0; i < n; ++i) {
+        if (entities[i].id == entity.id) {
+            return entities + i;
+        }
+    }
+    return NULL;
+}
 
 void on_popup_pause(entity_t e) {
     set_touchable(e, false);
@@ -30,7 +34,7 @@ void on_popup_resume(entity_t e) {
 }
 
 void on_popup_opening(entity_t e) {
-    set_scale(e, vec2(0,0));
+    set_scale(e, vec2(0, 0));
     set_touchable(e, false);
     set_visible(e, true);
 }
@@ -52,17 +56,21 @@ void on_popup_closing(entity_t e) {
 }
 
 void on_popup_closed(entity_t e) {
-    entity_id_t* ptr = g_popup_manager.active.find(e.id);
+    // erase at
+    entity_t* ptr = find_entity(g_popup_manager.active, g_popup_manager.active_num, e);
     if (ptr) {
-        g_popup_manager.active.erase_ptr(ptr);
+        --g_popup_manager.active_num;
+        for (uint32_t i = ptr - g_popup_manager.active; i < g_popup_manager.active_num; ++i) {
+            g_popup_manager.active[i] = g_popup_manager.active[i + 1];
+        }
     }
 
-    if (g_popup_manager.active.empty()) {
+    if (!g_popup_manager.active_num) {
         entity_t pm = g_popup_manager.entity;
         set_touchable(pm, false);
         set_visible(pm, false);
     } else {
-        on_popup_resume(entity_t{g_popup_manager.active.back()});
+        on_popup_resume(entity_t{g_popup_manager.active[g_popup_manager.active_num - 1]});
     }
 
     set_visible(e, false);
@@ -81,12 +89,12 @@ void on_popup_close_animation(float t, entity_t e) {
 void init_basic_popup(entity_t e) {
     auto node_close = find(e, H("btn_close"));
     if (node_close.id) {
-        auto* i = interactive_get(node_close);
-        if(i) {
+        interactive_t* i = interactive_get(node_close);
+        if (i) {
             i->back_button = true;
-            auto* btn = ecs::try_get<Button>(node_close);
+            ek::Button* btn = ecs::try_get<ek::Button>(node_close);
             if (btn) {
-                ecs::add<NodeEventHandler>(node_close).on(BUTTON_EVENT_CLICK, [](const NodeEventData& event) {
+                ecs::add<ek::NodeEventHandler>(node_close).on(BUTTON_EVENT_CLICK, [](const ek::NodeEventData& event) {
                     close_popup(get_parent(event.receiver));
                 });
             }
@@ -98,18 +106,19 @@ void open_popup(entity_t e) {
     g_popup_manager.closing_last = NULL_ENTITY;
 
     // if we have entity in active list - do nothing
-    if (g_popup_manager.active.find(e.id) != nullptr) {
+    entity_t* found = find_entity(g_popup_manager.active, g_popup_manager.active_num, e);
+    if (found) {
         return;
     }
 
-    if (ecs::get<Node>(e).parent.id == g_popup_manager.layer.id) {
+    if (ecs::get<node_t>(e).parent.id == g_popup_manager.layer.id) {
         return;
     }
 
-    if (!g_popup_manager.active.empty()) {
-        on_popup_pause(entity_id(g_popup_manager.active.back()));
+    if (g_popup_manager.active_num) {
+        on_popup_pause(g_popup_manager.active[g_popup_manager.active_num - 1]);
     }
-    g_popup_manager.active.push_back(e.id);
+    g_popup_manager.active[g_popup_manager.active_num++] = e;
     on_popup_opening(e);
 
     tween_t* tween = tween_reset(e);
@@ -127,13 +136,15 @@ void open_popup(entity_t e) {
     set_visible(g_popup_manager.entity, true);
 }
 
+
 void close_popup(entity_t e) {
     // we cannot close entity if it is not active
-    if (g_popup_manager.active.find(e.id) == nullptr) {
+    entity_t* found = find_entity(g_popup_manager.active, g_popup_manager.active_num, e);
+    if (!found) {
         return;
     }
 
-    if (g_popup_manager.active.back() == e.id) {
+    if (g_popup_manager.active[g_popup_manager.active_num - 1].id == e.id) {
         g_popup_manager.closing_last = e;
     }
     on_popup_closing(e);
@@ -149,9 +160,8 @@ void close_popup(entity_t e) {
     };
 }
 
-
 uint32_t count_active_popups() {
-    return g_popup_manager.active.size();
+    return g_popup_manager.active_num;
 }
 
 void clear_popups() {
@@ -161,7 +171,7 @@ void clear_popups() {
     set_alpha(g_popup_manager.back, 0);
 
     destroy_children(g_popup_manager.layer);
-    g_popup_manager.active.clear();
+    g_popup_manager.active_num = 0;
 
     const entity_t e = g_popup_manager.entity;
     set_touchable(e, false);
@@ -169,31 +179,33 @@ void clear_popups() {
 }
 
 void close_all_popups() {
-    auto copy_vec = g_popup_manager.active;
-    for (entity_id_t p: copy_vec) {
-        close_popup(entity_id(p));
+    entity_t copy[POPUPS_MAX_COUNT];
+    uint32_t n = g_popup_manager.active_num;
+    memcpy(copy, g_popup_manager.active, sizeof copy);
+    for (uint32_t i = 0; i < n; ++i) {
+        close_popup(copy[i]);
     }
 }
 
 entity_t createBackQuad() {
-    auto e = create_node2d(H("back"));
-    auto& display = ecs::add<Display2D>(e);
-    quad2d_setup(e)->setColor(COLOR_BLACK);
+    entity_t e = create_node2d(H("back"));
+    auto& display = ecs::add<ek::Display2D>(e);
+    ek::quad2d_setup(e)->setColor(COLOR_BLACK);
     display.program = R_SHADER_SOLID_COLOR;
-    ecs::add<LayoutRect>(e)
+    ecs::add<ek::LayoutRect>(e)
             .fill(true, true)
             .setInsetsMode(false);
 
     // intercept back-button if popup manager is active
     interactive_add(e);
-    auto& eh = ecs::add<NodeEventHandler>(e);
-    eh.on(INTERACTIVE_EVENT_BACK_BUTTON, [](const NodeEventData& ev) {
+    auto& eh = ecs::add<ek::NodeEventHandler>(e);
+    eh.on(INTERACTIVE_EVENT_BACK_BUTTON, [](const ek::NodeEventData& ev) {
         ev.processed = true;
     });
 
     // if touch outside of popups, simulate back-button behavior
     eh.on(POINTER_EVENT_DOWN, [](auto) {
-        if (!g_popup_manager.active.empty()) {
+        if (g_popup_manager.active_num) {
             interaction_system_send_back_button();
         }
     });
@@ -201,9 +213,7 @@ entity_t createBackQuad() {
     return e;
 }
 
-}
-
-ek::PopupManager g_popup_manager;
+PopupManager g_popup_manager;
 
 void popup_manager_init() {
     using namespace ek;
@@ -233,12 +243,12 @@ void popup_manager_init() {
 void update_popup_manager() {
     using namespace ek;
     auto& p = g_popup_manager;
-    if(UNLIKELY(!p.entity.id)) {
+    if (UNLIKELY(!p.entity.id)) {
         return;
     }
     auto dt = g_time_layers[TIME_LAYER_UI].dt;
-    bool need_fade = !p.active.empty();
-    if (p.active.size() == 1 && p.active.back() == p.closing_last.id) {
+    bool need_fade = p.active_num != 0;
+    if (p.active_num == 1 && p.active[0].id == p.closing_last.id) {
         need_fade = false;
     }
     p.fade_progress = reach(p.fade_progress,

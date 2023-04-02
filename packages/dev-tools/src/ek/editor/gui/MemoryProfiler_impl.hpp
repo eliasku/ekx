@@ -221,7 +221,7 @@ void drawECSMemoryStats() {
             auto* header = ecx_components[i];
             if (header) {
                 const char* label = header->label;
-                const uint32_t cap = arr_capacity(header->handleToEntity);
+                const uint32_t cap = arr_capacity(header->handle_to_entity);
                 const uint32_t len = header->size;
                 uint32_t controlSizeReserved = cap * (sizeof(entity_t) + sizeof(component_type_id));
                 uint32_t controlSizeUsed = len * (sizeof(entity_t) + sizeof(component_type_id));

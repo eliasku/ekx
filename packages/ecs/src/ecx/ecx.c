@@ -5,10 +5,6 @@
 #include <ek/assert.h>
 #include <string.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // forward
 component_handle_t ecx__erase_data(ecx_component_type* type, entity_idx_t entity_idx);
 
@@ -41,13 +37,13 @@ static void ecx_reset_entity_pool() {
 // World create / destroy
 
 void ecx_setup(void) {
-    log_debug("ecs::world initialize");
+    log_debug("ecx initialize");
     ecx_reset_entity_pool();
     ecx.components_num = 1;
 }
 
 void ecx_shutdown(void) {
-    log_debug("ecs::world shutdown");
+    log_debug("ecx shutdown");
 #pragma nounroll
     for (uint32_t i = 1; i < ecx.components_num; ++i) {
         ecx_component_type* type = ecx_components[i];
@@ -94,8 +90,8 @@ void init_component_type(ecx_component_type* type, ecx_component_type_decl decl)
     type->index = index;
     type->label = decl.label;
 
-    type->entityToHandle = ek_sparse_array_create(ECX_ENTITIES_MAX_COUNT);
-    ek_buf_set_size((void**) &type->handleToEntity, sizeof(entity_t), 1, decl.capacity);
+    type->entity_to_handle = ek_sparse_array_create(ECX_ENTITIES_MAX_COUNT);
+    ek_buf_set_size((void**) &type->handle_to_entity, sizeof(entity_t), 1, decl.capacity);
     ek_buf_set_size((void**) &type->component_next, sizeof(ecx_component_list_t), 1, decl.capacity);
     type->size = 1;
 
@@ -162,11 +158,11 @@ component_handle_t _create_component(ecx_component_type* type, entity_idx_t enti
     EK_ASSERT_R2(get_component_handle_by_index(type, entity_idx) == 0);
 
     const component_handle_t handle = type->size++;
-    ek_sparse_array_insert(type->entityToHandle, entity_idx, handle);
+    ek_sparse_array_insert(type->entity_to_handle, entity_idx, handle);
 
-    arr_maybe_grow((void**) &type->handleToEntity, sizeof(entity_t));
-    ek_buf_header(type->handleToEntity)->length++;
-    type->handleToEntity[handle] = entity_idx;
+    arr_maybe_grow((void**) &type->handle_to_entity, sizeof(entity_t));
+    ek_buf_header(type->handle_to_entity)->length++;
+    type->handle_to_entity[handle] = entity_idx;
 
     // link component
     arr_maybe_grow((void**) &type->component_next, sizeof(component_type_id));
@@ -218,9 +214,9 @@ component_handle_t ecx__erase_data(ecx_component_type* type, entity_idx_t entity
     EK_ASSERT(type->size > 1);
     component_handle_t last = --type->size;
     component_handle_t handle;
-    const entity_idx_t back_entity_idx = type->handleToEntity[last];
+    const entity_idx_t back_entity_idx = type->handle_to_entity[last];
     if (entity_idx != back_entity_idx) {
-        handle = ek_sparse_array_move_remove(type->entityToHandle, entity_idx, back_entity_idx);
+        handle = ek_sparse_array_move_remove(type->entity_to_handle, entity_idx, back_entity_idx);
         if (type->dtor) {
             type->dtor(handle);
         }
@@ -230,17 +226,17 @@ component_handle_t ecx__erase_data(ecx_component_type* type, entity_idx_t entity
             // [removed_handle] <-- [last]
             memcpy((char*) arr + handle * stride, (char*) arr + last * stride, stride);
         }
-        type->handleToEntity[handle] = back_entity_idx;
+        type->handle_to_entity[handle] = back_entity_idx;
         type->component_next[handle] = type->component_next[last];
     } else {
         handle = last;
-        ek_sparse_array_set(type->entityToHandle, entity_idx, 0);
+        ek_sparse_array_set(type->entity_to_handle, entity_idx, 0);
         if (type->dtor) {
             type->dtor(handle);
         }
     }
 
-    arr_pop(type->handleToEntity);
+    arr_pop(type->handle_to_entity);
     arr_pop(type->component_next);
 #pragma nounroll
     for (uint32_t i = 0; i < type->data_num; ++i) {
@@ -270,8 +266,8 @@ void foreach_type(ecx_component_type* type, void(* callback)(component_handle_t)
 
 component_handle_t get_component_handle_by_index(const ecx_component_type* type, entity_idx_t entity_idx) {
     EK_ASSERT(type);
-    EK_ASSERT(type->entityToHandle.data && "component type is not initialized");
-    return ek_sparse_array_get(type->entityToHandle, entity_idx);
+    EK_ASSERT(type->entity_to_handle.data && "component type is not initialized");
+    return ek_sparse_array_get(type->entity_to_handle, entity_idx);
 }
 
 component_handle_t get_component_handle(const ecx_component_type* type, entity_t entity) {
@@ -283,7 +279,7 @@ entity_t get_entity(const ecx_component_type* type, component_handle_t handle) {
     EK_ASSERT(type);
     EK_ASSERT(handle);
     EK_ASSERT(handle < type->size);
-    return entity_at(type->handleToEntity[handle]);
+    return entity_at(type->handle_to_entity[handle]);
 }
 
 bool remove_component(ecx_component_type* type, entity_t entity) {
@@ -359,7 +355,3 @@ static int compare_ecs_types_(const void* a, const void* b) {
 void _sort_component_type_table(ecx_component_type** types_table, uint32_t count) {
     qsort(types_table, count, sizeof(ecx_component_type*), compare_ecs_types_);
 }
-
-#ifdef __cplusplus
-}
-#endif

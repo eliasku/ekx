@@ -14,7 +14,7 @@ void simple_animator_init(void) {
 void simple_animator_update(float dt) {
     EK_ASSERT(simple_animator_comp.index);
     for (uint32_t i = 1; i < simple_animator_comp.size; ++i) {
-        entity_idx_t ei = simple_animator_comp.handleToEntity[i];
+        entity_idx_t ei = simple_animator_comp.handle_to_entity[i];
         entity_t e = entity_at(ei);
         simple_animator_t* s = ((simple_animator_t*) simple_animator_comp.data[0]) + i;
         s->rotation += dt * s->rotation_speed;

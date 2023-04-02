@@ -44,8 +44,8 @@ public:
                 return true;
             }
             // filter secondary entity vectors
-            const entity_idx_t entity_idx = m->handleToEntity[it];
-            for (uint32_t k = 1u; k < components_num; ++k) {
+            const entity_idx_t entity_idx = m->handle_to_entity[it];
+            for (uint32_t k = 1; k < components_num; ++k) {
                 if (get_component_handle_by_index(table[k], entity_idx) == 0) {
                     return false;
                 }
@@ -56,7 +56,7 @@ public:
         inline static bool is_valid_fast(entity_idx_t entity_idx, const ecx_component_type** table) {
             // filter secondary entity vectors
             const uint32_t cn = components_num;
-            for (uint32_t k = 1u; k < cn; ++k) {
+            for (uint32_t k = 1; k < cn; ++k) {
                 if (get_component_handle_by_index(table[k], entity_idx) == 0) {
                     return false;
                 }
@@ -65,11 +65,11 @@ public:
         }
 
         inline entity_t operator*() const noexcept {
-            return entity_at(table_[0]->handleToEntity[it_]);
+            return entity_at(table_[0]->handle_to_entity[it_]);
         }
 
         inline entity_t operator*() noexcept {
-            return entity_at(table_[0]->handleToEntity[it_]);
+            return entity_at(table_[0]->handle_to_entity[it_]);
         }
 
     private:
@@ -140,7 +140,7 @@ public:
         }
 
         inline entity_t operator*() const noexcept {
-            return entity_at(type<C>()->handleToEntity[it_]);
+            return entity_at(type<C>()->handle_to_entity[it_]);
         }
 
     private:

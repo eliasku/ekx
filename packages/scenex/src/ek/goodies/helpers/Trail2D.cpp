@@ -60,7 +60,7 @@ void update_trail2d() {
     auto* trails = (Trail2D*)ecs::type<Trail2D>()->data[0];
     const auto count = ecs::type<Trail2D>()->size;
     for (uint32_t i = 1; i < count; ++i) {
-        auto ei = ecs::type<Trail2D>()->handleToEntity[i];
+        auto ei = ecs::type<Trail2D>()->handle_to_entity[i];
         auto wti = get_component_handle_by_index(ecs::type<WorldTransform2D>(), ei);
         const auto& m = ((WorldTransform2D*)get_component_data(ecs::type<WorldTransform2D>(), wti, 0))->matrix;
         trails[i].update(m);

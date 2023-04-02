@@ -85,6 +85,16 @@ void* _check_ptr_alignment(void* ptr, uint32_t width);
 
 #define cast_ptr_aligned(T, ptr) ((T*)_check_ptr_alignment(ptr, 4))
 
+// fixed array utilities
+
+#define COUNT_OF(FixedArray) (sizeof(FixedArray) / sizeof(*(FixedArray)))
+#define DEFINE_ARRAY_FIND(T) static (T)* find_##T((T)* array, uint32_t n, T element) { \
+    for (uint32_t i = 0; i < n; ++i) { \
+        if (array[i] == element) return array + i; \
+    } \
+    return NULL; \
+}
+
 #ifdef __cplusplus
 }
 #endif

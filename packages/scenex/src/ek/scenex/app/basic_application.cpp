@@ -27,7 +27,7 @@
 #include <ek/scenex/2d/Display2D.hpp>
 #include <ek/scenex/base/tween.h>
 #include <ek/goodies/camera_shaker.h>
-#include <ek/goodies/PopupManager.hpp>
+#include <ek/goodies/popup_manager.h>
 #include <ek/goodies/bubble_text.h>
 #include <ek/scenex/base/interactiv.h>
 #include <ek/goodies/helpers/Trail2D.hpp>

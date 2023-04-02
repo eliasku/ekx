@@ -38,7 +38,7 @@ vec2_t random_f2(float min, float max) {
 void camera_shaker_update(void) {
     EK_ASSERT(camera_shaker_comp_type.index);
     for (uint32_t i = 1; i < camera_shaker_comp_type.size; ++i) {
-        entity_idx_t ei = camera_shaker_comp_type.handleToEntity[i];
+        entity_idx_t ei = camera_shaker_comp_type.handle_to_entity[i];
         entity_t e = entity_at(ei);
         camera_shaker_t* s = ((camera_shaker_t*) camera_shaker_comp_type.data[0]) + i;
         const float dt = g_time_layers[s->timer].dt;

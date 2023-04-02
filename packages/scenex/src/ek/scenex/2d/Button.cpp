@@ -18,13 +18,13 @@ static inline void play_button_sound(string_hash_t id) {
 }
 
 void start_post_tween(Button& btn) {
-    btn.timePost = fmaxf(random_range_f(0.7f, 1.0f), btn.timePost);
+    btn.time_post = fmaxf(random_range_f(0.7f, 1.0f), btn.time_post);
 }
 
 void initialize_base_transform(Button& btn, const Transform2D& transform) {
-    btn.baseColor = transform.color;
-    btn.baseScale = transform.getScale();
-    btn.baseSkew = transform.getSkew();
+    btn.base_color = transform.color;
+    btn.base_scale = transform.getScale();
+    btn.base_skew = transform.getSkew();
 }
 
 const ButtonSkin& get_skin(const Button& btn) {
@@ -89,21 +89,21 @@ void apply_skin(const ButtonSkin& skin, const Button& btn, Transform2D& transfor
     // TODO: skin params?
     (void) skin;
 
-    const float over = btn.timeOver;
-    const float push = btn.timePush;
-    const float post = btn.timePost;
+    const float over = btn.time_over;
+    const float push = btn.time_push;
+    const float post = btn.time_post;
     const float pi = MATH_PI;
 
     float sx = 1.0f + 0.2f * sinf((1.0f - post) * pi * 5.0f) * post;
     float sy = 1.0f + 0.2f * sinf((1.0f - post) * pi) * cosf((1.0f - post) * pi * 5.0f) * post;
 
-    transform.set_scale(btn.baseScale * vec2(sx, sy));
+    transform.set_scale(btn.base_scale * vec2(sx, sy));
 
     const auto color = lerp_color(COLOR_WHITE, ARGB(0xFF888888), push);
-    transform.color.scale = mul_color(btn.baseColor.scale, color);
+    transform.color.scale = mul_color(btn.base_color.scale, color);
 
     const float h = 0.1f * over;
-    transform.color.offset = btn.baseColor.offset + color_4f(h, h, h, 0);
+    transform.color.offset = btn.base_color.offset + color_4f(h, h, h, 0);
 }
 
 void update_movie_frame(entity_t entity, const interactive_t* interactive) {
@@ -123,22 +123,22 @@ void update_movie_frame(entity_t entity, const interactive_t* interactive) {
 void update_button_events(interactive_t* interactive, Button* button, entity_t e, entity_t* queue, uint32_t* queue_num) {
     if(interactive->ev_over) {
         const auto& skin = get_skin(*button);
-        play_button_sound(skin.sfxOver);
+        play_button_sound(skin.sfx_over);
     }
     if(interactive->ev_out) {
         const auto& skin = get_skin(*button);
         if(button->pushed) {
             start_post_tween(*button);
-            play_button_sound(skin.sfxCancel);
+            play_button_sound(skin.sfx_cancel);
         }
         else {
-            play_button_sound(skin.sfxOut);
+            play_button_sound(skin.sfx_out);
         }
         button->pushed = false;
     }
     if(interactive->ev_down) {
         const auto& skin = get_skin(*button);
-        play_button_sound(skin.sfxDown);
+        play_button_sound(skin.sfx_down);
     }
     if(interactive->ev_tap) {
         auto* ev_eh = ecs::try_get<NodeEventHandler>(e);
@@ -148,7 +148,7 @@ void update_button_events(interactive_t* interactive, Button* button, entity_t e
             //ev_eh->emit({BUTTON_EVENT_CLICK, e, {nullptr}, e});
         }
         const auto& skin = get_skin(*button);
-        play_button_sound(skin.sfxClick);
+        play_button_sound(skin.sfx_click);
         start_post_tween(*button);
     }
     button->pushed = interactive->pushed;
@@ -174,17 +174,17 @@ void Button::updateAll() {
 
             const auto& skin = get_skin(*btn);
 
-            btn->timeOver = reach_delta(btn->timeOver,
+            btn->time_over = reach_delta(btn->time_over,
                                        interactive->over ? 1.0f : 0.0f,
-                                       dt * skin.overSpeedForward,
-                                       -dt * skin.overSpeedBackward);
+                                       dt * skin.over_speed_forward,
+                                       -dt * skin.over_speed_backward);
 
-            btn->timePush = reach_delta(btn->timePush,
+            btn->time_push = reach_delta(btn->time_push,
                                        interactive->pushed ? 1.0f : 0.0f,
-                                       dt * skin.pushSpeedForward,
-                                       -dt * skin.pushSpeedBackward);
+                                       dt * skin.push_speed_forward,
+                                       -dt * skin.push_speed_backward);
 
-            btn->timePost = reach(btn->timePost, 0.0f, 2.0f * dt);
+            btn->time_post = reach(btn->time_post, 0.0f, 2.0f * dt);
 
             apply_skin(skin, *btn, *transform);
             update_movie_frame(e, interactive);

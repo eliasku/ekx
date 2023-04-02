@@ -36,10 +36,10 @@ public:
             // todo: size recovery (case we remove entities before *it)
             EK_ASSERT_R2(it_ < table_[0]->size);
 
-            while (it_ != 0 && !valid(table_[0]->handleToEntity[it_])) {
+            while (it_ != 0 && !valid(table_[0]->handle_to_entity[it_])) {
                 --it_;
             }
-            ent_ = table_[0]->handleToEntity[it_];
+            ent_ = table_[0]->handle_to_entity[it_];
         }
 
         [[nodiscard]]
@@ -114,7 +114,7 @@ public:
         }
 
         inline entity_t operator*() const noexcept {
-            return entity_at(type<C>()->handleToEntity[it_]);
+            return entity_at(type<C>()->handle_to_entity[it_]);
         }
 
     private:
