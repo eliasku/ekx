@@ -56,7 +56,7 @@ bool is_key_down(ek_key_code code);
 
 bool is_key_up(ek_key_code code);
 
-void reset_keyboard();
+void reset_keyboard(void);
 
 touch_t* get_or_create_touch(uint64_t id);
 

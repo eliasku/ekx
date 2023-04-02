@@ -58,7 +58,7 @@ void vibrate(int length) {
     }
 }
 
-void update_audio_manager() {
+void update_audio_manager(void) {
     const uint32_t prefs = g_audio.prefs;
     auph_set_gain(AUPH_BUS_MUSIC.id, (prefs & AUDIO_PREF_MUSIC) ? 1.0f : 0.0f);
     auph_set_gain(AUPH_BUS_SOUND.id, (prefs & AUDIO_PREF_SOUND) ? 1.0f : 0.0f);

@@ -373,7 +373,7 @@ public:
                         StringsAsset* asset = loader_->asset;
                         if (ek_local_res_success(lr)) {
                             loader_->lr = *lr;
-                            add_lang(loader_->lang, lr->buffer, lr->length);
+                            add_lang(loader_->lang, lr->buffer, (uint32_t)lr->length);
                         } else {
                             log_error("Strings resource not found: %s", loader_->lang.str);
                             asset->error = 1;

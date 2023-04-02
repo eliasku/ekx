@@ -60,7 +60,7 @@ void on_popup_closed(entity_t e) {
     entity_t* ptr = find_entity(g_popup_manager.active, g_popup_manager.active_num, e);
     if (ptr) {
         --g_popup_manager.active_num;
-        for (uint32_t i = ptr - g_popup_manager.active; i < g_popup_manager.active_num; ++i) {
+        for (uint32_t i = (uint32_t)(ptr - g_popup_manager.active); i < g_popup_manager.active_num; ++i) {
             g_popup_manager.active[i] = g_popup_manager.active[i + 1];
         }
     }

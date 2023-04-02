@@ -32,7 +32,7 @@ void play_sound_at(string_hash_t name, vec2_t position, float volume, float pitc
 
 void vibrate(int length);
 
-void update_audio_manager();
+void update_audio_manager(void);
 
 extern audio_manager_t g_audio;
 

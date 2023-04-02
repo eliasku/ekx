@@ -134,7 +134,6 @@ void input_state_process_event(const ek_app_event* event, game_display_info* dis
             interaction_system_send_back_button();
             break;
         case EK_APP_EVENT_PAUSE:
-            interaction_system_send_back_button();
             interaction_system_handle_pause();
             break;
         default:
@@ -191,7 +190,7 @@ void input_state_post_update() {
     }
 }
 
-void reset_keyboard() {
+void reset_keyboard(void) {
     g_input_state.reset_keys = true;
 }
 
