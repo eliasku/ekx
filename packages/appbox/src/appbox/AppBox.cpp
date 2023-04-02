@@ -58,10 +58,17 @@ void set_state_on_off(entity_t e, bool enabled) {
 void AppBox::initDefaultControls(entity_t e) {
     {
         // VERSION
-        auto e_version = find(e, H("version"));
+        entity_t e_version = find(e, H("version"));
         if (e_version.id) {
 #ifndef NDEBUG
-            set_text_f(e_version, "DEBUG %s #%s", config.version_name, config.version_code);
+            set_text_f(e_version, "%s #%s_d", config.version_name, config.version_code);
+            interactive_add(e_version);
+            ecs::add<Button>(e_version);
+            ecs::add<NodeEventHandler>(e_version).on(BUTTON_EVENT_CLICK, [](const NodeEventData& ) {
+                // force crash
+                volatile uint8_t* invalid_ptr = (uint8_t*)NULL;
+                *invalid_ptr = 0;
+            });
 #else
             set_text_f(e_version, "%s #%s", config.version_name, config.version_code);
 #endif
