@@ -40,5 +40,6 @@ export async function setup(project: Project) {
     });
     await project.import(
         "../app/ek.ts",
+        "../../external/oboe/ek.ts",
     );
 }
