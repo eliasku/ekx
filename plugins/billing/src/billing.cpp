@@ -1,6 +1,4 @@
-#include "billing.hpp"
-#include <ek/util/StaticStorage.hpp>
-#include <ek/log.h>
+#include "billing.h"
 
 // implementation
 #if defined(__APPLE__)
@@ -11,31 +9,16 @@
 
 #if defined(__ANDROID__)
 
-#include "billing_android.hpp"
+#include "billing_android.cpp.h"
 
 #elif TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 
-#include "billing_ios.hpp"
+#include "billing_ios.m.h"
 
 #else
 
-#include "billing_sim.hpp"
+#include "billing_sim.c.h"
 
 #endif
 
-namespace billing {
-
-static ek::StaticStorage<Context> _context{};
-Context& context = *_context.ptr();
-
-void _initialize() {
-    log_debug("billing initialize");
-    _context.initialize();
-}
-
-void shutdown() {
-    log_debug("billing shutdown");
-    _context.shutdown();
-}
-
-}
+struct billing_callbacks g_billing;

@@ -14,18 +14,28 @@ const bool useAdMobSimulator = true;
 const bool useAdMobSimulator = false;
 #endif
 
+void ads_on_purchase_changed(const purchase_data_t* purchase) {
+    if (!g_ads->removed && purchase->state == 0 &&
+        strcmp(purchase->product_id, g_ads->config.sku_remove_ads) == 0) {
+        g_ads->onRemoveAdsPurchased();
+        if (purchase->token && purchase->token[0]) {
+            // non-consumable
+        }
+    }
+}
+
+void ads_on_product_details(const product_details_t* details) {
+    if (strcmp(details->product_id, g_ads->config.sku_remove_ads) == 0) {
+        g_ads->price = details->price;
+        g_ads->onProductLoaded();
+    }
+}
+
 Ads::Ads(ads_premium_config config_) :
         config{config_},
         wrapper{AdMobWrapper::create(useAdMobSimulator)} {
-    billing::context.onPurchaseChanged += [this](auto purchase) {
-        this->onPurchaseChanged(purchase);
-    };
-    billing::context.onProductDetails += [this](const billing::ProductDetails& details) {
-        if (details.sku == config.sku_remove_ads) {
-            price = details.price;
-            onProductLoaded();
-        }
-    };
+    g_billing.on_purchase_changed = &ads_on_purchase_changed;
+    g_billing.on_product_details = &ads_on_product_details;
 
 #ifndef NDEBUG
     setRemoveAdsPurchaseCache(false);
@@ -38,28 +48,21 @@ Ads::Ads(ads_premium_config config_) :
 }
 
 void Ads::onStart() {
-    // just wait billing service a little, TODO: billing initialized promise
+    // just wait billing service a little
+    // TODO: billing initialized promise
     ek_timer_callback cb;
     cb.action = [](void* sku_) {
-        billing::getPurchases();
-        billing::getDetails({(const char*) sku_});
+        billing_get_purchases();
+        const char* sku_list[1] = {(const char*)sku_};
+        billing_get_details(sku_list, 1);
     };
     cb.cleanup = nullptr;
     cb.userdata = (void*) config.sku_remove_ads;
     ek_set_timeout(cb, 3);
 }
 
-void Ads::onPurchaseChanged(const billing::PurchaseData& purchase) {
-    if (!removed && purchase.productID == config.sku_remove_ads && purchase.state == 0) {
-        onRemoveAdsPurchased();
-        if (!purchase.token.empty()) {
-            // non-consumable
-        }
-    }
-}
-
 void Ads::purchaseRemoveAds() const {
-    billing::purchase(config.sku_remove_ads, "");
+    billing_purchase(config.sku_remove_ads, "");
 }
 
 void Ads::setRemoveAdsPurchaseCache(bool adsRemoved) const {

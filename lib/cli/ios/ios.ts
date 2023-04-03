@@ -190,7 +190,6 @@ export async function export_ios(ctx: Project): Promise<void> {
                         },
                         configs: {
                             Debug: {
-                                ENABLE_BITCODE: false
                             },
                             Release: {
                                 GCC_PREPROCESSOR_DEFINITIONS: [

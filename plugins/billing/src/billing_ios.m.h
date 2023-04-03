@@ -1,5 +1,3 @@
-#pragma once
-
 #include <ek/log.h>
 #include <ek/app_native.h>
 
@@ -44,8 +42,6 @@
 
 - (void)handleQueue:(SKPaymentQueue*)queue
 updatedTransactions:(NSArray*)transactions {
-    using namespace billing;
-
     for (SKPaymentTransaction* transaction in transactions) {
 
         const char* trID = transaction.transactionIdentifier ? transaction.transactionIdentifier.UTF8String : "";
@@ -63,24 +59,24 @@ updatedTransactions:(NSArray*)transactions {
             case SKPaymentTransactionStateFailed: {
                 [queue finishTransaction:transaction];
 
-                PurchaseData purchase;
-                purchase.productID = prodID;
+                purchase_data_t purchase;
+                purchase.product_id = prodID;
                 purchase.token = trID;
-                purchase.errorCode = (int) transaction.error.code;
+                purchase.error_code = (int) transaction.error.code;
                 purchase.state = -1; // failed
                 // SKErrorPaymentCancelled
                 if (transaction.error.code == SKErrorPaymentCancelled) {
                 } else {
                 }
-                context.onPurchaseChanged(purchase);
+                g_billing.on_purchase_changed(&purchase);
             }
                 break;
 
             case SKPaymentTransactionStatePurchased: {
                 [_transactionsDict setObject:transaction forKey:transaction.transactionIdentifier];
 
-                PurchaseData purchase;
-                purchase.productID = prodID;
+                purchase_data_t purchase;
+                purchase.product_id = prodID;
                 purchase.token = trID;
                 purchase.state = 0; // purchased
 
@@ -94,7 +90,7 @@ updatedTransactions:(NSArray*)transactions {
                     purchase.payload = [userData UTF8String];
                 }
 
-                context.onPurchaseChanged(purchase);
+                g_billing.on_purchase_changed(&purchase);
             }
                 break;
 
@@ -141,7 +137,6 @@ updatedTransactions:(NSArray*)transactions {
 
 - (void)productsRequest:(SKProductsRequest*)request
      didReceiveResponse:(SKProductsResponse*)response {
-    using namespace billing;
 
     //NSArray *products = [response products];
     //NSArray *inv = response.invalidProductIdentifiers;
@@ -152,17 +147,17 @@ updatedTransactions:(NSArray*)transactions {
 
     for (SKProduct* product in response.products) {
         [_products setObject:product forKey:product.productIdentifier];
-        ProductDetails details;
-        details.sku = [product.productIdentifier UTF8String];
+        product_details_t details;
+        details.product_id = [product.productIdentifier UTF8String];
 
         NSNumberFormatter* numberFormatter = [[NSNumberFormatter alloc] init];
         numberFormatter.numberStyle = NSNumberFormatterCurrencyStyle;
         numberFormatter.locale = product.priceLocale;
         NSString* formattedString = [numberFormatter stringFromNumber:product.price];
         details.price = [formattedString UTF8String];
-        details.currencyCode = [numberFormatter.currencyCode UTF8String];
+        details.currency_code = [numberFormatter.currencyCode UTF8String];
 
-        context.onProductDetails(details);
+        g_billing.on_product_details(&details);
     }
 }
 
@@ -198,19 +193,18 @@ updatedTransactions:(NSArray*)transactions {
 
 @end
 
-namespace billing {
 Billing* _billing = nullptr;
 
-void initialize(const char* developerKey) {
-    (void) developerKey;
+void billing_setup(const char* developer_key) {
+    log_debug("billing setup");
+    (void) developer_key;
     if (_billing != nil) {
         return;
     }
-    _initialize();
     _billing = [Billing new];
 }
 
-void getPurchases() {
+void billing_get_purchases() {
     if (_billing == nil) {
         return;
     }
@@ -218,35 +212,34 @@ void getPurchases() {
     [_billing restore];
 }
 
-void getDetails(const ek::Array <ek::String>& items) {
+void billing_get_details(const char** product_ids, uint32_t count) {
     if (_billing == nil) {
         return;
     }
 
     NSArray* array = [[NSArray alloc] init];
 
-    for (const auto& item: items) {
-        NSString* str = [NSString stringWithUTF8String:item.c_str()];
+    for (uint32_t i = 0; i < count; ++i) {
+        const char* product_id = product_ids[i];
+        NSString* str = [NSString stringWithUTF8String: product_id];
         array = [array arrayByAddingObject:str];
     }
 
     [_billing updateProducts:array];
 }
 
-void purchase(const ek::String& sku, const ek::String& payload) {
+void billing_purchase(const char* product_id, const char* payload) {
     if (_billing == nil) {
         return;
     }
 
-    [_billing purchase:sku.c_str() :payload.c_str()];
+    [_billing purchase:product_id :payload];
 }
 
-void consume(const ek::String& token) {
+void consume(const char* token) {
     if (_billing == nil) {
         return;
     }
 
-    [_billing consume:token.c_str()];
-}
-
+    [_billing consume:token];
 }

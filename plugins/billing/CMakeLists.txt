@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 project(plugin-billing)
 add_library(${PROJECT_NAME} STATIC
-        src/billing.hpp
+        src/billing.h
         src/billing.cpp
         )
 

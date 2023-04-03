@@ -1,7 +1,9 @@
 #pragma once
 
-#include <billing.hpp>
+#include <billing.h>
 #include <ek/core/target.h>
+#include <ek/util/Signal.hpp>
+#include <ek/ds/String.hpp>
 #include <ek/scenex/app/GameAppListener.hpp>
 #include <functional>
 
@@ -24,8 +26,6 @@ public:
     explicit Ads(ads_premium_config config_);
     ~Ads() override;
 
-    void onPurchaseChanged(const billing::PurchaseData& purchase);
-
     void purchaseRemoveAds() const;
 
     // TODO: rename, try start commercial break
@@ -46,12 +46,14 @@ public:
     bool removed = false;
     ads_premium_config config;
     AdMobWrapper* wrapper = nullptr;
+
+    void onRemoveAdsPurchased();
 private:
     void setRemoveAdsPurchaseCache(bool adsRemoved) const;
 
     [[nodiscard]] bool checkRemoveAdsPurchase() const;
 
-    void onRemoveAdsPurchased();
+
 };
 
 }

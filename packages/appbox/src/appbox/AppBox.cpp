@@ -1,12 +1,11 @@
 #include "AppBox.hpp"
 
-#include <ek/ds/String.hpp>
 #include <ek/app.h>
 #include <ek/scenex/base/node.h>
 #include <ek/scenex/2d/Display2D.hpp>
 #include <ek/scenex/2d/Button.hpp>
 #include <ek/scenex/base/interactiv.h>
-#include <billing.hpp>
+#include <billing.h>
 #include <ekx/app/audio_manager.h>
 #include <ek/game_services.h>
 #include <ekx/app/localization.h>
@@ -21,7 +20,7 @@ AppBox::AppBox(AppBoxConfig config_) :
 
     // unlock abort()
 
-    billing::initialize(config.billing_key);
+    billing_setup(config.billing_key);
     ek_admob_init(config.admob);
     ads_init(config.ads);
     ek_game_services_init();
@@ -115,7 +114,7 @@ void AppBox::initDefaultControls(entity_t e) {
         entity_t btn = find(e, H("restore_purchases"));
         if (btn.id) {
             ecs::add<NodeEventHandler>(btn).on(BUTTON_EVENT_CLICK, [](const NodeEventData& ) {
-                billing::getPurchases();
+                billing_get_purchases();
             });
         }
     }
@@ -210,7 +209,7 @@ void AppBox::initLanguageButton(entity_t e) {
         ecs::add<NodeEventHandler>(btn).on(BUTTON_EVENT_CLICK, [](const NodeEventData& ) {
             uint32_t index = s_localization.lang_index;
             uint32_t num = s_localization.lang_num;
-            // check if langs are available
+            // check if languages are available
             if (index < num && num != 0 &&
                 set_language_index((index + 1) % num)) {
                 const char* lang_name = s_localization.languages[s_localization.lang_index].name.str;
