@@ -28,6 +28,7 @@ void billing_get_details(const char** product_ids, uint32_t count) {
 
 void billing_purchase(const char* product_id, const char* payload) {
     purchase_data_t* data = (purchase_data_t*) malloc(sizeof(purchase_data_t));
+    *data = {};
     data->product_id = product_id;
     data->payload = payload;
     data->state = 0;

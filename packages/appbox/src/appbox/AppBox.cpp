@@ -1,4 +1,4 @@
-#include "AppBox.hpp"
+#include "appbox.h"
 
 #include <ek/app.h>
 #include <ek/scenex/base/node.h>
@@ -10,13 +10,35 @@
 #include <ek/game_services.h>
 #include <ekx/app/localization.h>
 #include "Ads.hpp"
-#include "ek/scenex/base/NodeEvents.hpp"
-#include "ek/local_storage.h"
+#include <ek/scenex/base/NodeEvents.hpp>
+#include <ek/local_storage.h>
 
-namespace ek {
+appbox_config_t appbox_config_default(void) {
+    appbox_config_t config = {};
+    config.version_name = "1.0.0";
+    config.version_code = "";
+    config.privacy_policy_url = "https://eliasku-games.web.app/privacy-policy";
+    config.ads.sku_remove_ads = "remove_ads";
+    config.ads.key0 = "ads_key_0";
+    config.ads.val0 = 1111;
+    config.ads.key1 = "ads_key_1";
+    config.ads.val1 = 2222;
+    config.admob.child_directed = EK_ADMOB_CHILD_DIRECTED_UNSPECIFIED;
+    config.billing_key = "";
+    // used for sharing results or app for link in the end of the message
+    // TODO: could be better to share link object with text description
+    config.app_link_url = "";
+    // currently only for manual "rate us" feature
+    config.app_id = "";
 
-AppBox::AppBox(AppBoxConfig config_) :
-        config{config_} {
+    return config;
+}
+
+
+appbox_context_t g_appbox;
+
+void appbox_setup(appbox_config_t config) {
+    g_appbox.config = config;
 
     // unlock abort()
 
@@ -54,13 +76,14 @@ void set_state_on_off(entity_t e, bool enabled) {
     set_visible(off, !enabled);
 }
 
-void AppBox::initDefaultControls(entity_t e) {
+void appbox_init_default_controls(entity_t e) {
+    using namespace ek;
     {
         // VERSION
         entity_t e_version = find(e, H("version"));
         if (e_version.id) {
 #ifndef NDEBUG
-            set_text_f(e_version, "%s #%s_d", config.version_name, config.version_code);
+            set_text_f(e_version, "%s #%s_d", g_appbox.config.version_name, g_appbox.config.version_code);
             interactive_add(e_version);
             ecs::add<Button>(e_version);
             ecs::add<NodeEventHandler>(e_version).on(BUTTON_EVENT_CLICK, [](const NodeEventData& ) {
@@ -69,7 +92,7 @@ void AppBox::initDefaultControls(entity_t e) {
                 *invalid_ptr = 0;
             });
 #else
-            set_text_f(e_version, "%s #%s", config.version_name, config.version_code);
+            set_text_f(e_version, "%s #%s", g_appbox.config.version_name, g_appbox.config.version_code);
 #endif
         }
     }
@@ -87,7 +110,7 @@ void AppBox::initDefaultControls(entity_t e) {
             interactive_add(e_pp);
             ecs::add<Button>(e_pp);
             ecs::add<NodeEventHandler>(e_pp).on(BUTTON_EVENT_CLICK, [](const NodeEventData& ) {
-                ek_app_open_url(g_app_box->config.privacy_policy_url);
+                ek_app_open_url(g_appbox.config.privacy_policy_url);
             });
         }
     }
@@ -99,7 +122,7 @@ void AppBox::initDefaultControls(entity_t e) {
             if (g_ads->removed) {
                 set_visible(btn, false);
             } else {
-                g_ads->onRemoved << [btn] {
+                g_ads->on_removed << [btn] {
                     if (is_entity(btn)) {
                         set_visible(btn, false);
                     }
@@ -152,47 +175,48 @@ void AppBox::initDefaultControls(entity_t e) {
             }
         }
 
-        initLanguageButton(e);
+        appbox_init_language_button(e);
     }
 }
 
-void AppBox::shareWithAppLink(const char* text) {
-    String msg = text;
+void appbox_share_with_app_link(const char* text) {
+    ek::String msg = text;
     msg += " ";
-    msg += config.app_link_url;
+    msg += g_appbox.config.app_link_url;
     ek_app_share(msg.c_str());
 }
 
-void AppBox::rateUs() const {
+void appbox_rate_us(void) {
 #ifdef __ANDROID__
     char buf[1024];
-    ek_snprintf(buf, 1024, "market://details?id=%s", config.app_id);
+    ek_snprintf(buf, 1024, "market://details?id=%s", g_appbox.config.app_id);
     ek_app_open_url(buf);
 #endif // __ANDROID__
 
 #ifdef __APPLE__
     char buf[1024];
     ek_snprintf(buf, 1024, "itms-apps://itunes.apple.com/us/app/apple-store/id%s?mt=8&action=write-review",
-                config.app_id);
+                g_appbox.config.app_id);
     ek_app_open_url(buf);
 #endif // __APPLE__
 }
 
 /// download app feature
 
-void wrap_button(entity_t e, string_hash_t tag, const char* link) {
-    entity_t x = find(e, tag);
-    if (link && *link) {
-        ecs::add<Button>(x);
-        ecs::add<NodeEventHandler>(x).on(BUTTON_EVENT_CLICK, [link](const NodeEventData& ) {
-            ek_app_open_url(link);
-        });
-    } else {
-        set_visible(e, false);
-    }
-}
+//static void wrap_button(entity_t e, string_hash_t tag, const char* link) {
+//    using namespace ek;
+//    entity_t x = find(e, tag);
+//    if (link && *link) {
+//        ecs::add<Button>(x);
+//        ecs::add<NodeEventHandler>(x).on(BUTTON_EVENT_CLICK, [link](const NodeEventData& ) {
+//            ek_app_open_url(link);
+//        });
+//    } else {
+//        set_visible(e, false);
+//    }
+//}
 
-void AppBox::initDownloadAppButtons(entity_t) {
+void appbox_init_download_app_buttons(entity_t) {
 //    auto banner = sg_create("gfx", "cross_banner");
 //    setName(banner, "banner");
 //    layout_wrapper{banner}.aligned(0.5f, 0.0f, 1.0f, 0.0f);
@@ -203,7 +227,8 @@ void AppBox::initDownloadAppButtons(entity_t) {
 //    append(e, banner);
 }
 
-void AppBox::initLanguageButton(entity_t e) {
+void appbox_init_language_button(entity_t e) {
+    using namespace ek;
     entity_t btn = find(e, H("language"));
     if (btn.id) {
         ecs::add<NodeEventHandler>(btn).on(BUTTON_EVENT_CLICK, [](const NodeEventData& ) {
@@ -217,13 +242,4 @@ void AppBox::initLanguageButton(entity_t e) {
             }
         });
     }
-}
-
-}
-
-ek::AppBox* g_app_box = nullptr;
-
-void init_app_box(ek::AppBoxConfig config) {
-    EK_ASSERT(!g_app_box);
-    g_app_box = new ek::AppBox(config);
 }

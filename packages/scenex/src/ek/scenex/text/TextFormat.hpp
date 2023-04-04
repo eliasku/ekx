@@ -5,49 +5,29 @@
 
 #include "Font.hpp"
 
-namespace ek {
-
-struct Alignment {
-    Alignment(uint8_t flags) :
-            flags_{flags} {
-    }
-
-    [[nodiscard]] inline bool is_top() const {
-        return (flags_ & Top) != 0;
-    }
-
-    [[nodiscard]] inline bool is_bottom() const {
-        return (flags_ & Bottom) != 0;
-    }
-
-    [[nodiscard]] inline bool is_left() const {
-        return (flags_ & Left) != 0;
-    }
-
-    [[nodiscard]] inline bool is_right() const {
-        return (flags_ & Right) != 0;
-    }
-
-    [[nodiscard]] inline vec2_t anchor() const {
-        return vec2(
-                is_right() ? 1.0f : (is_left() ? 0.0f : 0.5f),
-                is_bottom() ? 1.0f : (is_top() ? 0.0f : 0.5f)
-        );
-    }
-
-    enum {
-        Left = 1u,
-        Top = 2u,
-        Center = 4u,
-        Right = 8u,
-        Bottom = 16u,
-        TopLeft = Top | Left,
-        CenterBottom = Center | Bottom
-    };
-
-private:
-    uint8_t flags_ = 0u;
+enum {
+    ALIGNMENT_NONE = 0,
+    ALIGNMENT_LEFT = 1,
+    ALIGNMENT_TOP = 2,
+    ALIGNMENT_RIGHT = 4,
+    ALIGNMENT_BOTTOM = 8,
+    ALIGNMENT_CENTER_X = 16,
+    ALIGNMENT_CENTER_Y = 32,
+    ALIGNMENT_CENTER = ALIGNMENT_CENTER_X | ALIGNMENT_CENTER_Y,
+    ALIGNMENT_TOP_LEFT = ALIGNMENT_TOP | ALIGNMENT_LEFT,
+    ALIGNMENT_CENTER_BOTTOM = ALIGNMENT_CENTER_X | ALIGNMENT_BOTTOM
 };
+
+typedef int32_t alignment_t;
+
+inline vec2_t vec2_ui_align(alignment_t alignment, vec2_t v) {
+    return vec2(
+            (alignment & ALIGNMENT_RIGHT) ? 1.0f : ((alignment & ALIGNMENT_LEFT) ? 0.0f : (alignment & ALIGNMENT_CENTER_X ? 0.5f : v.x)),
+            (alignment & ALIGNMENT_BOTTOM) ? 1.0f : ((alignment & ALIGNMENT_TOP) ? 0.0f : (alignment & ALIGNMENT_CENTER_Y ? 0.5f : v.y))
+    );
+}
+
+namespace ek {
 
 struct Font;
 
@@ -116,8 +96,8 @@ struct TextFormat {
             size{fontSize} {
     }
 
-    void setAlignment(Alignment align) {
-        alignment = align.anchor();
+    void setAlignment(alignment_t align) {
+        alignment = vec2_ui_align(align, vec2(0.5f, 0.5f));
     }
 
     void addShadow(color_t color, float radius, vec2_t offset = {}, float hardness = 0.2f /* 0..1 */) {

@@ -98,6 +98,6 @@ export async function setup(project: Project) {
 
     await project.import(
         "../firebase/ek.ts",
-        "../../packages/scenex/ek.ts",
+        "../../packages/audio/ek.ts",
     );
 }

@@ -62,7 +62,7 @@ entity_t bubble_text_entity(string_hash_t fontName, vec2_t pos, float delay) {
     c.start = pos;
     c.offset = vec2(random_range_f(-spread, spread), 0.0f);
     ek::TextFormat format{fontName, font_size};
-    format.setAlignment(ek::Alignment::Center);
+    format.setAlignment(ALIGNMENT_CENTER);
     format.setTextColor(COLOR_WHITE);
     format.addShadow(COLOR_BLACK, 4, vec2(0.0f, 1.5f));
 
