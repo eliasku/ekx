@@ -1,5 +1,5 @@
 #include "Atlas.hpp"
-#include "Sprite.hpp"
+#include "sprite.h"
 
 #include <ek/log.h>
 #include <ek/local_res.h>
@@ -39,8 +39,6 @@ int get_scale_num(float scale) {
     }
     return 4;
 }
-
-namespace ek {
 
 Atlas::Atlas() = default;
 
@@ -192,4 +190,3 @@ void Atlas::clear() {
     }
 }
 
-}

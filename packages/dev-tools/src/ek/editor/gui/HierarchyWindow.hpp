@@ -6,15 +6,14 @@
 
 // components
 #include <ek/scenex/base/node.h>
-#include <ek/scenex/2d/Display2D.hpp>
-#include <ek/scenex/2d/Transform2D.hpp>
-#include <ek/scenex/base/interactiv.h>
-#include <ek/scenex/3d/Light3D.hpp>
-#include <ek/scenex/2d/MovieClip.hpp>
-#include <ek/scenex/2d/Button.hpp>
-#include <ek/scenex/3d/Transform3D.hpp>
-#include <ek/scenex/2d/Viewport.hpp>
-#include <ek/scenex/2d/Camera2D.hpp>
+#include <ek/scenex/2d/text2d.h>
+#include <ek/scenex/2d/transform2d.h>
+#include <ek/scenex/base/interactive.h>
+#include <ek/scenex/2d/movieclip.h>
+#include <ek/scenex/2d/button.h>
+#include <ek/scenex/3d/scene3d.h>
+#include <ek/scenex/2d/viewport.h>
+#include <ek/scenex/2d/camera2d.h>
 
 namespace ek {
 
@@ -45,7 +44,7 @@ public:
 
     static bool hoverIconButton(const char* str_id, const char* icon);
 
-    void drawVisibleTouchControls(Node* node, bool parentedVisible, bool parentedTouchable);
+    void drawVisibleTouchControls(node_t* node, bool parentedVisible, bool parentedTouchable);
 
     void drawEntityInTree(entity_t e, bool parentedVisible, bool parentedTouchable);
 

@@ -1,6 +1,6 @@
 #include "simple_animator.h"
 
-#include <ek/scenex/2d/transform_api.h>
+#include <ek/scenex/2d/transform2d.h>
 #include <ek/math.h>
 
 ecx_component_type simple_animator_comp;

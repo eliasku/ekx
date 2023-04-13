@@ -11,7 +11,7 @@ enum {
     POPUPS_MAX_COUNT = 8,
 };
 
-struct PopupManager {
+typedef struct {
     entity_t entity;
     entity_t back;
     entity_t layer;
@@ -23,7 +23,7 @@ struct PopupManager {
 
     uint32_t active_num;
     entity_t active[POPUPS_MAX_COUNT];
-};
+} popup_manager_t;
 
 void init_basic_popup(entity_t e);
 
@@ -31,21 +31,21 @@ void open_popup(entity_t e);
 
 void close_popup(entity_t e);
 
-void clear_popups();
+void clear_popups(void);
 
-void close_all_popups();
+void close_all_popups(void);
 
 void update_popup_managers(float dt);
 
-uint32_t count_active_popups();
+uint32_t count_active_popups(void);
 
-extern PopupManager g_popup_manager;
+extern popup_manager_t g_popup_manager;
 
-void popup_manager_init();
-void update_popup_manager();
+void popup_manager_init(void);
+void update_popup_manager(void);
 
 #ifdef __cplusplus
-};
+}
 #endif
 
 #endif // SCENEX_GOODIES_POPUP_MANAGER_H

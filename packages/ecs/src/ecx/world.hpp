@@ -52,8 +52,8 @@ constexpr ecx_component_type* type() noexcept {
 }
 
 template<typename C>
-inline C& add(entity_t e) {
-    return *(C*) add_component(type<C>(), e);
+inline C* add(entity_t e) {
+    return (C*) add_component(type<C>(), e);
 }
 
 template<typename C1, typename C2, typename ...Cn>
@@ -69,8 +69,8 @@ inline bool has(entity_t e) {
 }
 
 template<typename C>
-inline C& get(entity_t e) {
-    return *(C*) get_component(type<C>(), e);
+inline C* get(entity_t e) {
+    return (C*) get_component(type<C>(), e);
 }
 
 template<typename C>
@@ -84,8 +84,8 @@ inline bool remove(entity_t e) {
 }
 
 template<typename C>
-inline const C& get_or_default(entity_t e) {
-    return *(C*) get_component_or_default(type<C>(), e);
+inline const C* get_or_default(entity_t e) {
+    return (C*) get_component_or_default(type<C>(), e);
 }
 
 template<typename ...Cn>

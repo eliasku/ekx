@@ -1,9 +1,8 @@
 #include "fireworks.h"
 
-#include <ek/scenex/scene_factory.h>
 #include <ek/scenex/particles/ParticleSystem.hpp>
 #include <ekx/app/audio_manager.h>
-#include <ek/scenex/2d/LayoutRect.hpp>
+#include <ek/scenex/2d/layout_rect.h>
 #include <ek/scenex/base/node.h>
 
 static fireworks_state_t fireworks;
@@ -12,37 +11,35 @@ void start_fireworks(entity_t e) {
     using ek::ParticleLayer2D;
     using ek::ParticleRenderer2D;
     using ek::ParticleEmitter2D;
-    using ek::Display2D;
 
     ecs::add<ParticleLayer2D>(e);
     ek::particle_renderer2d_setup(e)->target = e;
-    auto& emitter = ecs::add<ParticleEmitter2D>(e);
-    emitter.data.burst = 0;
-    emitter.particle = R_PARTICLE(H("firework_star"));
-    emitter.layer = e;
-    emitter.enabled = true;
+    auto* emitter = ecs::add<ParticleEmitter2D>(e);
+    emitter->data.burst = 0;
+    emitter->particle = R_PARTICLE(H("firework_star"));
+    emitter->layer = e;
+    emitter->enabled = true;
     set_touchable(e, false);
 }
 
 void update_fireworks() {
     using ek::ParticleEmitter2D;
-    using ek::find_parent_layout_rect;
     using ek::res_particle;
     using ek::ParticleDecl;
     using ek::particles_burst;
 
-    auto e = fireworks.layer;
+    entity_t e = fireworks.layer;
     if(!is_entity(e) || !fireworks.enabled) {
         return;
     }
     fireworks.timer_ -= g_time_layers[fireworks.time_layer].dt;
     if (fireworks.timer_ <= 0) {
-        auto& emitter = ecs::get<ParticleEmitter2D>(e);
+        auto* emitter = ecs::get<ParticleEmitter2D>(e);
 
         auto rect = find_parent_layout_rect(e, true);
         rect.h *= 0.5f;
 
-        emitter.position = rect.position + rect.size * vec2(random_f(), random_f());
+        emitter->position = rect.position + rect.size * vec2(random_f(), random_f());
         play_sound(H("sfx/firework"), random_range_f(0.5f, 1.0f), 1);
         ParticleDecl* part = &RES_NAME_RESOLVE(res_particle, H("firework_star"));
         switch (random_n(4)) {
@@ -62,14 +59,14 @@ void update_fireworks() {
                 break;
         }
 
-        emitter.particle = R_PARTICLE(H("firework_spark"));
-        emitter.data.acc.set(0, 100);
-        emitter.data.speed.set(50, 100);
+        emitter->particle = R_PARTICLE(H("firework_spark"));
+        emitter->data.acc.set(0, 100);
+        emitter->data.speed.set(50, 100);
         particles_burst(e, random_range_i(20, 30));
 
-        emitter.particle = R_PARTICLE(H("firework_star"));
-        emitter.data.speed.set(10, 100);
-        emitter.data.acc.set(0, -50);
+        emitter->particle = R_PARTICLE(H("firework_star"));
+        emitter->data.speed.set(10, 100);
+        emitter->data.acc.set(0, -50);
         particles_burst(e, random_range_i(60, 80));
 
         fireworks.timer_ = random_range_f(0.1f, 1.0f);

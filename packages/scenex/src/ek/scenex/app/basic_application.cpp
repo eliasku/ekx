@@ -1,12 +1,13 @@
 #include "basic_application.hpp"
-#include "RootAppListener.hpp"
+#include <ek/scenex/2d/display2d.h>
 
+#include <ekx/ng/updater.h>
 #include <ekx/app/input_state.h>
 
 /** resource managers include **/
 #include <ek/scenex/particles/ParticleDecl.hpp>
 #include <ek/scenex/scene_factory.h>
-#include <ek/scenex/text/Font.hpp>
+#include <ek/scenex/text/font.h>
 #include <ek/scenex/2d/DynamicAtlas.hpp>
 #include <ek/scenex/2d/Atlas.hpp>
 #include <ek/scenex/particles/ParticleSystem.hpp>
@@ -14,27 +15,28 @@
 /** systems **/
 #include <ek/scenex/interaction_system.h>
 #include <ekx/app/audio_manager.h>
-#include <ek/scenex/2d/Viewport.hpp>
-#include <ek/scenex/2d/LayoutRect.hpp>
-#include <ek/scenex/systems/main_flow.hpp>
+#include <ek/scenex/2d/viewport.h>
+#include <ek/scenex/2d/layout_rect.h>
+#include <ek/scenex/systems/main_flow.h>
 #include <ek/log.h>
 #include <ek/gfx.h>
 #include <ek/canvas.h>
-#include <ek/scenex/2d/Camera2D.hpp>
+#include <ek/scenex/2d/camera2d.h>
 
-#include <ek/scenex/2d/Button.hpp>
-#include <ek/scenex/2d/MovieClip.hpp>
-#include <ek/scenex/2d/Display2D.hpp>
+#include <ek/scenex/2d/button.h>
+#include <ek/scenex/2d/movieclip.h>
+#include <ek/scenex/2d/text2d.h>
 #include <ek/scenex/base/tween.h>
 #include <ek/goodies/camera_shaker.h>
 #include <ek/goodies/popup_manager.h>
 #include <ek/goodies/bubble_text.h>
-#include <ek/scenex/base/interactiv.h>
+#include <ek/scenex/base/interactive.h>
 #include <ek/goodies/helpers/Trail2D.hpp>
 #include <ek/scenex/base/destroy_timer.h>
-#include <ek/scenex/base/NodeEvents.hpp>
+#include <ek/scenex/base/node_events.h>
 
 ek::basic_application* g_game_app = nullptr;
+
 void init_game_app(ek::basic_application* app) {
     EK_ASSERT(!g_game_app);
     EK_ASSERT(app);
@@ -69,7 +71,7 @@ void drawPreloader(float progress, float zoneWidth, float zoneHeight) {
             float oy = sinf(r * 3.14f * 2 + 3.14f);
             float R = (sh / 10.0f) *
                       (1.8f - 0.33f * speed - 0.33f * ((cosf(r * 3.14f) + 2.0f * cosf(r * 3.14f * 2 + 3.14f))));
-            canvas_fill_circle({cx + ox * sw, cy - 2.0f * sh + oy * sh, R}, COLOR_WHITE, COLOR_WHITE, 16);
+            canvas_fill_circle({{cx + ox * sw, cy - 2.0f * sh + oy * sh, R}}, COLOR_WHITE, COLOR_WHITE, 16);
         }
     }
 }
@@ -85,33 +87,30 @@ basic_application::~basic_application() {
 
 void registerSceneXComponents() {
     //// basic scene
-    ECX_COMPONENT_RESERVE(Node, 512);
-    ECX_COMPONENT_RESERVE(Transform2D, 512);
-    ECX_COMPONENT_RESERVE(WorldTransform2D, 512);
-    ECX_COMPONENT_RESERVE(Display2D, 256);
-    ECX_COMPONENT(Bounds2D);
-    ECX_COMPONENT(Quad2D);
-    ECX_COMPONENT(Sprite2D);
-    ECX_COMPONENT(NinePatch2D);
-    ECX_COMPONENT(Arc2D);
-    ECX_COMPONENT(Text2D);
-    ECX_COMPONENT(Camera2D);
-    ECX_COMPONENT(MovieClip);
-    ECX_COMPONENT(MovieClipTargetIndex);
+    Node_register();
+    Transform2D_setup();
+    Display2D_setup();
+    Text2D_setup();
+    Camera2D_setup();
+    MovieClip_setup();
 
-    ECX_COMPONENT(LayoutRect);
-    ECX_COMPONENT(Viewport);
-    ECX_COMPONENT(Button);
+    LayoutRect_setup();
+    Viewport_setup();
+    Button_setup();
     interactive_init();
-    ECX_COMPONENT(tween_t);
+    ECX_COMPONENT(NodeEventHandler);
+
+    Tween_setup();
     camera_shaker_init();
-    ECX_COMPONENT(bubble_text_t);
+    bubble_text_setup();
     ECX_COMPONENT(Trail2D);
     ECX_COMPONENT(TrailRenderer2D);
-    ECX_COMPONENT(NodeEventHandler);
+
     ECX_COMPONENT(ParticleEmitter2D);
     ECX_COMPONENT(ParticleLayer2D);
     ECX_COMPONENT(ParticleRenderer2D);
+
+    updater_init();
 }
 
 void basic_application::initialize() {
@@ -126,29 +125,29 @@ void basic_application::initialize() {
     root = create_node2d(H("root"));
 
     const vec2_t baseResolution = vec2(ek_app.config.width, ek_app.config.height);
-    ecs::add<Viewport>(root).options.baseResolution = baseResolution;
+    viewport_t* vp = add_viewport(root);
+    vp->options.baseResolution = baseResolution;
 
-    ecs::add<LayoutRect>(root);
+    add_layout_rect(root);
     ecs::add<NodeEventHandler>(root);
-    Viewport::updateAll(&display.info);
-    scale_factor = ecs::get<Viewport>(root).output.scale;
+    Viewport_update(&display.info);
+    scale_factor = vp->output.scale;
 
     log_debug("base application: initialize InteractionSystem");
-    init_interaction_system();
     g_interaction_system.root_ = root;
     log_debug("base application: initialize AudioManager");
     init_audio_manager();
 
     log_debug("base application: initialize Scene");
-    auto camera = create_node2d(H("camera"));
-    auto& defaultCamera = ecs::add<Camera2D>(camera);
-    defaultCamera.root = root;
-    defaultCamera.order = 1;
-    defaultCamera.viewportNode = root;
-    Camera2D::Main = camera;
+    entity_t camera = create_node2d(H("camera"));
+    camera2d_t* default_camera = add_camera2d(camera);
+    default_camera->root = root;
+    default_camera->order = 1;
+    default_camera->viewportNode = root;
+    main_camera = camera;
     append(root, camera);
 
-    LayoutRect::DesignCanvasRect = rect_size(baseResolution);
+    LayoutRect_design_canvas_rect = rect_size(baseResolution);
 }
 
 void basic_application::preload() {
@@ -175,13 +174,13 @@ void basic_application::onFrame() {
 
     dispatcher.onBeforeFrameBegin();
     game_display_update(&display);
-    Viewport::updateAll(&display.info);
-    scale_factor = ecs::get<Viewport>(root).output.scale;
+    Viewport_update(&display.info);
+    scale_factor = get_viewport(root)->output.scale;
     asset_manager.set_scale_factor(scale_factor);
 
     /** base app BEGIN **/
 
-    const float dt = fminf((float)update_frame_timer(&frame_timer), 0.3f);
+    const float dt = fminf((float) update_frame_timer(&frame_timer), 0.3f);
     // fixed for GIF recorder
     //dt = 1.0f / 60.0f;
     doUpdateFrame(dt);

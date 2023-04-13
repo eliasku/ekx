@@ -3,8 +3,8 @@
 #include "ParticleDecl.hpp"
 
 
-#include <ek/scenex/2d/Sprite.hpp>
-#include <ek/scenex/text/Font.hpp>
+#include <ek/scenex/2d/sprite.h>
+#include <ek/scenex/text/font.h>
 #include <ek/canvas.h>
 
 namespace ek {

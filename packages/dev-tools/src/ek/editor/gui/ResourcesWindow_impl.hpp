@@ -3,15 +3,14 @@
 #include "ResourcesWindow.hpp"
 
 #include <gen_sg.h>
-#include <ek/scenex/3d/Material3D.hpp>
-#include <ek/scenex/3d/StaticMesh.hpp>
+#include <ek/scenex/scene_factory.h>
+#include <ek/scenex/3d/scene3d.h>
 #include <ek/scenex/2d/Atlas.hpp>
-#include <ek/scenex/text/Font.hpp>
+#include <ek/scenex/text/font.h>
 #include <ek/scenex/2d/DynamicAtlas.hpp>
-#include <ek/scenex/text/Font.hpp>
+#include <ek/scenex/text/font.h>
 #include <ek/scenex/text/TrueTypeFont.hpp>
 #include <ek/scenex/text/BitmapFont.hpp>
-
 
 namespace ek {
 
@@ -22,7 +21,7 @@ void draw_sprite_info(void* asset) {
 }
 
 void draw_font_info(void* asset) {
-    guiFont((const Font*)asset);
+    guiFont((const font_t*)asset);
 }
 
 void draw_sg_info(void* asset) {
@@ -124,7 +123,7 @@ void draw_dynamic_atlas_info(void* asset) {
 }
 
 void draw_material3d_info(void* asset) {
-    Material3D* m = (Material3D*) asset;
+    material3d_t* m = (material3d_t*) asset;
 
 //    if(!m->is_loaded) {
 //        ImGui::TextColored(ImColor{1.0f, 0.0f, 0.0f}, "null");
@@ -139,7 +138,7 @@ void draw_material3d_info(void* asset) {
 }
 
 void draw_mesh3d_info(void* asset) {
-    StaticMesh* m = (StaticMesh*) asset;
+    static_mesh_t* m = (static_mesh_t*) asset;
     ImGui::Text("Indices: %i", m->indices_count);
 }
 

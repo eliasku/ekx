@@ -70,7 +70,7 @@ bool game_display_dev_begin(game_display* display) {
     }
 
     if (display->simulated) {
-        sg_pass_action pass_action = {};
+        sg_pass_action pass_action = {0};
         pass_action.colors[0].action = SG_ACTION_DONTCARE;
         sg_begin_default_pass(&pass_action, w, h);
 
@@ -91,7 +91,7 @@ void game_display_dev_end(game_display* display) {
 }
 
 sg_image game_display_create_image(int w, int h, bool isColor, const char* label) {
-    sg_image_desc desc = {};
+    sg_image_desc desc = {0};
     desc.type = SG_IMAGETYPE_2D;
     desc.render_target = true;
     desc.width = w;
@@ -140,7 +140,7 @@ void game_display_update_simulated(game_display* display) {
         }
 
         sg_destroy_pass(display->pass);
-        sg_pass_desc pass_desc = {};
+        sg_pass_desc pass_desc = {0};
         pass_desc.color_attachments[0].image = display->color;
         if (display->depthStencil.id) {
             pass_desc.depth_stencil_attachment.image = display->depthStencil;

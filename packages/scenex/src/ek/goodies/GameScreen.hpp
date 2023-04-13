@@ -1,12 +1,11 @@
-#pragma once
+#ifndef SCENEX_GOODIES_GAME_SCREENS_H
+#define SCENEX_GOODIES_GAME_SCREENS_H
 
 #include <ecx/ecx.hpp>
 #include <ek/ds/PodArray.hpp>
 #include <ek/util/Signal.hpp>
 #include <ek/math.h>
 #include <ek/hash.h>
-
-namespace ek {
 
 #define GAME_SCREEN_EVENT_CREATE H("game-screen-create")
 #define GAME_SCREEN_EVENT_DESTROY H("game-screen-destroy")
@@ -57,7 +56,7 @@ struct ScreenTransitionState {
 struct GameScreenManager {
     entity_t layer = NULL_ENTITY;
 
-    PodArray<entity_t> stack;
+    ek::PodArray<entity_t> stack;
 
     ScreenTransitionState transition;
 
@@ -82,7 +81,7 @@ struct GameScreenManager {
 
 void init_game_screen(entity_t e, string_hash_t name = 0);
 
-}
-
-extern ek::GameScreenManager* g_game_screen_manager;
+extern GameScreenManager* g_game_screen_manager;
 void init_game_screen_manager();
+
+#endif // SCENEX_GOODIES_GAME_SCREENS_H

@@ -1,7 +1,8 @@
-#pragma once
+#ifndef SCENEX_TRAIL2D_H
+#define SCENEX_TRAIL2D_H
 
 #include <ecx/ecx.hpp>
-#include <ek/scenex/2d/Display2D.hpp>
+#include <ek/scenex/2d/sprite.h>
 #include <ek/time.h>
 #include <ek/ds/PodArray.hpp>
 #include <ekx/app/time_layers.h>
@@ -110,3 +111,5 @@ void trail_renderer2d_draw(entity_t e);
 }
 
 ECX_COMP_TYPE_CXX(ek::Trail2D)
+
+#endif // SCENEX_TRAIL2D_H

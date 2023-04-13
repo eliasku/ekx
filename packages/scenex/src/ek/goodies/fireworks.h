@@ -1,7 +1,13 @@
-#pragma once
+#ifndef SCENEX_GOODIES_FIREWORKS_H
+#define SCENEX_GOODIES_FIREWORKS_H
 
-#include <ecx/ecx_fwd.hpp>
+#include <ecx/ecx.h>
 #include <ekx/app/time_layers.h>
+
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
+//
 
 struct fireworks_state_t {
     entity_t layer = NULL_ENTITY;
@@ -15,3 +21,5 @@ void start_fireworks(entity_t e);
 void update_fireworks();
 
 void stop_fireworks();
+
+#endif // SCENEX_GOODIES_FIREWORKS_H

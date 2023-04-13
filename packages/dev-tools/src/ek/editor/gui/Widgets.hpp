@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ek/ds/String.hpp>
+#include <ek/scenex/2d/sprite.h>
 
 namespace ImGui {
 
@@ -20,16 +21,12 @@ bool InputTextMultiline(const char* label, ek::String* str, const ImVec2& size =
 
 }
 
-namespace ek {
+void get_debug_node_path(entity_t e, char buffer[1024]);
 
-struct TextLayerEffect;
+typedef struct text_layer_effect_ text_layer_effect_t;
 
-void guiTextLayerEffect(TextLayerEffect& layer);
+void guiTextLayerEffect(text_layer_effect_t* layer);
 
 void guiSprite(const sprite_t* sprite);
 
-void guiFont(const Font* font);
-
-void getDebugNodePath(entity_t e, char buffer[1024]);
-
-}
+void guiFont(const font_t* font);

@@ -96,7 +96,7 @@ void init_component_type(ecx_component_type* type, ecx_component_type_decl decl)
     type->size = 1;
 
     type->data_num = decl.data_num;
-    EK_ASSERT(decl.data_num < ECX_COMPONENT_DATA_LAYERS_MAX_COUNT);
+    EK_ASSERT(decl.data_num <= ECX_COMPONENT_DATA_LAYERS_MAX_COUNT);
 
 #pragma nounroll
     for (uint32_t i = 0; i < decl.data_num; ++i) {
@@ -172,8 +172,8 @@ component_handle_t _create_component(ecx_component_type* type, entity_idx_t enti
     type->component_next[handle] = next;
 
     for (uint32_t i = 0; i < type->data_num; ++i) {
-        void** p_arr = &type->data[0];
-        uint16_t stride = type->data_stride[0];
+        void** p_arr = &type->data[i];
+        uint16_t stride = type->data_stride[i];
         arr_maybe_grow(p_arr, stride);
         arr_add_(p_arr, stride);
     }
@@ -307,6 +307,10 @@ void* get_component_data(ecx_component_type* type, component_handle_t handle, ui
 }
 
 void* get_component(ecx_component_type* type, entity_t entity) {
+    return get_component_n(type, entity, 0);
+}
+
+void* get_component_n(ecx_component_type* type, entity_t entity, uint32_t index) {
     EK_ASSERT(type);
 #ifndef NDEBUG
     if (UNLIKELY(!is_entity(entity))) {
@@ -315,7 +319,7 @@ void* get_component(ecx_component_type* type, entity_t entity) {
     }
 #endif
     const component_handle_t handle = get_component_handle_by_index(type, entity.idx);
-    return handle ? get_component_data(type, handle, 0) : NULL;
+    return handle ? get_component_data(type, handle, index) : NULL;
 }
 
 void* get_component_or_default(ecx_component_type* type, entity_t entity) {

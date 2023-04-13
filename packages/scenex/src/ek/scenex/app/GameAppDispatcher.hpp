@@ -13,55 +13,55 @@ public:
 
     void onBeforeFrameBegin() override {
         for (auto* listener : listeners) {
-            listener->onBeforeFrameBegin();
+            if(listener) listener->onBeforeFrameBegin();
         }
     }
 
     void onPreload() override {
         for (auto* listener : listeners) {
-            listener->onPreload();
+            if(listener) listener->onPreload();
         }
     }
 
     void onPreRender() override {
         for (auto* listener : listeners) {
-            listener->onPreRender();
+            if(listener) listener->onPreRender();
         }
     }
 
     void onRenderOverlay() override {
         for (auto* listener : listeners) {
-            listener->onRenderOverlay();
+            if(listener) listener->onRenderOverlay();
         }
     }
 
     void onRenderFrame() override {
         for (auto* listener : listeners) {
-            listener->onRenderFrame();
+            if(listener) listener->onRenderFrame();
         }
     }
 
     void onUpdate() override {
         for (auto* listener : listeners) {
-            listener->onUpdate();
+            if(listener) listener->onUpdate();
         }
     }
 
     void onStart() override {
         for (auto* listener : listeners) {
-            listener->onStart();
+            if(listener) listener->onStart();
         }
     }
 
     void onEvent(const ek_app_event& event) override {
         for (auto* listener : listeners) {
-            listener->onEvent(event);
+            if(listener) listener->onEvent(event);
         }
     }
 
     void onPostFrame() override {
         for (auto* listener : listeners) {
-            listener->onPostFrame();
+            if(listener) listener->onPostFrame();
         }
     }
 };

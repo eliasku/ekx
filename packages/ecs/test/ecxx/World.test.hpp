@@ -155,7 +155,7 @@ SUITE(ecs) {
 //
 //        v.value = 10;
 //        REQUIRE_EQ(10, v.value);
-//        REQUIRE_EQ((w.get<value_t>(e).value), 10);
+//        REQUIRE_EQ((w.get<value_t>(e)->value), 10);
 //
 //
 //        // check if comp pool is not created
@@ -179,8 +179,8 @@ SUITE(ecs) {
 
         entity_t e = create_entity();
 
-        ecs::add<value_t>(e).value = 1;
-        CHECK_EQ(ecs::get<value_t>(e).value, 1);
+        ecs::add<value_t>(e)->value = 1;
+        CHECK_EQ(ecs::get<value_t>(e)->value, 1);
         CHECK(ecs::has<value_t>(e));
         ecs::remove<value_t>(e);
         CHECK_FALSE(ecs::has<value_t>(e));
@@ -196,8 +196,8 @@ SUITE(ecs) {
 
         entity_t e = create_entity();
 
-        ecs::add<value_t>(e).value = 1;
-        ecs::add<position_t>(e) = {1.0f, 1.0f};
+        ecs::add<value_t>(e)->value = 1;
+        *ecs::add<position_t>(e) = {1.0f, 1.0f};
         CHECK(ecs::has<value_t>(e));
         CHECK(ecs::has<position_t>(e));
         destroy_entity(e);

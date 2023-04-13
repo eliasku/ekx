@@ -2,4 +2,4 @@
 "ekx": patch
 ---
 
-fix usage of timespec_get on iOS <13.0
+ios: fix usage of timespec_get on iOS <13.0

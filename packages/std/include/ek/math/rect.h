@@ -102,6 +102,7 @@ rect_t rect_size(vec2_t size);
 rect_t rect_minmax(vec2_t min, vec2_t max);
 rect_t rect_01(void);
 rect_t rect_wh(float w, float h);
+rect_t rect_half_extents(float w, float h);
 vec2_t rect_rb(rect_t rc);
 vec2_t rect_center(rect_t rc);
 rect_t rect_clamp_bounds(rect_t a, rect_t b);

@@ -54,10 +54,8 @@ public:
         return arr_empty(buffer);
     }
 
-    void clear() const {
-        if (buffer) {
-            ek_buf_header(buffer)->length = 0;
-        }
+    inline void clear() const {
+        arr_clear(buffer);
     }
 
     [[nodiscard]]

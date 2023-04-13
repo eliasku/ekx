@@ -1,8 +1,8 @@
 #include "profiler.h"
 
 // C++ mixed
-#include <ek/scenex/text/TextEngine.hpp>
-#include <ek/scenex/app/basic_application.hpp>
+#include <ek/scenex/text/text_engine.h>
+//#include <ek/scenex/app/basic_application.hpp>
 
 #include <ek/canvas.h>
 #include <ek/app.h>
@@ -151,7 +151,7 @@ void profiler_render_end() {
 }
 
 void profiler_draw_text(const struct profiler_track* track) {
-    ek::get_text_engine()->engine.drawFormat(track->titleFormat, track->name, (int) track->value);
+    draw_text_format(track->titleFormat, track->name, (int) track->value);
 }
 
 void profiler_draw_graph(const struct profiler_track* track) {
@@ -185,7 +185,7 @@ void profiler_draw(const game_display_info* display_info) {
         return;
     }
     const float scale = display_info->dpiScale;
-    canvas.matrix[0].rot = {scale, 0, 0, scale};
+    canvas.matrix[0].rot = (mat2_t){{scale, 0, 0, scale}};
     canvas.matrix[0].pos = display_info->insets.xy;
     canvas_set_empty_image();
 
@@ -197,10 +197,10 @@ void profiler_draw(const game_display_info* display_info) {
     canvas_restore_matrix();
 
     canvas_save_matrix();
-    ek::TextFormat tf = {PROFILER_FONT, 10};
+    text_format_t tf = text_format(PROFILER_FONT, 10);
     tf.leading = 1;
-    ek::get_text_engine()->engine.format = tf;
-    ek::get_text_engine()->engine.position = vec2(2, 2 + tf.size);
+    text_engine.format = tf;
+    text_engine.position = vec2(2, 2 + tf.size);
     for (uint32_t i = 0; i < PROFILE_TRACKS_MAX_COUNT; ++i) {
         profiler_draw_text(s_profile_metrics.tracks + i);
         canvas_translate(vec2(0, 35));

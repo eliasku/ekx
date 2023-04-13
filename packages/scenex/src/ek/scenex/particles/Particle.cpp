@@ -87,7 +87,7 @@ void Particle::draw() {
     canvas_concat_color({color, offset});
     if (sprite) {
         const sprite_t* spr = &REF_RESOLVE(res_sprite, sprite);
-        ::ek::draw(spr);
+        draw_sprite(spr);
     }
     canvas_restore_transform();
 }

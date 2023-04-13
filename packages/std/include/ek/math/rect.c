@@ -19,6 +19,10 @@ rect_t rect_wh(const float w, const float h) {
     return (rect_t) {{0, 0, w, h}};
 }
 
+rect_t rect_half_extents(const float w, const float h) {
+    return (rect_t) {{-0.5 * w, -0.5 * h, w, h}};
+}
+
 rect_t rect_minmax(const vec2_t min, const vec2_t max) {
     return (rect_t) {{min.x, min.y, max.x - min.x, max.y - min.y}};
 }

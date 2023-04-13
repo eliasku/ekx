@@ -2,6 +2,7 @@
 #include <ek/gfx.h>
 #include <ek/math.h>
 #include <ek/assert.h>
+#include <string.h>
 
 struct res_dynamic_atlas res_dynamic_atlas;
 
@@ -24,8 +25,6 @@ void update_res_dynamic_atlas(void) {
         }
     }
 }
-
-namespace ek {
 
 //void copy_pixels_normal(image_t& dest, int2 dest_position,
 //                        const image_t& src, const rect_i& src_rect) {
@@ -161,8 +160,6 @@ public:
     size_t dataSize = 0;
     irect_t dirtyRect;
     bool dirty;
-
-
     bool alphaMap;
     bool mipmaps;
 };
@@ -229,4 +226,3 @@ void DynamicAtlas::invalidate() {
     }
 }
 
-}

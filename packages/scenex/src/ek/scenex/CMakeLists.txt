@@ -1,55 +1,50 @@
 cmake_minimum_required(VERSION 3.19)
 
-target_sources(${PROJECT_NAME} PRIVATE
+target_sources(${PROJECT_NAME} PUBLIC
+
+        3d/render_system.c.h
 
         ekx_app.cpp
         ekx_app.c
 
         base/node.h
-        base/Node.cpp
-        base/interactiv.cpp
-        base/NodeEvents.hpp
+        base/node.c
+        base/interactive.c
+        base/node_events.h
         base/NodeEvents.cpp
         base/tween.h
         base/destroy_timer.h
 
-        3d/Transform3D.cpp
-        3d/Transform3D.hpp
-        3d/StaticMesh.hpp
-        3d/RenderSystem3D.cpp
-        3d/RenderSystem3D.hpp
-        3d/Camera3D.hpp
-        3d/Light3D.hpp
-        3d/Material3D.hpp
-
         2d/Atlas.cpp
-        2d/Sprite.cpp
+        2d/sprite.c
         2d/DynamicAtlas.cpp
 
-        2d/Transform2D.cpp
-        2d/Display2D.cpp
-        2d/RenderSystem2D.cpp
-        2d/RenderSystem2D.hpp
-        2d/Camera2D.hpp
-        2d/Camera2D.cpp
-        2d/Camera2D_debug.cpp
-        2d/LayoutRect.hpp
-        2d/LayoutRect.cpp
-        2d/Viewport.hpp
-        2d/Viewport.cpp
-        2d/Button.hpp
-        2d/Button.cpp
-        2d/MovieClip.hpp
-        2d/MovieClip.cpp
+        2d/transform2d.c
+        2d/display2d.c
+        2d/text2d.c
+        2d/render2d.c
+        2d/render2d.h
+        2d/camera2d.h
+        2d/camera2d.c
+        2d/camera2d_debug.c
+        2d/layout_rect.h
+        2d/layout_rect.c
+        2d/viewport.h
+        2d/viewport.c
+        2d/button.h
+        2d/button.c
+        2d/movieclip.h
+        2d/movieclip.c
 
         text/BitmapFont.cpp
         text/TrueTypeFont.cpp
-        text/Font.cpp
-        text/FontImplBase.cpp
-        text/FontImplBase.hpp
+        text/font_.cpp
+        text/font_base.cpp
+        text/font_base.h
         text/TextEngine.cpp
+        text/text_format.c
 
-        interaction_system.cpp
+        interaction_system.c
         interaction_system.h
 
         particles/Particle.cpp
@@ -59,17 +54,15 @@ target_sources(${PROJECT_NAME} PRIVATE
         particles/ParticleSystem.hpp
 
         app/basic_application.cpp
-        app/basic_application.hpp
-        
-        StorageVariable.hpp
+        app/root_app_callbacks.cpp
 
-        systems/hitTest.hpp
-        systems/hitTest.cpp
-        systems/main_flow.hpp
+        systems/hit_test.h
+        systems/hit_test.c
+        systems/main_flow.h
         systems/main_flow.cpp
 
         asset2/Assets.cpp
 
         scene_factory.h
-        scene_factory.cpp
+        scene_factory.c
         )

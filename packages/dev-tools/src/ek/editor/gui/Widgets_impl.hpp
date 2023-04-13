@@ -99,17 +99,15 @@ bool ToolbarButton(const char* label, bool active, const char* tooltip) {
 
 }
 
-namespace ek {
-
-void getDebugNodePath(entity_t e, char buffer[1024]) {
+void get_debug_node_path(entity_t e, char buffer[1024]) {
     entity_t entity = e;
     const char* names[32];
     int depth = 0;
-    String result;
     while (entity.id && depth < 32) {
-        const auto tag = ecs::get_or_default<Node>(entity).tag;
+        const node_t* node = Node_get(entity);
+        const string_hash_t tag = node->tag;
         names[depth++] = tag ? hsp_get(tag) : "_";
-        entity = ecs::get<Node>(entity).parent;
+        entity = node->parent;
     }
     uint32_t len = 0;
     while(depth-- > 0) {
@@ -124,33 +122,33 @@ void getDebugNodePath(entity_t e, char buffer[1024]) {
     buffer[len] = '\0';
 }
 
-const char* getTextLayerTypeName(TextLayerType type) {
-    static const char* names[] = {
+static const char* get_text_layer_type_name(text_layer_type type) {
+    static const char* names[4] = {
             "Text",
             "Stroke1",
             "Stroke2",
             "Shadow"
     };
-    return names[static_cast<int>(type)];
+    return names[type];
 }
 
-void guiTextLayerEffect(TextLayerEffect& layer) {
+void guiTextLayerEffect(text_layer_effect_t* layer) {
     ImGui::PushID(&layer);
 
-    if (ImGui::CollapsingHeader(getTextLayerTypeName(layer.type))) {
-        ImGui::Checkbox("Visible", &layer.visible);
-        ImGui::Checkbox("Show Glyph Bounds", &layer.showGlyphBounds);
-        ImGui::DragFloat("Radius", &layer.blurRadius, 1, 0, 8);
-        int iterations = layer.blurIterations;
-        int strength = layer.strength;
+    if (ImGui::CollapsingHeader(get_text_layer_type_name(layer->type))) {
+        ImGui::Checkbox("Visible", &layer->visible);
+        ImGui::Checkbox("Show Glyph Bounds", &layer->showGlyphBounds);
+        ImGui::DragFloat("Radius", &layer->blurRadius, 1, 0, 8);
+        int iterations = layer->blurIterations;
+        int strength = layer->strength;
         ImGui::DragInt("Iterations", &iterations, 1, 0, 3);
         ImGui::DragInt("Strength", &strength, 1, 0, 7);
-        layer.blurIterations = iterations;
-        layer.strength = strength;
+        layer->blurIterations = iterations;
+        layer->strength = strength;
 
-        ImGui::DragFloat2("Offset", layer.offset.data, 1, 0, 8);
+        ImGui::DragFloat2("Offset", layer->offset.data, 1, 0, 8);
 
-        ImGui::Color32Edit("Color", &layer.color);
+        ImGui::Color32Edit("Color", &layer->color);
     }
     ImGui::PopID();
 }
@@ -198,24 +196,24 @@ void guiSprite(const sprite_t* sprite) {
     }
 }
 
-void guiFont(const Font* font) {
+void guiFont(const font_t* font) {
     if(!font) {
         ImGui::TextColored(ImColor{1.0f, 0.0f, 0.0f}, "ERROR: font resource slot could not be null");
         return;
     }
-    if(!font->impl) {
+    if(!font->base) {
         ImGui::TextColored(ImColor{1.0f, 0.0f, 0.0f}, "null");
         return;
     }
-    switch (font->impl->getFontType()) {
-        case FontType::Bitmap: {
-            auto* bm = (const BitmapFont*)font->impl;
+    switch (font->base->getFontType()) {
+        case FONT_TYPE_BITMAP: {
+            auto* bm = (const BitmapFont*)font->base;
             ImGui::Text("Font Type: Bitmap");
             ImGui::Text("Glyphs: %u", bm->map._data.size());
         }
             break;
-        case FontType::TrueType: {
-            auto* ttf = (const TrueTypeFont*)font->impl;
+        case FONT_TYPE_TTF: {
+            auto* ttf = (const TrueTypeFont*)font->base;
             ImGui::Text("Font Type: TrueType");
             ImGui::Text("Glyphs: %u", ttf->map.size());
         }
@@ -223,4 +221,3 @@ void guiFont(const Font* font) {
     }
 }
 
-}

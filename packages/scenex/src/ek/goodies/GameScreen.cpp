@@ -1,14 +1,12 @@
 #include "GameScreen.hpp"
-#include "ek/scenex/base/NodeEvents.hpp"
+#include "ek/scenex/base/node_events.h"
 
 
-#include <ek/scenex/2d/Transform2D.hpp>
+#include <ek/scenex/2d/transform2d.h>
 #include <ek/scenex/base/node.h>
 #include <ek/log.h>
-#include <ek/scenex/2d/LayoutRect.hpp>
+#include <ek/scenex/2d/layout_rect.h>
 #include <ekx/app/time_layers.h>
-
-namespace ek {
 
 /** GameScreen component **/
 void init_game_screen(entity_t e, string_hash_t name) {
@@ -40,11 +38,9 @@ void ScreenTransitionState::checkStates() {
     }
 }
 
-void emit_screen_event(entity_t e, string_hash_t type) {
-    auto* eh = ecs::try_get<NodeEventHandler>(e);
-    if (eh) {
-        eh->emit({type, e, {nullptr}, e});
-    }
+void emit_screen_event(entity_t e, string_hash_t event_type) {
+    const node_event_t event = node_event(event_type, e);
+    emit_node_event(e, &event);
 }
 
 void ScreenTransitionState::beginPrev() {
@@ -133,8 +129,8 @@ void GameScreenManager::setScreen(string_hash_t name) {
         transition.t = 1.0f;
         applyTransitionEffect();
 
-        //ecs::get<GameScreen>(e).onEnterBegin();
-        //ecs::get<GameScreen>(e).onEvent.emit(GameScreenEvent::EnterBegin);
+        //ecs::get<GameScreen>(e)->onEnterBegin();
+        //ecs::get<GameScreen>(e)->onEvent.emit(GameScreenEvent::EnterBegin);
         emit_screen_event(e, GAME_SCREEN_EVENT_ENTER_BEGIN);
 
         //broadcast(layer, GameScreen::EnterBegin);
@@ -190,7 +186,7 @@ void GameScreenManager::update() {
     if (!transition.active) {
         return;
     }
-    const auto dt = g_time_layers[TIME_LAYER_UI].dt;
+    const float dt = g_time_layers[TIME_LAYER_UI].dt;
     if (transition.delayTimer > 0.0f) {
         transition.delayTimer -= dt;
     } else if (transition.t <= 1.0f) {
@@ -224,33 +220,32 @@ void GameScreenManager::defaultTransitionEffect(GameScreenManager* gsm) {
     const auto prev = state.prev;
 
     if (prev.id) {
-        const auto t = state.getPrevProgress();
-        auto& transform = ecs::get<Transform2D>(prev);
-        float r = ease_p2_in(t);
+        const float t = state.getPrevProgress();
+        transform2d_t* transform = get_transform2d(prev);
+        const float r = ease_p2_in(t);
 
-        transform.color.scale.a = unorm8_f32_clamped(1.0f - r);
+        transform->color.scale.a = unorm8_f32_clamped(1.0f - r);
         //transform.color.setAdditive(r * r);
-        float s = 1.0f + r * 0.3f;
-        transform.set_scale(s);
-        transform.set_position({}, {}, rect_center(state.screenRect));
+        const float s = 1.0f + r * 0.3f;
+        transform2d_set_scale_f(transform, s);
+        transform2d_set_position_with_pivot_origin(transform, vec2(0,0), vec2(0, 0), rect_center(state.screenRect));
     }
 
     if (next.id) {
-        const auto t = state.getNextProgress();
-        auto& transform = ecs::get<Transform2D>(next);
-        float r = ease_p2_out(t);
-        transform.color.scale.a = unorm8_f32_clamped(r);
+        const float t = state.getNextProgress();
+        transform2d_t* transform = get_transform2d(next);
+        const float r = ease_p2_out(t);
+        transform->color.scale.a = unorm8_f32_clamped(r);
         //transform.color.offset.a = unorm8_f32_clamped(((1.0f - r) * (1.0f - r)));
-        float s = 1.0f + (1.0f - r) * 0.3f;
-        transform.set_scale(s);
-        transform.set_position({}, {}, rect_center(state.screenRect));
+        const float s = 1.0f + (1.0f - r) * 0.3f;
+        transform2d_set_scale_f(transform, s);
+        transform2d_set_position_with_pivot_origin(transform, vec2(0,0), vec2(0, 0), rect_center(state.screenRect));
     }
 }
-}
 
-ek::GameScreenManager* g_game_screen_manager = nullptr;
+GameScreenManager* g_game_screen_manager = nullptr;
 
 void init_game_screen_manager(void) {
     EK_ASSERT(!g_game_screen_manager);
-    g_game_screen_manager = new ek::GameScreenManager();
+    g_game_screen_manager = new GameScreenManager();
 }

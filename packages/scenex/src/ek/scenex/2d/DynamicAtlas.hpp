@@ -1,14 +1,11 @@
-#pragma once
+#ifndef SCENEX_DYNAMIC_ATLAS_H
+#define SCENEX_DYNAMIC_ATLAS_H
 
-//#include <ek/ds/Array.hpp>
 #include <ek/ds/PodArray.hpp>
 #include <ek/math.h>
-#include <cstring>
 #include <sokol/sokol_gfx.h>
 #include <ek/hash.h>
 #include <ek/rr.h>
-
-namespace ek {
 
 struct DynamicAtlasSprite {
     rect_t texCoords = rect_01();
@@ -34,7 +31,7 @@ public:
     void invalidate();
 
 public:
-    PodArray<Page*> pages_;
+    ek::PodArray<Page*> pages_;
     int pageWidth;
     int pageHeight;
     bool alphaMap;
@@ -45,9 +42,7 @@ public:
 private:
 };
 
-}
-
-typedef ek::DynamicAtlas* dynamic_atlas_ptr;
+typedef DynamicAtlas* dynamic_atlas_ptr;
 
 struct res_dynamic_atlas {
     string_hash_t names[16];
@@ -63,3 +58,4 @@ void update_res_dynamic_atlas(void);
 #define R_DYNAMIC_ATLAS(name) REF_NAME(res_dynamic_atlas, name)
 
 
+#endif // SCENEX_DYNAMIC_ATLAS_H

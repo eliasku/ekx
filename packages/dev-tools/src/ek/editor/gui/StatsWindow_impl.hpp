@@ -36,7 +36,7 @@ void StatsWindow::onDraw() {
     auto hitTarget = g_interaction_system.hitTarget_;
     if (is_entity(hitTarget)) {
         char buffer[1024];
-        getDebugNodePath(hitTarget, buffer);
+        get_debug_node_path(hitTarget, buffer);
         ImGui::Text("Hit Target: 0x%08X %s", hitTarget.id, buffer);
     }
 

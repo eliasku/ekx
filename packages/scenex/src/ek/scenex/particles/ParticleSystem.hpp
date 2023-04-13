@@ -3,7 +3,7 @@
 #include "ParticleDecl.hpp"
 #include "Particle.hpp"
 #include <ecx/ecx.hpp>
-#include <ek/scenex/2d/Display2D.hpp>
+#include <ek/scenex/2d/text2d.h>
 #include <ek/ds/PodArray.hpp>
 #include <ekx/app/time_layers.h>
 
@@ -16,7 +16,7 @@ struct ParticleLayer2D {
 };
 
 struct ParticleEmitter2D {
-    typedef void SpawnCallback(entity_t, Particle&);
+    typedef void SpawnCallback(entity_t, Particle*);
 
     EmitterData data = {};
     vec2_t position = vec2(0, 0);
@@ -46,7 +46,7 @@ void particles_burst(entity_t e, int count, vec2_t relativeVelocity = {});
 
 Particle* spawn_particle(entity_t e, string_hash_t particle_id);
 
-void spawnFromEmitter(entity_t src, entity_t toLayer, const ParticleDecl* decl, ParticleEmitter2D& emitter,
+void spawnFromEmitter(entity_t src, entity_t toLayer, const ParticleDecl* decl, ParticleEmitter2D* emitter,
                       int count);
 
 void update_emitters();
@@ -55,9 +55,9 @@ void update_particles();
 
 void draw_particle_layer(entity_t e);
 
-ParticleLayer2D& find_particle_layer(entity_t e);
+ParticleLayer2D* find_particle_layer(entity_t e);
 
-Particle& produce_particle(ParticleLayer2D& toLayer, const ParticleDecl* decl);
+Particle* produce_particle(ParticleLayer2D* toLayer, const ParticleDecl* decl);
 
 }
 

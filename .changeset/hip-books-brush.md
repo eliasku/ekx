@@ -2,4 +2,4 @@
 "ekx": patch
 ---
 
-fix C warnings
+refactoring to c

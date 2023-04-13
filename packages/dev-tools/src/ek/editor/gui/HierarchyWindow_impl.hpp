@@ -4,40 +4,40 @@
 #include "HierarchyWindow.hpp"
 #include <ek/editor/imgui/imgui.hpp>
 #include <ek/scenex/base/node.h>
-#include <ek/scenex/2d/Display2D.hpp>
-#include <ek/scenex/2d/Transform2D.hpp>
-#include <ek/scenex/base/interactiv.h>
-#include <ek/scenex/3d/Light3D.hpp>
-#include <ek/scenex/2d/MovieClip.hpp>
-#include <ek/scenex/2d/Button.hpp>
-#include <ek/scenex/3d/Transform3D.hpp>
-#include <ek/scenex/2d/Viewport.hpp>
-#include <ek/scenex/2d/Camera2D.hpp>
+#include <ek/scenex/2d/text2d.h>
+#include <ek/scenex/2d/display2d.h>
+#include <ek/scenex/2d/transform2d.h>
+#include <ek/scenex/base/interactive.h>
+#include <ek/scenex/2d/movieclip.h>
+#include <ek/scenex/2d/button.h>
+#include <ek/scenex/2d/viewport.h>
+#include <ek/scenex/2d/camera2d.h>
+#include <ek/scenex/3d/scene3d.h>
 
 namespace ek {
 
 entity_t HierarchyWindow::getSiblingNext(entity_t e) {
-    const auto* node = ecs::try_get<Node>(e);
+    const auto* node = Node_get(e);
     return node ? node->sibling_next : NULL_ENTITY;
 }
 
 const char* HierarchyWindow::getEntityIcon(entity_t e) {
-    if (ecs::has<Camera2D>(e)) return ICON_FA_VIDEO;
-    if (ecs::has<Viewport>(e)) return ICON_FA_TV;
-    if (ecs::has<Bounds2D>(e)) return ICON_FA_EXPAND;
-    if (ecs::has<Button>(e)) return ICON_FA_HAND_POINTER;
+    if (get_camera2d(e)) return ICON_FA_VIDEO;
+    if (get_viewport(e)) return ICON_FA_TV;
+    if (get_bounds2d(e)) return ICON_FA_EXPAND;
+    if (get_button(e)) return ICON_FA_HAND_POINTER;
     if (interactive_get(e)) return ICON_FA_FINGERPRINT;
-    if (ecs::has<MovieClip>(e)) return ICON_FA_FILM;
-    if (ecs::has<Sprite2D>(e)) return ICON_FA_IMAGE;
-    if (ecs::has<NinePatch2D>(e)) return ICON_FA_COMPRESS;
-    if (ecs::has<Quad2D>(e)) return ICON_FA_VECTOR_SQUARE;
-    if (ecs::has<Text2D>(e)) return ICON_FA_FONT;
-    if (ecs::has<Arc2D>(e)) return ICON_FA_CIRCLE_NOTCH;
-    if (ecs::has<Display2D>(e)) return ICON_FA_PAINT_BRUSH;
-    if (ecs::has<Transform2D>(e)) return ICON_FA_DICE_D6;
-    if (ecs::has<Node>(e)) return ICON_FA_BOX;
+    if (get_movieclip(e)) return ICON_FA_FILM;
+    if (get_sprite2d(e)) return ICON_FA_IMAGE;
+    if (get_ninepatch2d(e)) return ICON_FA_COMPRESS;
+    if (get_quad2d(e)) return ICON_FA_VECTOR_SQUARE;
+    if (get_text2d(e)) return ICON_FA_FONT;
+    if (get_arc2d(e)) return ICON_FA_CIRCLE_NOTCH;
+    if (get_display2d(e)) return ICON_FA_PAINT_BRUSH;
+    if (get_transform2d(e)) return ICON_FA_DICE_D6;
+    if (Node_get(e)) return ICON_FA_BOX;
 
-    if (ecs::has_type<Transform3D>() && ecs::has<Transform3D>(e)) return ICON_FA_DICE_D20;
+    if (Transform3D.index && get_transform3d(e)) return ICON_FA_DICE_D20;
 
     return ICON_FA_BORDER_STYLE;
 }
@@ -62,7 +62,7 @@ bool HierarchyWindow::isSelectedInHierarchy(entity_t ref) {
 }
 
 bool HierarchyWindow::hasChildren(entity_t e) {
-    Node* node = ecs::try_get<Node>(e);
+    node_t* node = Node_get(e);
     if (node) {
         auto first = node->child_first;
         return first.id && is_entity(first);
@@ -76,7 +76,7 @@ bool HierarchyWindow::hoverIconButton(const char* str_id, const char* icon) {
     return ImGui::IsItemClicked();
 }
 
-void HierarchyWindow::drawVisibleTouchControls(Node* node, bool parentedVisible, bool parentedTouchable) {
+void HierarchyWindow::drawVisibleTouchControls(node_t* node, bool parentedVisible, bool parentedTouchable) {
     if (!node) {
         return;
     }
@@ -129,7 +129,7 @@ void HierarchyWindow::drawEntityInTree(entity_t e, bool parentedVisible, bool pa
 
     auto nodeVisible = parentedVisible;
     auto nodeTouchable = parentedTouchable;
-    auto* node = ecs::try_get<Node>(e);
+    auto* node = Node_get(e);
     if (node) {
         nodeVisible = nodeVisible && !(node->flags & NODE_HIDDEN);
         nodeTouchable = nodeTouchable && !(node->flags & NODE_UNTOUCHABLE);
@@ -179,7 +179,7 @@ void HierarchyWindow::drawEntityFiltered(entity_t e, bool parentedVisible, bool 
         ImGui::Text("INVALID ENTITY");
         return;
     }
-    auto* node = ecs::try_get<Node>(e);
+    auto* node = Node_get(e);
     const char* name = node ? hsp_get(node->tag) : NULL;
     auto nodeVisible = parentedVisible;
     auto nodeTouchable = parentedTouchable;

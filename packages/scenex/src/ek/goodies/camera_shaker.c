@@ -1,7 +1,7 @@
 #include "camera_shaker.h"
 
 #include <ek/rnd.h>
-#include <ek/scenex/2d/transform_api.h>
+#include <ek/scenex/2d/transform2d.h>
 
 ecx_component_type camera_shaker_comp_type;
 

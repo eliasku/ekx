@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SCENEX_GAME_APP_LISTENER_H
+#define SCENEX_GAME_APP_LISTENER_H
 
 #include <ek/app.h>
 
@@ -29,3 +30,5 @@ public:
 };
 
 }
+
+#endif // SCENEX_GAME_APP_LISTENER_H

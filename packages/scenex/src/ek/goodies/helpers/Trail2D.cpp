@@ -1,6 +1,6 @@
 #include "Trail2D.hpp"
 
-#include <ek/scenex/2d/Transform2D.hpp>
+#include <ek/scenex/2d/transform2d.h>
 #include <ek/canvas.h>
 
 
@@ -57,21 +57,21 @@ void Trail2D::update_position(vec2_t newPosition) {
 }
 
 void update_trail2d() {
-    auto* trails = (Trail2D*)ecs::type<Trail2D>()->data[0];
+    Trail2D* trails = (Trail2D*)ecs::type<Trail2D>()->data[0];
     const auto count = ecs::type<Trail2D>()->size;
     for (uint32_t i = 1; i < count; ++i) {
         auto ei = ecs::type<Trail2D>()->handle_to_entity[i];
-        auto wti = get_component_handle_by_index(ecs::type<WorldTransform2D>(), ei);
-        const auto& m = ((WorldTransform2D*)get_component_data(ecs::type<WorldTransform2D>(), wti, 0))->matrix;
+        auto wti = get_component_handle_by_index(&Transform2D, ei);
+        const auto& m = ((world_transform2d_t*)get_component_data(&Transform2D, wti, 1))->matrix;
         trails[i].update(m);
     }
 }
 
 void TrailRenderer2D::draw() {
-    auto& trail = ecs::get<Trail2D>(target);
-    auto& nodeArray = trail.nodes.data;
+    auto* trail = ecs::get<Trail2D>(target);
+    auto& nodeArray = trail->nodes.data;
 
-    const uint32_t columns = trail.nodes.size();
+    const uint32_t columns = trail->nodes.size();
     if (columns < 2) {
         return;
     }
@@ -86,7 +86,7 @@ void TrailRenderer2D::draw() {
     canvas_set_image(image);
     canvas_triangles(columns * 2, quads * 6);
 
-    auto node_idx = trail.nodes.first;
+    auto node_idx = trail->nodes.first;
 
     const auto co = canvas.color[0].offset;
     const auto cm = canvas.color[0].scale;
@@ -159,7 +159,7 @@ void TrailRenderer2D::draw() {
 }
 
 void trail_renderer2d_draw(entity_t e) {
-    ecs::get<TrailRenderer2D>(e).draw();
+    ecs::get<TrailRenderer2D>(e)->draw();
 }
 
 }

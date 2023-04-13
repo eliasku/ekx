@@ -1,6 +1,7 @@
-#pragma once
+#ifndef SCENEX_TRUE_TYPE_FONT_H
+#define SCENEX_TRUE_TYPE_FONT_H
 
-#include "FontImplBase.hpp"
+#include "font_base.h"
 
 #include <ek/math.h>
 #include <ek/ds/Hash.hpp>
@@ -9,14 +10,11 @@
 
 struct stbtt_fontinfo;
 
-namespace ek {
-
 class DynamicAtlas;
-class MapFile;
 
 // TODO: metadata for base size, atlas resolution, etc
 // TODO: how to generate outlines?
-class TrueTypeFont : public FontImplBase {
+class TrueTypeFont : public font_base_ {
 public:
     TrueTypeFont(float dpiScale, float fontSize, string_hash_t dynamicAtlasName);
 
@@ -30,9 +28,9 @@ public:
 
     void unload();
 
-    bool getGlyph(uint32_t codepoint, Glyph& outGlyph) override;
+    bool getGlyph(uint32_t codepoint, glyph_t* outGlyph) override;
 
-    bool getGlyphMetrics(uint32_t codepoint, Glyph& outGlyph) override;
+    bool getGlyphMetrics(uint32_t codepoint, glyph_t* outGlyph) override;
 
     float getKerning(uint32_t codepoint1, uint32_t codepoint2) override;
 
@@ -47,7 +45,7 @@ public:
     float dpiScale;
     R(dynamic_atlas_ptr) atlas;
     unsigned atlasVersion = 0;
-    Hash<Glyph> map;
+    ek::Hash<glyph_t> map;
     uint64_t effectKeyBits = 0;
 
     float ascender = 0.0f;
@@ -58,5 +56,4 @@ public:
     uint8_t strengthPower_ = 0;
 };
 
-}
-
+#endif // SCENEX_TRUE_TYPE_FONT_H

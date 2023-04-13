@@ -55,4 +55,10 @@
 #define UNLIKELY(x) __builtin_expect(!!(x), 0)
 #define LIKELY(x) __builtin_expect(!!(x), 1)
 
+#ifdef __cplusplus
+#define INIT_ZERO {}
+#else
+#define INIT_ZERO {0}
+#endif
+
 #endif // EK_PRE_H

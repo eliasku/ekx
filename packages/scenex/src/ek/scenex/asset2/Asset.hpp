@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SCENEX_ASSET_H
+#define SCENEX_ASSET_H
 
 #include <ek/ds/PodArray.hpp>
 #include <ek/ds/String.hpp>
@@ -91,3 +92,5 @@ public:
 };
 
 }
+
+#endif // SCENEX_ASSET_H

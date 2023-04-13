@@ -20,6 +20,8 @@ uint32_t arr_capacity(const void* ptr);
 
 uint32_t arr_size(const void* ptr);
 
+void arr_clear(const void* ptr);
+
 bool arr_full(const void* ptr);
 
 bool arr_empty(const void* ptr);
@@ -94,6 +96,10 @@ void* _check_ptr_alignment(void* ptr, uint32_t width);
     } \
     return NULL; \
 }
+
+
+const char* str_get(void* buf);
+void str_copy(void** p_dest, const void* src);
 
 #ifdef __cplusplus
 }

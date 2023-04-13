@@ -1,7 +1,7 @@
 #ifndef SCENEX_DESTROY_TIMER_H
 #define SCENEX_DESTROY_TIMER_H
 
-#include <ecx/ecx.hpp>
+#include <ecx/ecx.h>
 #include <ekx/app/time_layers.h>
 #include <ek/buf.h>
 

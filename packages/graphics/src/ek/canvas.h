@@ -65,7 +65,7 @@ typedef enum ek_canvas_state_flags {
     EK_CANVAS_STATE_CHANGED = 0x8,
     EK_CANVAS_PASS_ACTIVE = 0x10,
     EK_CANVAS_CHECK_MASK = EK_CANVAS_CHECK_SCISSORS | EK_CANVAS_CHECK_SHADER | EK_CANVAS_CHECK_IMAGE,
-    _EK_CANVAS_STATE_FLAGS_FORCE_U32 = 0xFFFFFFFFu
+    _EK_CANVAS_STATE_FLAGS_FORCE_U32 = 0x7FFFFFFF,
 } ek_canvas_state_flags;
 
 typedef struct ek_canvas_pipeline_item {

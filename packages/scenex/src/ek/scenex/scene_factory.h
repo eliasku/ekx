@@ -15,7 +15,7 @@ void sg_load(sg_file_t* out, const void* data, uint32_t size);
 
 const sg_node_data_t* sg_get(const sg_file_t* sg, string_hash_t libraryName);
 
-entity_t sg_create(string_hash_t library, string_hash_t name, entity_t parent = NULL_ENTITY);
+entity_t sg_create(string_hash_t library, string_hash_t name, entity_t parent);
 
 rect_t sg_get_bounds(string_hash_t library, string_hash_t name);
 

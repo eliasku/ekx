@@ -35,9 +35,7 @@ struct interaction_system {
 
 extern struct interaction_system g_interaction_system;
 
-void init_interaction_system(void);
 void update_interaction_system(void);
-void complete_frame_interaction_system(void);
 void interaction_system_handle_touch(const ek_app_event* event, vec2_t position);
 void interaction_system_handle_mouse(const ek_app_event* event, vec2_t position);
 void interaction_system_handle_pause(void);

@@ -20,10 +20,9 @@
 
 #include <ek/scenex/2d/DynamicAtlas.hpp>
 
-namespace ek {
 
 TrueTypeFont::TrueTypeFont(float dpiScale_, float fontSize, string_hash_t dynamicAtlasName) :
-        FontImplBase(FontType::TrueType),
+        font_base_(FONT_TYPE_TTF),
         baseFontSize{fontSize},
         dpiScale{dpiScale_},
         atlas{R_DYNAMIC_ATLAS(dynamicAtlasName)} {
@@ -54,7 +53,7 @@ void TrueTypeFont::unload() {
 
 // store pre-rendered glyph for baseFontSize and upscaled by dpiScale
 // quad scale just multiplier to get fontSize relative to baseFontSize
-bool TrueTypeFont::getGlyph(uint32_t codepoint, Glyph& outGlyph) {
+bool TrueTypeFont::getGlyph(uint32_t codepoint, glyph_t* outGlyph) {
     if (!loaded_ || !atlas) {
         return false;
     }
@@ -71,7 +70,7 @@ bool TrueTypeFont::getGlyph(uint32_t codepoint, Glyph& outGlyph) {
     const uint64_t hash = effectKeyBits | codepoint;
     const auto* it = map.tryGet(hash);
     if (it) {
-        outGlyph = *it;
+        *outGlyph = *it;
         return true;
     }
 
@@ -83,19 +82,19 @@ bool TrueTypeFont::getGlyph(uint32_t codepoint, Glyph& outGlyph) {
 
     const float scale = stbtt_ScaleForPixelHeight(info, baseFontSize);
     map.set(hash, {});
-    auto& glyph = (Glyph&) *map.tryGet(hash);
-    glyph.source = this;
+    glyph_t* glyph =  (glyph_t*)map.tryGet(hash);
+    glyph->source = this;
 
     int advanceWidth = 0, leftSideBearing = 0;
     stbtt_GetGlyphHMetrics(info, glyphIndex, &advanceWidth, &leftSideBearing);
-    glyph.advanceWidth = scale * static_cast<float>(advanceWidth) / baseFontSize;
-    glyph.bearingX = scale * static_cast<float>(leftSideBearing) / baseFontSize;
+    glyph->advanceWidth = scale * static_cast<float>(advanceWidth) / baseFontSize;
+    glyph->bearingX = scale * static_cast<float>(leftSideBearing) / baseFontSize;
 
     int x0, y0, x1, y1;
     stbtt_GetGlyphBitmapBox(info, glyphIndex, dpiScale * scale, dpiScale * scale, &x0, &y0, &x1, &y1);
 
-    auto glyphWidth = x1 - x0;
-    auto glyphHeight = y1 - y0;
+    int glyphWidth = x1 - x0;
+    int glyphHeight = y1 - y0;
 
     if (glyphWidth > 0 && glyphHeight > 0) {
         int pad = blurRadius_;
@@ -123,33 +122,33 @@ bool TrueTypeFont::getGlyph(uint32_t codepoint, Glyph& outGlyph) {
         auto sprite = atlas_instance->addBitmap(bitmapWidth, bitmapHeight, bmp, bmpSize);
         //free(bmp);
 
-        glyph.image = sprite.image;
-        glyph.texCoord = sprite.texCoords;
+        glyph->image = sprite.image;
+        glyph->texCoord = sprite.texCoords;
 
-        glyph.rect.x = x0;
-        glyph.rect.y = y0;
-        glyph.rect.w = bitmapWidth;
-        glyph.rect.h = bitmapHeight;
+        glyph->rect.x = x0;
+        glyph->rect.y = y0;
+        glyph->rect.w = bitmapWidth;
+        glyph->rect.h = bitmapHeight;
 
         // scale to font size unit space
-        glyph.rect = rect_scale_f(glyph.rect, 1.0f / (dpiScale * baseFontSize));
-        glyph.lineHeight = lineHeightMultiplier;
-        glyph.ascender = ascender;
-        glyph.descender = descender;
+        glyph->rect = rect_scale_f(glyph->rect, 1.0f / (dpiScale * baseFontSize));
+        glyph->lineHeight = lineHeightMultiplier;
+        glyph->ascender = ascender;
+        glyph->descender = descender;
     }
 
-    outGlyph = glyph;
+    *outGlyph = *glyph;
     return true;
 }
 
-bool TrueTypeFont::getGlyphMetrics(uint32_t codepoint, Glyph& outGlyph) {
+bool TrueTypeFont::getGlyphMetrics(uint32_t codepoint, glyph_t* outGlyph) {
     if (!loaded_) {
         return false;
     }
 
     auto* it = map.tryGet(effectKeyBits | codepoint);
     if (it) {
-        outGlyph = *it;
+        *outGlyph = *it;
         return true;
     }
 
@@ -162,21 +161,21 @@ bool TrueTypeFont::getGlyphMetrics(uint32_t codepoint, Glyph& outGlyph) {
     const float scale = stbtt_ScaleForPixelHeight(info, baseFontSize);
     int advanceWidth = 0, leftSideBearing = 0;
     stbtt_GetGlyphHMetrics(info, glyphIndex, &advanceWidth, &leftSideBearing);
-    outGlyph.advanceWidth = scale * static_cast<float>(advanceWidth) / baseFontSize;
-    outGlyph.bearingX = scale * static_cast<float>(leftSideBearing) / baseFontSize;
-    outGlyph.lineHeight = lineHeightMultiplier;
-    outGlyph.ascender = ascender;
-    outGlyph.descender = descender;
+    outGlyph->advanceWidth = scale * static_cast<float>(advanceWidth) / baseFontSize;
+    outGlyph->bearingX = scale * static_cast<float>(leftSideBearing) / baseFontSize;
+    outGlyph->lineHeight = lineHeightMultiplier;
+    outGlyph->ascender = ascender;
+    outGlyph->descender = descender;
 
     int x0, y0, x1, y1;
     stbtt_GetGlyphBitmapBox(info, glyphIndex, dpiScale * scale, dpiScale * scale, &x0, &y0, &x1, &y1);
-    outGlyph.rect.x = x0;
-    outGlyph.rect.y = y0;
-    outGlyph.rect.w = x1 - x0;
-    outGlyph.rect.h = y1 - y0;
-    outGlyph.rect = rect_scale_f(outGlyph.rect, 1.0f / (dpiScale * baseFontSize));
+    outGlyph->rect.x = x0;
+    outGlyph->rect.y = y0;
+    outGlyph->rect.w = x1 - x0;
+    outGlyph->rect.h = y1 - y0;
+    outGlyph->rect = rect_scale_f(outGlyph->rect, 1.0f / (dpiScale * baseFontSize));
 
-    outGlyph.source = this;
+    outGlyph->source = this;
     return true;
 }
 
@@ -257,4 +256,3 @@ void TrueTypeFont::resetGlyphs() {
     }
 }
 
-}

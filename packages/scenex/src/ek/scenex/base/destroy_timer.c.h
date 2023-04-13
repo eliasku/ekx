@@ -36,7 +36,7 @@ void update_destroy_queue() {
                 continue;
             }
 
-            if (ecs::has<node_t>(e)) {
+            if (Node_has(e)) {
                 destroy_node(e);
             } else {
                 destroy_entity(e);

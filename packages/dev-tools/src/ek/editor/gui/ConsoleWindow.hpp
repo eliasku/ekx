@@ -3,6 +3,7 @@
 #include "EditorWindow.hpp"
 #include <ek/ds/PodArray.hpp>
 #include <ek/ds/Array.hpp>
+#include <ek/log.h>
 
 namespace ek {
 

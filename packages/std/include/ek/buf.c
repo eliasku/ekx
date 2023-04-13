@@ -22,6 +22,12 @@ uint32_t arr_size(const void* ptr) {
     return ptr ? ek_buf_header(ptr)->length : 0;
 }
 
+void arr_clear(const void* ptr) {
+    if (ptr) {
+        ek_buf_header(ptr)->length = 0;
+    }
+}
+
 bool arr_full(const void* ptr) {
     // TODO: add test for empty array
     if (ptr) {
@@ -147,6 +153,8 @@ void* arr_push_mem(void** p_arr, uint32_t element_size, const void* src) {
 }
 
 void arr_assign_(void** p_arr, uint32_t element_size, const void* src_arr) {
+    EK_ASSERT(p_arr);
+    EK_ASSERT(*p_arr != src_arr);
     const uint32_t other_size = arr_size(src_arr);
     if (other_size) {
         if (arr_capacity(*p_arr) < other_size) {
@@ -214,4 +222,12 @@ void arr_erase_(void* arr, const void* it, uint32_t element_size, uint32_t count
 void* arr_add_(void** p_arr, uint32_t element_size) {
     arr_maybe_grow(p_arr, element_size);
     return ek_buf_add_(*p_arr, element_size);
+}
+
+const char* str_get(void* buf) {
+    return buf ? buf : "";
+}
+
+void str_copy(void** p_dest, const void* src) {
+    arr_assign_(p_dest, 1, src);
 }

@@ -220,9 +220,9 @@ void SceneWindow::drawSceneNode(entity_t e) {
         return;
     }
 
-    auto* disp = ecs::try_get<Display2D>(e);
+    auto* disp = get_display2d(e);
     if (disp) {
-        auto* transform = ecs::try_get<WorldTransform2D>(e);
+        auto* transform = get_world_transform2d(e);
         if (transform) {
             canvas.matrix[0] = transform->matrix;
             canvas.color[0] = transform->color;
@@ -245,13 +245,13 @@ void SceneWindow::drawSceneNodeBounds(entity_t e) {
         return;
     }
 
-    auto* disp = ecs::try_get<Display2D>(e);
+    auto* disp = get_display2d(e);
     if (disp) {
         canvas.matrix[0] = mat3x2_identity();
         canvas.color[0] = color2_identity();
 
         mat3x2_t m = view.view2.matrix;
-        auto* transform = ecs::try_get<WorldTransform2D>(e);
+        auto* transform = get_world_transform2d(e);
         if (transform) {
             m = mat3x2_mul(view.view2.matrix, transform->matrix);
         }
@@ -306,8 +306,8 @@ void SceneWindow::drawScene() {
 }
 
 entity_t SceneWindow::hitTest(entity_t e, vec2_t worldPos) {
-    const auto& node = ecs::get<Node>(e);
-    if (node.flags & (NODE_HIDDEN | NODE_UNTOUCHABLE)) {
+    const node_t* node = Node_get(e);
+    if (node->flags & (NODE_HIDDEN | NODE_UNTOUCHABLE)) {
         return NULL_ENTITY;
     }
     entity_t it = get_last_child(e);
@@ -318,9 +318,9 @@ entity_t SceneWindow::hitTest(entity_t e, vec2_t worldPos) {
         }
         it = get_prev_child(it);
     }
-    auto* disp = ecs::try_get<Display2D>(e);
+    auto* disp = get_display2d(e);
     if (disp && disp->get_bounds) {
-        auto* wt = ecs::try_get<WorldTransform2D>(e);
+        auto* wt = get_world_transform2d(e);
         if (wt) {
             vec2_t lp;
             if (vec2_transform_inverse(worldPos, wt->matrix, &lp) &&
@@ -391,7 +391,7 @@ void SceneWindow::manipulateObject2D() {
     auto& selection = g_editor->hierarchy.selection;
     if (selection.size() > 0 && is_entity(entity_id(selection[0]))) {
         entity_t sel = entity_id(selection[0]);
-        auto worldMatrix2D = ecs::get<WorldTransform2D>(sel).matrix;
+        auto worldMatrix2D = get_world_transform2d(sel)->matrix;
         mat4_t worldMatrix3D = matrix2Dto3D(worldMatrix2D);
         ImGuizmo::OPERATION op = ImGuizmo::OPERATION::BOUNDS;
         if (currentTool == 2) {
@@ -413,12 +413,12 @@ void SceneWindow::manipulateObject2D() {
                              nullptr,
                              nullptr);
 
-        auto& localTransform = ecs::get<Transform2D>(sel);
-        const auto parentWorldMatrix2D = ecs::get<WorldTransform2D>(get_parent(sel)).matrix;
+        transform2d_t* localTransform = get_transform2d(sel);
+        const auto parentWorldMatrix2D = get_world_transform2d(get_parent(sel))->matrix;
         const auto parentWorldMatrix3D = matrix2Dto3D(parentWorldMatrix2D);
         const auto inverseParentWorldMatrix3D = mat4_inverse(parentWorldMatrix3D);
         const auto newLocalMatrix3D = mat4_mul(inverseParentWorldMatrix3D, worldMatrix3D);
-        localTransform.setMatrix(matrix3Dto2D(newLocalMatrix3D));
+        transform2d_set_matrix(localTransform, matrix3Dto2D(newLocalMatrix3D));
     }
 }
 
@@ -426,7 +426,7 @@ void SceneWindow::manipulateObject3D() {
     auto& selection = g_editor->hierarchy.selection;
     if (selection.size() > 0 && is_entity(entity_id(selection[0]))) {
         entity_t sel = entity_id(selection[0]);
-        auto worldMatrix2D = ecs::get<WorldTransform2D>(sel).matrix;
+        auto worldMatrix2D = get_world_transform2d(sel)->matrix;
         mat4_t worldMatrix3D = matrix2Dto3D(worldMatrix2D);
         ImGuizmo::OPERATION op = ImGuizmo::OPERATION::BOUNDS;
         if (currentTool == 2) {
@@ -448,8 +448,8 @@ void SceneWindow::manipulateObject3D() {
                              nullptr,
                              nullptr);
 
-//        auto& localTransform = ecs::get<Transform2D>(sel);
-//        const auto parentWorldMatrix2D = ecs::get<Node>(sel).ecs::get<WorldTransform2D>(parent).matrix;
+//        auto& localTransform = get_transform2d(sel);
+//        const auto parentWorldMatrix2D = Node_get(sel).get_world_transform2d(parent).matrix;
 //        const auto parentWorldMatrix3D = matrix2Dto3D(parentWorldMatrix2D);
 //        const auto inverseParentWorldMatrix3D = inverse(parentWorldMatrix3D);
 //        const auto newLocalMatrix3D = inverseParentWorldMatrix3D * worldMatrix3D;

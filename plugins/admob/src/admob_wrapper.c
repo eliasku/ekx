@@ -13,7 +13,7 @@
 
 // implementation
 
-#if defined(__ANDROID__) || TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#if defined(NDEBUG) || defined(__ANDROID__) || TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 #define EK_ADMOB_SIMULATOR 0
 #else
 #define EK_ADMOB_SIMULATOR 1
@@ -78,8 +78,8 @@ void admob_wrapper_show_interstitial(void(* callback)(void)) {
     if (g_admob_wrapper.supported) {
         ek_admob_show_interstitial_ad();
     }
-    else if (callback) {
-        callback();
+    else {
+        admob_wrapper_interstitial_end(NULL);
     }
 #endif
 }
@@ -97,8 +97,8 @@ void admob_wrapper_show_rewarded_ad(void(* callback)(bool)) {
     if (g_admob_wrapper.supported) {
         ek_admob_show_rewarded_ad();
     }
-    else if (callback) {
-        callback(false);
+    else {
+        admob_wrapper_rewarded_ad_end(NULL);
     }
 #endif
 }

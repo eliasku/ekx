@@ -104,12 +104,12 @@ bool set_language_index(uint32_t index) {
 
 lang_name_t current_lang_name(void) {
     const localization_t l = s_localization;
-    return l.lang_index < l.lang_num ? l.languages[l.lang_index].name : (lang_name_t) {};
+    return l.lang_index < l.lang_num ? l.languages[l.lang_index].name : (lang_name_t) {0};
 }
 
 void add_lang(lang_name_t name, void* buffer, uint32_t size) {
     EK_ASSERT(s_localization.lang_num < LANG_MAX_COUNT);
-    string_catalog cat = {};
+    string_catalog cat = {0};
     cat.name = name;
     cat.buffer = buffer;
     cat.length = size;

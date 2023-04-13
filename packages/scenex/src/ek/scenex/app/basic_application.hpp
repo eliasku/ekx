@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SCENEX_BASIC_APPLICATION_H
+#define SCENEX_BASIC_APPLICATION_H
 
 #include <ecx/ecx_fwd.hpp>
 
@@ -19,9 +20,10 @@
 #include <ekx/app/profiler.h>
 #include <ekx/app/game_display.h>
 #include <ekx/app/frame_timer.h>
-#include <ek/scenex/text/TextEngine.hpp>
+#include <ek/scenex/text/text_engine.h>
 #include <ek/scenex/asset2/Asset.hpp>
 #include "GameAppDispatcher.hpp"
+#include "root_app_callbacks.h"
 
 namespace ek {
 class basic_application;
@@ -101,10 +103,6 @@ void launcher_on_frame();
 
 void setup_resource_managers();
 
-void root_app_on_frame();
-
-void root_app_on_event(ek_app_event ev);
-
 template<typename T>
 inline void run_app() {
     log_init();
@@ -114,6 +112,12 @@ inline void run_app() {
     uint32_t seed = ek_time_seed32();
     random_seed = seed++;
     game_random_seed = seed;
+
+    // audio should be initialized before "Resume" event, so the best place is "On Create" event
+    audio_setup();
+
+    // setup resources before app constructor, for example because Profiler requires font id resolving
+    setup_resource_managers();
 
     setup_text_engine();
 
@@ -125,15 +129,11 @@ inline void run_app() {
     }
 #endif
 
-    // audio should be initialized before "Resume" event, so the best place is "On Create" event
-    audio_setup();
-
-    // setup resources before app constructor, for example because Profiler requires font id resolving
-    setup_resource_managers();
-
     ek_app.on_ready = [] { init_game_app(new T()); };
     ek_app.on_frame = launcher_on_frame;
     ek_app.on_event = root_app_on_event;
 }
 
 }
+
+#endif // SCENEX_BASIC_APPLICATION_H

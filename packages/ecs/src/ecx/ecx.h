@@ -140,6 +140,7 @@ bool remove_component(ecx_component_type* type, entity_t entity);
  * @return NULL if component is not set, assert/NULL if invalid entity
  */
 void* get_component(ecx_component_type* type, entity_t entity);
+void* get_component_n(ecx_component_type* type, entity_t entity, uint32_t index);
 void* get_component_or_default(ecx_component_type* type, entity_t entity);
 /**
  * Adds component to entity if is not set,

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ek/scenex/2d/Sprite.hpp>
+#include <ek/scenex/2d/sprite.h>
 #include <ek/rnd.h>
 #include <ek/rr.h>
 #include <ek/ds/FixedArray.hpp>

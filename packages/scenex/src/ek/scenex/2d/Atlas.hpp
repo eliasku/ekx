@@ -1,14 +1,13 @@
-#pragma once
+#ifndef SCENEX_ATLAS_H
+#define SCENEX_ATLAS_H
 
-#include "Sprite.hpp"
+#include "sprite.h"
 
 #include <ek/ds/String.hpp>
 #include <ek/ds/Array.hpp>
 #include <ek/ds/PodArray.hpp>
 #include <ek/rr.h>
 #include <ek/texture_loader.h>
-
-namespace ek {
 
 class Atlas {
 public:
@@ -19,12 +18,12 @@ public:
 
     void clear();
 
-    PodArray<R(sprite_t)> sprites;
-    PodArray<R(sg_image)> pages;
+    ek::PodArray<R(sprite_t)> sprites;
+    ek::PodArray<R(sg_image)> pages;
 
     // loading routine
-    PodArray<ek_texture_loader*> loaders;
-    String base_path;
+    ek::PodArray<ek_texture_loader*> loaders;
+    ek::String base_path;
     uint32_t formatMask = 1;
 
     [[nodiscard]] int getLoadingImagesCount() const;
@@ -33,9 +32,7 @@ public:
     void load(const char* path, float scaleFactor);
 };
 
-}
-
-typedef ek::Atlas* atlas_ptr;
+typedef Atlas* atlas_ptr;
 
 struct res_atlas {
     string_hash_t names[32];
@@ -49,3 +46,5 @@ void setup_res_atlas(void);
 void update_res_atlas(void);
 
 #define R_ATLAS(name) REF_NAME(res_atlas, name)
+
+#endif // SCENEX_ATLAS_H

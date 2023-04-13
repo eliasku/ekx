@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 project(scenex)
 
-add_library(${PROJECT_NAME} STATIC "")
+add_library(${PROJECT_NAME} STATIC)
 
 add_library(ekx::scenex ALIAS scenex)
 
@@ -12,14 +12,13 @@ if(EK_UITEST)
     add_definitions(-DEK_UITEST)
 endif(EK_UITEST)
 
-add_subdirectory(src/ek/scenex)
-add_subdirectory(src/ek/goodies)
-
 set_target_properties(${PROJECT_NAME} PROPERTIES
         C_STANDARD 11
         CXX_STANDARD 17
-        #UNITY_BUILD ON
         )
+
+add_subdirectory(src/ek/scenex)
+add_subdirectory(src/ek/goodies)
 
 target_include_directories(${PROJECT_NAME}
         PUBLIC src

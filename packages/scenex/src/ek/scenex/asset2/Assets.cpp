@@ -12,9 +12,9 @@
 
 #include <ek/scenex/scene_factory.h>
 #include <ek/scenex/2d/Atlas.hpp>
-#include <ek/scenex/3d/StaticMesh.hpp>
+#include <ek/scenex/3d/scene3d.h>
 
-#include <ek/scenex/text/Font.hpp>
+#include <ek/scenex/text/font.h>
 #include <ek/scenex/text/TrueTypeFont.hpp>
 #include <ek/scenex/text/BitmapFont.hpp>
 
@@ -242,16 +242,16 @@ public:
                 [](ek_local_res* lr) {
                     BitmapFontAsset* this_ = (BitmapFontAsset*) lr->userdata;
                     if (ek_local_res_success(lr)) {
-                        Font* fnt = &REF_RESOLVE(res_font, this_->res);
-                        if (fnt->impl) {
+                        font_t* fnt = &REF_RESOLVE(res_font, this_->res);
+                        if (fnt->base) {
                             EK_ASSERT(false && "Font is not unloaded before");
-                            delete fnt->impl;
+                            delete fnt->base;
                         }
                         // keep lr instance
-                        this_->lr = *lr;
+                        this_->local_res = *lr;
                         auto* bmFont = new BitmapFont();
                         bmFont->load(lr->buffer, lr->length);
-                        fnt->impl = bmFont;
+                        fnt->base = bmFont;
                     } else {
                         ek_local_res_close(lr);
                     }
@@ -260,17 +260,17 @@ public:
     }
 
     void do_unload() override {
-        Font* fnt = &REF_RESOLVE(res_font, res);
-        if (fnt->impl) {
-            delete fnt->impl;
-            fnt->impl = nullptr;
+        font_t* fnt = &REF_RESOLVE(res_font, res);
+        if (fnt->base) {
+            delete fnt->base;
+            fnt->base = nullptr;
         }
-        ek_local_res_close(&lr);
-        lr.closeFunc = nullptr;
+        ek_local_res_close(&local_res);
+        local_res.closeFunc = nullptr;
     }
 
     // keep data instance
-    ek_local_res lr;
+    ek_local_res local_res;
     R(Font) res;
     String path_;
 
@@ -362,7 +362,7 @@ public:
     void do_load() override {
         loaded = 0;
         char lang_path[1024];
-        for (int i = 0; i < total; ++i) {
+        for (uint32_t i = 0; i < total; ++i) {
             auto* loader = &loaders_[i];
             ek_snprintf(lang_path, sizeof lang_path, "%s/%s/%s.mo", manager_->base_path.c_str(), name_.c_str(),
                         loader->lang.str);
@@ -419,11 +419,11 @@ public:
                 [](ek_local_res* lr) {
                     ModelAsset* this_ = (ModelAsset*) lr->userdata;
                     if (ek_local_res_success(lr)) {
-                        calo_reader_t reader = {0};
+                        calo_reader_t reader = {};
                         reader.p = lr->buffer;
                         read_calo(&reader);
                         model3d_t model = read_stream_model3d(&reader);
-                        RES_NAME_RESOLVE(res_mesh3d, H(this_->name_.c_str())) = new StaticMesh(model);
+                        RES_NAME_RESOLVE(res_mesh3d, H(this_->name_.c_str())) = static_mesh(model);
                         ek_local_res_close(lr);
                     } else {
                         log_error("MODEL resource not found: %s", this_->name_.c_str());
@@ -436,11 +436,8 @@ public:
     }
 
     void do_unload() override {
-        StaticMesh** pp = &RES_NAME_RESOLVE(res_mesh3d, H(name_.c_str()));;
-        if (*pp) {
-            delete *pp;
-            *pp = nullptr;
-        }
+        static_mesh_t* pp = &RES_NAME_RESOLVE(res_mesh3d, H(name_.c_str()));
+        static_mesh_destroy(pp);
     }
 
     String name_;
@@ -468,10 +465,10 @@ public:
                 [](ek_local_res* lr) {
                     TrueTypeFontAsset* this_ = (TrueTypeFontAsset*) lr->userdata;
 
-                    Font* fnt = &REF_RESOLVE(res_font, this_->res);
-                    if (fnt->impl) {
+                    font_t* fnt = &REF_RESOLVE(res_font, this_->res);
+                    if (fnt->base) {
                         EK_ASSERT(false && "Font is not unloaded before");
-                        delete fnt->impl;
+                        delete fnt->base;
                     }
 
                     // `lr` ownership moves to font impl
@@ -479,7 +476,7 @@ public:
                         TrueTypeFont* ttfFont = new TrueTypeFont(this_->manager_->scale_factor, this_->baseFontSize_,
                                                                  this_->glyphCache_);
                         ttfFont->loadFromMemory(lr);
-                        fnt->impl = ttfFont;
+                        fnt->base = ttfFont;
                     } else {
                         ek_local_res_close(lr);
                     }
@@ -489,10 +486,10 @@ public:
     }
 
     void do_unload() override {
-        Font* fnt = &REF_RESOLVE(res_font, res);
-        if (fnt->impl) {
-            delete fnt->impl;
-            fnt->impl = nullptr;
+        font_t* fnt = &REF_RESOLVE(res_font, res);
+        if (fnt->base) {
+            delete fnt->base;
+            fnt->base = nullptr;
         }
     }
 
