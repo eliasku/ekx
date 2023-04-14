@@ -19,7 +19,7 @@
 #include <ek/scenex/text/BitmapFont.hpp>
 
 #include <utility>
-#include <ek/scenex/2d/DynamicAtlas.hpp>
+#include <ek/scenex/2d/dynamic_atlas.h>
 
 #include <ekx/app/localization.h>
 
@@ -168,26 +168,16 @@ public:
     // do not reload dynamic atlas, because references to texture* should be invalidated,
     // but current strategy not allow that
     void do_load() override {
-        const int pageSize = DynamicAtlas::estimateBetterSize(manager_->scale_factor,
-                                                              512,
-                                                              2048);
-        dynamic_atlas_ptr* ptr = &REF_RESOLVE(res_dynamic_atlas, res);
-        EK_ASSERT((*ptr) == nullptr);
-        *ptr = new DynamicAtlas(
-                pageSize,
-                pageSize,
-                (flags_ & 1) != 0,
-                (flags_ & 2) != 0
-        );
+        const int page_size = dynamic_atlas_estimate_better_size(manager_->scale_factor, 512, 2048);
+        dynamic_atlas_t* ptr = &REF_RESOLVE(res_dynamic_atlas, res);
+        EK_ASSERT(ptr->pages_ == NULL);
+        dynamic_atlas_create(ptr, page_size, page_size, (flags_ & 1) != 0, (flags_ & 2) != 0);
         state = AssetState::Ready;
     }
 
     void do_unload() override {
-        dynamic_atlas_ptr* ptr = &REF_RESOLVE(res_dynamic_atlas, res);
-        if (*ptr) {
-            delete *ptr;
-            *ptr = nullptr;
-        }
+        dynamic_atlas_t* ptr = &REF_RESOLVE(res_dynamic_atlas, res);
+        dynamic_atlas_destroy(ptr);
     }
 
     R(dynamic_atlas_ptr) res;

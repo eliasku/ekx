@@ -81,7 +81,7 @@ void* arr_add_(void** p_arr, uint32_t element_size);
 #define arr_back(arr) ((arr) ? (arr_end(arr) - 1) : 0)
 
 #define arr_for_block_(arr, Type, It, End) for(Type * It = (arr), * End = (arr) + arr_size(arr); It != End; ++It)
-#define arr_for(Var, InArray) arr_for_block_(InArray, __typeof__(*InArray), Var, Var ## _end)
+#define arr_for(Var, InArray) arr_for_block_((InArray), __typeof__(*(InArray)), Var, Var ## _end)
 
 void* _check_ptr_alignment(void* ptr, uint32_t width);
 

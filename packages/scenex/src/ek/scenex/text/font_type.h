@@ -4,6 +4,11 @@
 #include <ek/gfx.h>
 #include <ek/math.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 typedef enum {
     FONT_TYPE_BITMAP = 0,
     FONT_TYPE_TTF = 1,
@@ -31,5 +36,11 @@ typedef struct {
     font_base_t* source;
 } glyph_t;
 
+
+float font_base_kerning(font_base_t* font, uint32_t codepoint1, uint32_t codepoint2);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SCENEX_FONT_TYPE_H

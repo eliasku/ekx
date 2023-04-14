@@ -2,7 +2,7 @@
 
 #include <ek/canvas.h>
 #include <ek/app.h>
-#include "ek/log.h"
+#include <ek/log.h>
 
 #ifdef EK_UITEST
 #define STB_IMAGE_WRITE_IMPLEMENTATION

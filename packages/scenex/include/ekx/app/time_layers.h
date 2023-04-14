@@ -22,7 +22,7 @@ enum {
     TIME_LAYER_MAX_COUNT = 4,
 };
 
-typedef uint8_t TimeLayer;
+typedef uint8_t time_layer_t;
 
 extern time_layer_state_t g_time_layers[TIME_LAYER_MAX_COUNT];
 

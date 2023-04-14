@@ -6,7 +6,7 @@
 #include "ecx/ecx.h"
 
 typedef struct camera_shaker {
-    TimeLayer timer;
+    time_layer_t timer;
     float state;
     /**
      * max camera rotation delta

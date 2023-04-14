@@ -1,11 +1,8 @@
 #include "profiler.h"
 
-// C++ mixed
 #include <ek/scenex/text/text_engine.h>
-//#include <ek/scenex/app/basic_application.hpp>
-
 #include <ek/canvas.h>
-#include <ek/app.h>
+//#include <ek/app.h>
 
 // TODO: EK_DEV_BUILD
 #ifndef ENABLE_PROFILER
@@ -14,10 +11,6 @@
 #define ENABLE_PROFILER
 #endif
 
-#endif
-
-#ifdef __cplusplus
-extern "C" {
 #endif
 
 void fps_counter_update(fps_counter* fps_counter, float dt) {
@@ -209,6 +202,3 @@ void profiler_draw(const game_display_info* display_info) {
 #endif
 }
 
-#ifdef __cplusplus
-}
-#endif

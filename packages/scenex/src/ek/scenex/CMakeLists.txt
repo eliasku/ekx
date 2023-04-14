@@ -17,7 +17,7 @@ target_sources(${PROJECT_NAME} PUBLIC
 
         2d/Atlas.cpp
         2d/sprite.c
-        2d/DynamicAtlas.cpp
+        2d/dynamic_atlas.c
 
         2d/transform2d.c
         2d/display2d.c
@@ -41,17 +41,17 @@ target_sources(${PROJECT_NAME} PUBLIC
         text/font_.cpp
         text/font_base.cpp
         text/font_base.h
-        text/TextEngine.cpp
+        text/text_engine.c
         text/text_format.c
 
         interaction_system.c
         interaction_system.h
 
-        particles/Particle.cpp
-        particles/Particle.hpp
-        particles/ParticleDecl.hpp
-        particles/ParticleSystem.cpp
-        particles/ParticleSystem.hpp
+        particles/particle.c
+        particles/particle.h
+        particles/particle_decl.c
+        particles/particle_system.c
+        particles/particle_system.h
 
         app/basic_application.cpp
         app/root_app_callbacks.cpp

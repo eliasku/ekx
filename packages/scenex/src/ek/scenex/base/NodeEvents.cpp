@@ -14,7 +14,13 @@ void add_node_event_listener_once(entity_t e, string_hash_t event_type, void(* c
 }
 
 node_event_t node_event(string_hash_t event_type, entity_t e) {
-    return (node_event_t) {event_type, e, e, (node_event_data_t) {0}, false};
+    node_event_t r;
+    r.type = event_type;
+    r.source = e;
+    r.receiver = e;
+    r.data.pointer = NULL;
+    r.processed = false;
+    return r;
 }
 
 bool emit_node_event(entity_t e, const node_event_t* event) {

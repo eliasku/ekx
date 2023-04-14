@@ -6,7 +6,7 @@ time_layer_state_t g_time_layers[TIME_LAYER_MAX_COUNT];
 
 #define TIME_LAYER_DELTA_TIME_MAX (0.3f)
 
-time_layer_state_t time_layer(TimeLayer tl) {
+time_layer_state_t time_layer(time_layer_t tl) {
     EK_ASSERT(tl < TIME_LAYER_MAX_COUNT);
     return g_time_layers[tl];
 }

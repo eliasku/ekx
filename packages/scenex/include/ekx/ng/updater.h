@@ -10,10 +10,10 @@ extern "C" {
 
 typedef struct updater_state updater_state;
 
-typedef void (* updater_callback_t)(entity_t e, TimeLayer time_layer);
+typedef void (* updater_callback_t)(entity_t e, time_layer_t time_layer);
 
 struct updater_state {
-    TimeLayer time_layer;
+    time_layer_t time_layer;
     updater_callback_t callback;
 };
 

@@ -184,6 +184,10 @@ void canvas_restore_transform(void) {
     canvas_restore_color();
 }
 
+void canvas_transform_pivot(vec2_t pos, float rotation, vec2_t scale, vec2_t pivot) {
+    mat3x2_transform_pivot(canvas.matrix, pos, rotation, scale, pivot);
+}
+
 void canvas_translate(const vec2_t v) {
     mat3x2_translate(canvas.matrix, v);
 }

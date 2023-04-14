@@ -5,7 +5,7 @@
 
 destroy_manager_t g_destroy_manager;
 
-void destroy_later(entity_t e, float delay, TimeLayer timer) {
+void destroy_later(entity_t e, float delay, time_layer_t timer) {
     if(is_entity(e)) {
         destroy_timer_t t;
         t.entity = e;
@@ -15,7 +15,7 @@ void destroy_later(entity_t e, float delay, TimeLayer timer) {
     }
 }
 
-void destroy_children_later(entity_t e, float delay, TimeLayer timer) {
+void destroy_children_later(entity_t e, float delay, time_layer_t timer) {
     entity_t it = get_first_child(e);
     while (it.id) {
         destroy_later(it, delay, timer);

@@ -11,7 +11,7 @@
 #include <ek/scenex/base/node.h>
 #include <ek/scenex/2d/layout_rect.h>
 #include <ek/scenex/base/node_events.h>
-#include <ek/scenex/particles/ParticleSystem.hpp>
+#include <ek/scenex/particles/particle_system.h>
 #include <ek/scenex/2d/camera2d.h>
 #include <ek/scenex/2d/viewport.h>
 
@@ -241,7 +241,7 @@ inline void editDisplayArc(arc2d_t* arc) {
     ImGui::Color32Edit("Color Outer", &arc->color_outer);
 }
 
-inline void editParticleRenderer2D(ParticleRenderer2D* p) {
+inline void editParticleRenderer2D(particle_renderer2d_t* p) {
     guiEntityRef("Target", p->target);
 }
 
@@ -297,7 +297,7 @@ inline void guiLayout(layout_rect_t* layout) {
     ImGui::EditRect("Safe Rect", layout->safeRect.data);
 }
 
-inline void guiParticleEmitter2D(ParticleEmitter2D* emitter) {
+inline void guiParticleEmitter2D(particle_emitter2d_t* emitter) {
     ImGui::Checkbox("Enabled", &emitter->enabled);
     ImGui::Text("_Time: %f", emitter->time);
     guiEntityRef("Layer", emitter->layer);
@@ -312,15 +312,15 @@ inline void guiParticleEmitter2D(ParticleEmitter2D* emitter) {
     ImGui::DragFloat("Interval", &emitter->data.interval);
     ImGui::Separator();
 
-    ImGui::DragFloat2("burst_rotation_delta", emitter->data.burst_rotation_delta.data());
-    ImGui::DragFloat2("speed", emitter->data.speed.data());
-    ImGui::DragFloat2("acc", emitter->data.acc.data());
-    ImGui::DragFloat2("dir", emitter->data.dir.data());
+    ImGui::DragFloat2("burst_rotation_delta", (float*) &emitter->data.burst_rotation_delta);
+    ImGui::DragFloat2("speed", (float*) &emitter->data.speed);
+    ImGui::DragFloat2("acc", (float*) &emitter->data.acc);
+    ImGui::DragFloat2("dir", (float*) &emitter->data.dir);
 }
 
-inline void guiParticleLayer2D(ParticleLayer2D* layer) {
-    ImGui::Checkbox("Keep Alive", &layer->keepAlive);
-    ImGui::LabelText("Num Particles", "%u", layer->particles.size());
+inline void guiParticleLayer2D(particle_layer2d_t* layer) {
+    ImGui::Checkbox("Keep Alive", &layer->keep_alive);
+    ImGui::LabelText("Num Particles", "%u", arr_size(layer->particles));
 }
 
 void InspectorWindow::gui_inspector(entity_t e) {
@@ -360,8 +360,9 @@ void InspectorWindow::gui_inspector(entity_t e) {
     guiComponentPanel<NodeEventHandler>(e, "Event Handler", [](auto& c) {});
 
     // particles
-    guiComponentPanel<ParticleEmitter2D>(e, "ParticleEmitter2D", guiParticleEmitter2D);
-    guiComponentPanel<ParticleLayer2D>(e, "ParticleLayer2D", guiParticleLayer2D);
+    guiComponentPanel("ParticleEmitter2D", get_particle_emitter2d(e), guiParticleEmitter2D);
+    guiComponentPanel("ParticleLayer2D", get_particle_layer2d(e), guiParticleLayer2D);
+    guiComponentPanel("ParticleRenderer2D", get_particle_renderer2d(e), editParticleRenderer2D);
 
     // display2d
     guiComponentPanel("Quad2D", get_quad2d(e), editDisplayRectangle);
@@ -369,7 +370,6 @@ void InspectorWindow::gui_inspector(entity_t e) {
     guiComponentPanel("NinePatch2D", get_ninepatch2d(e), editDisplayNinePatch);
     guiComponentPanel("Text2D", get_text2d(e), editDisplayText);
     guiComponentPanel("Arc2D", get_arc2d(e), editDisplayArc);
-    guiComponentPanel<ParticleRenderer2D>(e, "ParticleRenderer2D", editParticleRenderer2D);
 
     guiComponentPanel("Movie Clip", get_movieclip(e), guiMovieClip);
 

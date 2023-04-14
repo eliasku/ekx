@@ -17,7 +17,7 @@ typedef struct {
     float delay;
     float time;
     float duration;
-    TimeLayer timer;
+    time_layer_t timer;
     bool keep;
     // destroy entity on complete
     bool destroy_entity;

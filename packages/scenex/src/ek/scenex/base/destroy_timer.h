@@ -12,16 +12,16 @@ extern "C" {
 typedef struct {
     entity_t entity;
     float delay;
-    TimeLayer time_layer;
+    time_layer_t time_layer;
 } destroy_timer_t;
 
 typedef struct {
     destroy_timer_t* timers;
 } destroy_manager_t;
 
-void destroy_later(entity_t e, float delay, TimeLayer timer);
+void destroy_later(entity_t e, float delay, time_layer_t timer);
 
-void destroy_children_later(entity_t e, float delay, TimeLayer timer);
+void destroy_children_later(entity_t e, float delay, time_layer_t timer);
 
 extern destroy_manager_t g_destroy_manager;
 

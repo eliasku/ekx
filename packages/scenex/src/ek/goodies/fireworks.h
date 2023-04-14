@@ -2,24 +2,19 @@
 #define SCENEX_GOODIES_FIREWORKS_H
 
 #include <ecx/ecx.h>
-#include <ekx/app/time_layers.h>
 
-//#ifdef __cplusplus
-//extern "C" {
-//#endif
-//
-
-struct fireworks_state_t {
-    entity_t layer = NULL_ENTITY;
-    TimeLayer time_layer = TIME_LAYER_ROOT;
-    float timer_ = 1.0f;
-    bool enabled = false;
-};
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void start_fireworks(entity_t e);
 
-void update_fireworks();
+void update_fireworks(void);
 
-void stop_fireworks();
+void stop_fireworks(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SCENEX_GOODIES_FIREWORKS_H

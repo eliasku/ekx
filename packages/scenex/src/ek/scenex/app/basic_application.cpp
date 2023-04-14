@@ -5,12 +5,12 @@
 #include <ekx/app/input_state.h>
 
 /** resource managers include **/
-#include <ek/scenex/particles/ParticleDecl.hpp>
+#include <ek/scenex/particles/particle_decl.h>
 #include <ek/scenex/scene_factory.h>
 #include <ek/scenex/text/font.h>
-#include <ek/scenex/2d/DynamicAtlas.hpp>
+#include <ek/scenex/2d/dynamic_atlas.h>
 #include <ek/scenex/2d/Atlas.hpp>
-#include <ek/scenex/particles/ParticleSystem.hpp>
+#include <ek/scenex/particles/particle_system.h>
 
 /** systems **/
 #include <ek/scenex/interaction_system.h>
@@ -31,7 +31,7 @@
 #include <ek/goodies/popup_manager.h>
 #include <ek/goodies/bubble_text.h>
 #include <ek/scenex/base/interactive.h>
-#include <ek/goodies/helpers/Trail2D.hpp>
+#include <ek/goodies/trail2d.h>
 #include <ek/scenex/base/destroy_timer.h>
 #include <ek/scenex/base/node_events.h>
 
@@ -103,13 +103,8 @@ void registerSceneXComponents() {
     Tween_setup();
     camera_shaker_init();
     bubble_text_setup();
-    ECX_COMPONENT(Trail2D);
-    ECX_COMPONENT(TrailRenderer2D);
-
-    ECX_COMPONENT(ParticleEmitter2D);
-    ECX_COMPONENT(ParticleLayer2D);
-    ECX_COMPONENT(ParticleRenderer2D);
-
+    setup_trail2d();
+    setup_particle2d();
     updater_init();
 }
 

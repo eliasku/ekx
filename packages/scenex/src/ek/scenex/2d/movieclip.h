@@ -13,7 +13,7 @@ typedef struct {
     const sg_movie_t* data;
     float time;
     float fps;
-    TimeLayer timer;
+    time_layer_t timer;
     bool playing;
 }  movieclip_t;
 

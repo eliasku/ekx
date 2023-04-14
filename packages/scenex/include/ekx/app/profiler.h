@@ -52,7 +52,7 @@ struct profiler_track {
     float max;// = 33.3f;
 };
 
-typedef struct profile_metrics_t {
+typedef struct {
     struct profiler_track tracks[PROFILE_TRACKS_MAX_COUNT];
     struct fps_counter fps;
     float drawable_area;

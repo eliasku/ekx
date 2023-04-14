@@ -7,7 +7,7 @@
 #include <ek/scenex/3d/scene3d.h>
 #include <ek/scenex/2d/Atlas.hpp>
 #include <ek/scenex/text/font.h>
-#include <ek/scenex/2d/DynamicAtlas.hpp>
+#include <ek/scenex/2d/dynamic_atlas.h>
 #include <ek/scenex/text/font.h>
 #include <ek/scenex/text/TrueTypeFont.hpp>
 #include <ek/scenex/text/BitmapFont.hpp>
@@ -94,22 +94,19 @@ void draw_atlas_info(void* asset) {
 }
 
 void draw_dynamic_atlas_info(void* asset) {
-    dynamic_atlas_ptr p_atlas = *(dynamic_atlas_ptr*) asset;
+    dynamic_atlas_t* atlas = (dynamic_atlas_t*) asset;
 
-    if(!p_atlas) {
+    if(!atlas) {
         ImGui::TextColored(ImColor{1.0f, 0.0f, 0.0f}, "null");
         return;
     }
-    if(ImGui::Button("Reset")) {
-        p_atlas->reset();
-    }
-    auto pagesCount = p_atlas->pages_.size();
-    ImGui::Text("Page Size: %d x %d", p_atlas->pageWidth, p_atlas->pageHeight);
+    uint32_t pagesCount = arr_size(atlas->pages_);
+    ImGui::Text("Page Size: %d x %d", atlas->pageWidth, atlas->pageHeight);
     ImGui::Text("Page Count: %u", pagesCount);
     static float pageScale = 0.25f;
     ImGui::SliderFloat("Scale", &pageScale, 0.0f, 1.0f);
     for (int i = 0; i < pagesCount; ++i) {
-        const sg_image page = p_atlas->get_page_image(i);
+        const sg_image page = atlas->pages_[i].image;
         if (page.id) {
             ImGui::Text("Page #%d", i);
             const sg_image_desc info = sg_query_image_desc(page);

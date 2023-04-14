@@ -36,7 +36,7 @@ typedef struct {
     vec2_t base_scale;
     color2_t base_color;
 
-    TimeLayer time;
+    time_layer_t time;
 
     bool initialized;
     bool pushed;

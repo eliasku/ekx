@@ -18,7 +18,7 @@
 
 #endif
 
-#include <ek/scenex/2d/DynamicAtlas.hpp>
+#include <ek/scenex/2d/dynamic_atlas.h>
 
 
 TrueTypeFont::TrueTypeFont(float dpiScale_, float fontSize, string_hash_t dynamicAtlasName) :
@@ -58,8 +58,8 @@ bool TrueTypeFont::getGlyph(uint32_t codepoint, glyph_t* outGlyph) {
         return false;
     }
 
-    dynamic_atlas_ptr atlas_instance = REF_RESOLVE(res_dynamic_atlas, atlas);
-    if (!atlas_instance) {
+    dynamic_atlas_t* atlas_instance = &REF_RESOLVE(res_dynamic_atlas, atlas);
+    if (arr_empty(atlas_instance->pages_)) {
         resetGlyphs();
         // not ready to fill dynamic atlas :(
         return false;
@@ -119,7 +119,7 @@ bool TrueTypeFont::getGlyph(uint32_t codepoint, glyph_t* outGlyph) {
         bitmap_blur_gray(bmp, bitmapWidth, bitmapHeight, bitmapWidth, blurRadius_, blurIterations_,
                          strengthPower_);
 
-        auto sprite = atlas_instance->addBitmap(bitmapWidth, bitmapHeight, bmp, bmpSize);
+        dynamic_atlas_sprite_t sprite = dynamic_atlas_add_bitmap(atlas_instance, bitmapWidth, bitmapHeight, bmp, bmpSize);
         //free(bmp);
 
         glyph->image = sprite.image;
@@ -249,10 +249,7 @@ float TrueTypeFont::getKerning(uint32_t codepoint1, uint32_t codepoint2) {
 void TrueTypeFont::resetGlyphs() {
     map.clear();
     if (atlas) {
-        dynamic_atlas_ptr atlas_instance = REF_RESOLVE(res_dynamic_atlas, atlas);
-        if (atlas_instance) {
-            atlasVersion = atlas_instance->version;
-        }
+        atlasVersion = REF_RESOLVE(res_dynamic_atlas, atlas).version;
     }
 }
 

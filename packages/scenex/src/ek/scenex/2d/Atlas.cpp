@@ -51,7 +51,7 @@ void load_atlas_meta(Atlas* atlas, ek_local_res* lr) {
     log_debug("Atlas Base Path: %s", atlas->base_path.c_str());
 
     // header
-    calo_reader_t reader = {0};
+    calo_reader_t reader = INIT_ZERO;
     reader.p = lr->buffer;
     read_calo(&reader);
     atlas_info_t atlas_info = read_stream_atlas_info(&reader);

@@ -167,9 +167,7 @@ void canvas_save_transform(void);
 
 void canvas_restore_transform(void);
 
-inline void canvas_transform_pivot(vec2_t pos, float rotation, vec2_t scale, vec2_t pivot) {
-    mat3x2_transform_pivot(canvas.matrix, pos, rotation, scale, pivot);
-}
+void canvas_transform_pivot(vec2_t pos, float rotation, vec2_t scale, vec2_t pivot);
 
 void canvas_translate(vec2_t delta);
 

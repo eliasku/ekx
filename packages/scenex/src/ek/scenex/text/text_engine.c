@@ -1,6 +1,5 @@
 #include "text_engine.h"
 #include "font.h"
-#include "font_base.h"
 #include <ek/buf.h>
 #include <ek/gfx.h>
 #include <ek/canvas.h>
@@ -8,15 +7,15 @@
 #include <ek/print.h>
 #include <stdarg.h>
 
+#define ZERO_LINE (text_block_line_t){0}
 text_engine_t text_engine;
 
 void setup_text_engine(void) {
-    text_engine = {};
     text_engine.format = text_format(H("mini"), 16.0f);
 }
 
 static font_t* get_font_data(R(Font) ref) {
-    return ref ? &REF_RESOLVE(res_font, ref) : nullptr;
+    return ref ? &REF_RESOLVE(res_font, ref) : NULL;
 }
 
 static void update_line_size(vec2_t* line_size, float length, float height) {
@@ -98,12 +97,10 @@ void draw_text_block(const char* text, const text_block_t* info) {
     if (!font) {
         return;
     }
-    //auto alignment = format.alignment;
-
     canvas_push_program(res_shader.data[R_SHADER_ALPHA_MAP]);
     // render effects first
     for (int i = text_engine.format.layersCount - 1; i >= 0; --i) {
-        auto* layer = text_engine.format.layers + i;
+        text_layer_effect_t* layer = text_engine.format.layers + i;
         if (!layer->visible) {
             continue;
         }
@@ -131,7 +128,7 @@ void draw_text_block_layer(const char* text, const text_layer_effect_t* layer, c
 
     font_set_blur(font, layer->blurRadius, layer->blurIterations, layer->strength);
 
-    vec2_t current = text_engine.position + layer->offset;
+    vec2_t current = add_vec2(text_engine.position, layer->offset);
     const float startX = current.x;
     int lineIndex = 0;
     int numLines = (int) arr_size(info->lines);
@@ -144,7 +141,7 @@ void draw_text_block_layer(const char* text, const text_layer_effect_t* layer, c
     uint32_t prev_image_id = SG_INVALID_ID;
     uint32_t prevCodepointOnLine = 0;
     glyph_t gdata;
-    uint32_t codepoint = 0;
+    uint32_t codepoint;
     while (lineIndex < numLines) {
         const char* it = text + info->lines[lineIndex].begin;
         const char* end = text + info->lines[lineIndex].end;
@@ -152,7 +149,7 @@ void draw_text_block_layer(const char* text, const text_layer_effect_t* layer, c
             codepoint = utf8_next(&it);
             if (font_get_glyph(font, codepoint, &gdata)) {
                 if (kerning && prevCodepointOnLine) {
-                    current.x += gdata.source->getKerning(prevCodepointOnLine, codepoint) * size;
+                    current.x += font_base_kerning(gdata.source, prevCodepointOnLine, codepoint) * size;
                 }
                 if (gdata.image.id) {
                     if (prev_image_id != gdata.image.id) {
@@ -203,7 +200,7 @@ static const char* whitespaces = " \n\t";
 static const char* punctuations = ".,!?:";
 
 static bool in_ascii_range(uint32_t c, const char* range) {
-    return c && c == (c & 0x7Fu) && strchr(range, static_cast<char>(c & 0x7Fu));
+    return c && c == (c & 0x7Fu) && strchr(range, (char)(c & 0x7Fu));
 }
 
 static const char* skip(const char* it, const char* range) {
@@ -247,22 +244,22 @@ void get_text_block_size(const char* text, text_block_t* info) {
     glyph_t metrics;
     const char* it = text;
     const char* prev = text;
-    const char* lastWrapToPosition = nullptr;
+    const char* lastWrapToPosition = NULL;
     text_block_line_t lastWrapLine;
 
     uint32_t prevCodepointOnLine = 0;
     uint32_t codepoint = 0;
-    text_block_line_t line = INIT_ZERO;
+    text_block_line_t line = {0};
     codepoint = utf8_next(&it);
     while (codepoint) {
         if (codepoint == '\n') {
-            close_line(&line, size, static_cast<int>(prev - text));
+            close_line(&line, size, (int)(prev - text));
             add_line(info, line);
-            line = INIT_ZERO;
-            line.begin = static_cast<int>(it - text);
+            line = ZERO_LINE;
+            line.begin = (int)(it - text);
             x = 0.0f;
 
-            lastWrapLine = INIT_ZERO;
+            lastWrapLine = ZERO_LINE;
             // next char
             prevCodepointOnLine = 0;
             prev = it;
@@ -274,26 +271,26 @@ void get_text_block_size(const char* text, text_block_t* info) {
             if (is_punctuation(prevCodepointOnLine)) {
                 lastWrapToPosition = skip_whitespaces(prev);
                 lastWrapLine = line;
-                close_line(&lastWrapLine, size, static_cast<int>(prev - text));
+                close_line(&lastWrapLine, size, (int)(prev - text));
             } else if (is_whitespace(codepoint)) {
                 lastWrapToPosition = skip_whitespaces(it);
                 lastWrapLine = line;
-                close_line(&lastWrapLine, size, static_cast<int>(prev - text));
+                close_line(&lastWrapLine, size, (int)(prev - text));
             }
         }
         if (font_get_glyph_metrics(font, codepoint, &metrics)) {
             const float kern = (kerning && prevCodepointOnLine) ?
-                               metrics.source->getKerning(prevCodepointOnLine, codepoint) * size :
+                               font_base_kerning(metrics.source, prevCodepointOnLine, codepoint) * size :
                                0.0f;
-            auto right = x + kern + size * fmax(RECT_R(metrics.rect), metrics.advanceWidth);
+            float right = x + kern + size * fmaxf(RECT_R(metrics.rect), metrics.advanceWidth);
             if (format.wordWrap && right > text_engine.max_width && text_engine.max_width > 0) {
                 if (lastWrapLine.end != 0) {
                     add_line(info, lastWrapLine);
-                    line = INIT_ZERO;
+                    line = ZERO_LINE;
                     it = lastWrapToPosition;
-                    line.begin = static_cast<int>(it - text);
+                    line.begin = (int)(it - text);
                     x = 0.0f;
-                    lastWrapLine = INIT_ZERO;
+                    lastWrapLine = ZERO_LINE;
                     prevCodepointOnLine = 0;
                     prev = it;
                     codepoint = utf8_next(&it);
@@ -301,11 +298,11 @@ void get_text_block_size(const char* text, text_block_t* info) {
                 }
                     // at least one symbol added to line
                 else if (it > text + line.begin && format.allowLetterWrap) {
-                    close_line(&line, size, static_cast<int>(prev - text));
+                    close_line(&line, size, (int)(prev - text));
                     add_line(info, line);
-                    line = INIT_ZERO;
-                    lastWrapLine = INIT_ZERO;
-                    line.begin = static_cast<int>(prev - text);
+                    line = ZERO_LINE;
+                    lastWrapLine = ZERO_LINE;
+                    line.begin = (int)(prev - text);
                     x = 0.0f;
                     prevCodepointOnLine = 0;
                     // use current codepoint
@@ -326,7 +323,7 @@ void get_text_block_size(const char* text, text_block_t* info) {
         prev = it;
         codepoint = utf8_next(&it);
     }
-    close_line(&line, size, static_cast<int>(prev - text));
+    close_line(&line, size, (int)(prev - text));
     add_line(info, line);
 
     EK_ASSERT(check_text_block_valid(info));
