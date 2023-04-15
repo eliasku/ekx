@@ -5,7 +5,7 @@
 #include <gen_sg.h>
 #include <ek/scenex/scene_factory.h>
 #include <ek/scenex/3d/scene3d.h>
-#include <ek/scenex/2d/Atlas.hpp>
+#include <ek/scenex/2d/atlas.h>
 #include <ek/scenex/text/font.h>
 #include <ek/scenex/2d/dynamic_atlas.h>
 #include <ek/scenex/text/font.h>
@@ -58,18 +58,13 @@ void draw_sg_info(void* asset) {
 }
 
 void draw_atlas_info(void* asset) {
-    atlas_ptr p_atlas = *(atlas_ptr*) asset;
-    if(!p_atlas) {
-        ImGui::TextColored(ImColor{1.0f, 0.0f, 0.0f}, "null");
-        return;
-    }
-
-    auto pagesCount = p_atlas->pages.size();
+    atlas_t* atlas = (atlas_t*) asset;
+    uint32_t pagesCount = arr_size(atlas->pages);
     ImGui::Text("Page Count: %u", pagesCount);
     static float pageScale = 0.25f;
     ImGui::SliderFloat("Scale", &pageScale, 0.0f, 1.0f);
     for (int i = 0; i < pagesCount; ++i) {
-        const sg_image page = REF_RESOLVE(res_image, p_atlas->pages[i]);
+        const sg_image page = REF_RESOLVE(res_image, atlas->pages[i]);
         if (page.id) {
             ImGui::Text("Page #%d", i);
             const sg_image_desc info = sg_query_image_desc(page);
@@ -81,8 +76,9 @@ void draw_atlas_info(void* asset) {
         }
     }
 
-    for (const auto spr: p_atlas->sprites) {
-        const auto* sprite = &REF_RESOLVE(res_sprite, spr);
+    arr_for (p_spr, atlas->sprites) {
+        R(sprite_t) spr = *p_spr;
+        const sprite_t* sprite = &REF_RESOLVE(res_sprite, spr);
         ImGui::Text("%s (GID: %u)", hsp_get(res_sprite.names[spr]), spr);
         if (sprite->state & SPRITE_LOADED) {
             guiSprite(sprite);

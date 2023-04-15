@@ -1,9 +1,10 @@
-#include "Atlas.hpp"
-#include "sprite.h"
+#include "atlas.h"
 
+#include <ek/string.h>
 #include <ek/log.h>
 #include <ek/local_res.h>
 #include <ek/gfx.h>
+#include <ek/buf.h>
 #include <ek/print.h>
 #include <gen_sg.h>
 
@@ -22,14 +23,12 @@ void setup_res_atlas(void) {
 
 void update_res_atlas(void) {
     for (res_id id = 0; id < res_atlas.rr.num; ++id) {
-        atlas_ptr content = res_atlas.data[id];
-        if (content) {
-            content->pollLoading();
-        }
+        atlas_t* atlas = &res_atlas.data[id];
+        atlas_poll_loading(atlas);
     }
 }
 
-int get_scale_num(float scale) {
+static int get_scale_num(float scale) {
     if (scale <= 1.0f) {
         return 1;
     } else if (scale <= 2.0f) {
@@ -40,15 +39,9 @@ int get_scale_num(float scale) {
     return 4;
 }
 
-Atlas::Atlas() = default;
-
-Atlas::~Atlas() {
-    clear();
-}
-
-void load_atlas_meta(Atlas* atlas, ek_local_res* lr) {
+static void load_atlas_meta(atlas_t* atlas, ek_local_res* lr) {
     log_debug("Decoding Atlas META");
-    log_debug("Atlas Base Path: %s", atlas->base_path.c_str());
+    log_debug("Atlas Base Path: %s", str_get(atlas->base_path));
 
     // header
     calo_reader_t reader = INIT_ZERO;
@@ -56,10 +49,10 @@ void load_atlas_meta(Atlas* atlas, ek_local_res* lr) {
     read_calo(&reader);
     atlas_info_t atlas_info = read_stream_atlas_info(&reader);
 
-    for (auto* loader: atlas->loaders) {
-        ek_texture_loader_destroy(loader);
+    arr_for (p_loader, atlas->loaders) {
+        ek_texture_loader_destroy(*p_loader);
     }
-    atlas->loaders.clear();
+    arr_reset((void**)&atlas->loaders);
 
     arr_for(page, atlas_info.pages) {
         res_id image_asset = R_IMAGE(H(page->image_path));
@@ -68,14 +61,15 @@ void load_atlas_meta(Atlas* atlas, ek_local_res* lr) {
         if (image->id) {
             log_debug("Destroy old page image %s", page->image_path);
             sg_destroy_image(*image);
-            *image = {SG_INVALID_ID};
+            image->id = SG_INVALID_ID;
         }
 
-        atlas->pages.push_back(image_asset);
-        atlas->loaders.emplace_back(ek_texture_loader_create());
+        arr_push(atlas->pages, image_asset);
+        ek_texture_loader_ptr loader = ek_texture_loader_create();
+        arr_push(atlas->loaders, loader);
         arr_for(spr, page->sprites) {
             res_id ref = R_SPRITE(spr->name);
-            atlas->sprites.push_back(ref);
+            arr_push(atlas->sprites, ref);
 
             sprite_t* sprite = &REF_RESOLVE(res_sprite, ref);
             EK_ASSERT((sprite->state & SPRITE_LOADED) == 0);
@@ -88,44 +82,42 @@ void load_atlas_meta(Atlas* atlas, ek_local_res* lr) {
 
     arr_for(page, atlas_info.pages) {
         const char* page_image_path = page->image_path;
-        log_debug("Load atlas page %s/%s", atlas->base_path.c_str(), page_image_path);
+        log_debug("Load atlas page %s/%s", str_get(atlas->base_path), page_image_path);
 
-        const uint32_t index = (uint32_t)(page - atlas_info.pages);
+        const uint32_t index = (uint32_t) (page - atlas_info.pages);
         ek_texture_loader* loader = atlas->loaders[index];
         loader->formatMask = atlas->formatMask;
-        ek_texture_loader_set_path(&loader->basePath, atlas->base_path.c_str());
+        ek_texture_loader_set_path(&loader->basePath, str_get(atlas->base_path));
         loader->imagesToLoad = 1;
         ek_texture_loader_set_path(&loader->urls[0], page_image_path);
         ek_texture_loader_load(loader);
     }
 }
 
-void Atlas::load(const char* path, float scaleFactor) {
+static void on_atlas_res_loaded(ek_local_res* lr) {
+    atlas_t* this_ = (atlas_t*) lr->userdata;
+    if (ek_local_res_success(lr)) {
+        load_atlas_meta(this_, lr);
+    }
+    ek_local_res_close(lr);
+}
+
+void atlas_load(atlas_t* atlas, const char* path, float scale_factor) {
     char meta_file_path[1024];
-    ek_snprintf(meta_file_path, sizeof meta_file_path, "%s%dx.atlas", path, get_scale_num(scaleFactor));
+    ek_snprintf(meta_file_path, sizeof meta_file_path, "%s%dx.atlas", path, get_scale_num(scale_factor));
 
     char dir_buf[1024];
     ek_path_dirname(dir_buf, sizeof dir_buf, path);
-    base_path = dir_buf;
+    str_init_c_str(&atlas->base_path, dir_buf);
 
-    ek_local_res_load(
-            meta_file_path,
-            [](ek_local_res* lr) {
-                Atlas* this_ = (Atlas*) lr->userdata;
-                if (ek_local_res_success(lr)) {
-                    load_atlas_meta(this_, lr);
-                }
-                ek_local_res_close(lr);
-            },
-            this
-    );
+    ek_local_res_load(meta_file_path, on_atlas_res_loaded, atlas);
 }
 
-int Atlas::pollLoading() {
-    int toLoad = (int) loaders.size();
+int atlas_poll_loading(atlas_t* atlas) {
+    int toLoad = (int) arr_size(atlas->loaders);
     if (toLoad > 0) {
-        for (uint32_t i = 0; i < loaders.size(); ++i) {
-            auto* loader = loaders[i];
+        for (uint32_t i = 0; i < arr_size(atlas->loaders); ++i) {
+            ek_texture_loader * loader = atlas->loaders[i];
             if (loader) {
                 ek_texture_loader_update(loader);
                 if (!loader->loading) {
@@ -138,7 +130,7 @@ int Atlas::pollLoading() {
                         const res_id image_id = R_IMAGE(H(loader->urls[0].path));
                         REF_RESOLVE(res_image, image_id) = loader->image;
                         ek_texture_loader_destroy(loader);
-                        loaders[i] = nullptr;
+                        atlas->loaders[i] = NULL;
                     }
                     --toLoad;
                 }
@@ -147,12 +139,12 @@ int Atlas::pollLoading() {
             }
         }
         if (toLoad == 0) {
-            for (auto* loader: loaders) {
-                if (loader) {
-                    ek_texture_loader_destroy(loader);
+            arr_for (p_loader, atlas->loaders) {
+                if (*p_loader) {
+                    ek_texture_loader_destroy(*p_loader);
                 }
             }
-            loaders.clear();
+            arr_reset((void**)&atlas->loaders);
             return 0;
         } else {
             return toLoad;
@@ -161,10 +153,10 @@ int Atlas::pollLoading() {
     return 0;
 }
 
-int Atlas::getLoadingImagesCount() const {
+int atlas_get_loading_images_count(const atlas_t* atlas) {
     int loading = 0;
-    for (uint32_t i = 0; i < loaders.size(); ++i) {
-        auto* loader = loaders[i];
+    for (uint32_t i = 0; i < arr_size(atlas->loaders); ++i) {
+        ek_texture_loader* loader = atlas->loaders[i];
         if (loader) {
             ++loading;
         }
@@ -172,21 +164,26 @@ int Atlas::getLoadingImagesCount() const {
     return loading;
 }
 
-void Atlas::clear() {
+void atlas_clear(atlas_t* atlas) {
     // TODO: idea with ref counting and when we can unload - just delete all unreferenced resources
 
-    for (auto page: pages) {
-        sg_image* image = &REF_RESOLVE(res_image, page);
+    arr_for (page, atlas->pages) {
+        sg_image* image = &REF_RESOLVE(res_image, *page);
         if (image->id) {
             sg_destroy_image(*image);
-            *image = {SG_INVALID_ID};
+            image->id = SG_INVALID_ID;
         }
     }
 
-    for (auto ref: sprites) {
-        auto* spr = &REF_RESOLVE(res_sprite, ref);
+    arr_for (ref, atlas->sprites) {
+        sprite_t* spr = &REF_RESOLVE(res_sprite, *ref);
         spr->image_id = 0;
         spr->state = 0;
     }
+
+    arr_reset((void**)&atlas->pages);
+    arr_reset((void**)&atlas->sprites);
+    arr_reset((void**)&atlas->loaders);
+    arr_reset(&atlas->base_path);
 }
 

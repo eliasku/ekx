@@ -33,11 +33,9 @@ extern ek::basic_application* g_game_app;
 
 void init_game_app(ek::basic_application* game);
 
+struct Asset;
+
 namespace ek {
-
-class AssetManager;
-
-class Asset;
 
 void basic_app_on_frame();
 
@@ -55,7 +53,6 @@ public:
 
     /////
     entity_t root;
-    AssetManager asset_manager;
 
     basic_application();
 
@@ -120,6 +117,8 @@ inline void run_app() {
     setup_resource_managers();
 
     setup_text_engine();
+
+    assets_init();
 
 #ifdef EK_DEV_TOOLS
     init_editor_config();

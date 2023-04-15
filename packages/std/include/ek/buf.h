@@ -100,6 +100,7 @@ void* _check_ptr_alignment(void* ptr, uint32_t width);
 
 const char* str_get(void* buf);
 void str_copy(void** p_dest, const void* src);
+void str_init_c_str(void** p_dest, const char* c_str);
 
 #ifdef __cplusplus
 }

@@ -16,10 +16,8 @@
 #include <ek/scenex/2d/movieclip.h>
 #include <ek/scenex/base/tween.h>
 #include <ek/goodies/game_screen.h>
-
-// TODO: ->C
 #include <ek/scenex/2d/dynamic_atlas.h>
-#include <ek/scenex/2d/Atlas.hpp>
+#include <ek/scenex/2d/atlas.h>
 
 void scene_pre_update(entity_t root, float dt) {
     (void)root;
@@ -53,10 +51,8 @@ void scene_post_update(entity_t root) {
 
 void scene_render(entity_t root) {
     (void)root;
-    // TODO: ->C
-    update_res_dynamic_atlas();
-    // TODO: ->C
-    update_res_atlas();
 
+    update_res_dynamic_atlas();
+    update_res_atlas();
     render_camera2d_queue();
 }

@@ -11,7 +11,7 @@
 #include <ek/texture_loader.h>
 
 #include <ek/scenex/scene_factory.h>
-#include <ek/scenex/2d/Atlas.hpp>
+#include <ek/scenex/2d/atlas.h>
 #include <ek/scenex/3d/scene3d.h>
 
 #include <ek/scenex/text/font.h>
@@ -23,13 +23,12 @@
 
 #include <ekx/app/localization.h>
 
-namespace ek {
 
 Asset* unpack_asset(calo_reader_t* r, string_hash_t type);
 
 class AudioAsset : public Asset {
 public:
-    AudioAsset(string_hash_t name, String filepath, uint32_t flags_) :
+    AudioAsset(string_hash_t name, ek::String filepath, uint32_t flags_) :
             res{R_AUDIO(name)},
             path_{std::move(filepath)},
             flags{flags_} {
@@ -41,7 +40,7 @@ public:
         EK_ASSERT(buffer->id == 0);
 
         char full_path[1024];
-        ek_path_join(full_path, sizeof full_path, manager_->base_path.c_str(), path_.c_str());
+        ek_path_join(full_path, sizeof full_path, asset_manager.base_path, path_.c_str());
         *buffer = auph_load(full_path, (flags & 1) ? AUPH_FLAG_STREAM : 0);
     }
 
@@ -56,7 +55,7 @@ public:
             else {
                 log_debug("loaded audio sound %s", path_.c_str());
             };
-            state = AssetState::Ready;
+            state = ASSET_STATE_READY;
         } else {
             log_debug("poll audio sound loading %s", path_.c_str());
         }
@@ -73,12 +72,12 @@ public:
     }
 
     R(auph_buffer) res;
-    String path_;
+    ek::String path_;
     uint32_t flags;
 };
 
-class AtlasAsset : public Asset {
-public:
+struct AtlasAsset : public Asset {
+
     AtlasAsset(const char* name_, uint32_t formatMask_) : res{R_ATLAS(H(name_))},
                                                           name{name_} {
         // we need to load atlas image and atlas meta
@@ -87,59 +86,50 @@ public:
     }
 
     void load() override {
-        if (state != AssetState::Ready || loaded_scale_ != manager_->scale_uid) {
-            loaded_scale_ = manager_->scale_uid;
+        if (state != ASSET_STATE_READY || loaded_scale_ != asset_manager.scale_uid) {
+            loaded_scale_ = asset_manager.scale_uid;
 
-            atlas_ptr* p_atlas = &REF_RESOLVE(res_atlas, res);
-            if (*p_atlas) {
-                delete *p_atlas;
-                *p_atlas = nullptr;
-            }
+            atlas_t* atlas = &REF_RESOLVE(res_atlas, res);
+            atlas_clear(atlas);
+            atlas->formatMask = formatMask;
 
-            *p_atlas = new Atlas;
             // do not switch to loading state, because after first load system does not poll pack's Asset objects
-            state = AssetState::Loading;
-
-            (*p_atlas)->formatMask = formatMask;
+            state = ASSET_STATE_LOADING;
 
             char full_path[1024];
-            ek_path_join(full_path, sizeof full_path, manager_->base_path.c_str(), name.c_str());
-            (*p_atlas)->load(full_path, manager_->scale_factor);
+            ek_path_join(full_path, sizeof full_path, asset_manager.base_path, name.c_str());
+            atlas_load(atlas, full_path, asset_manager.scale_factor);
         }
     }
 
     void poll() override {
-        if (state == AssetState::Loading) {
-            atlas_ptr* p_atlas = &REF_RESOLVE(res_atlas, res);
-            if (*p_atlas) {
-                // we poll atlas loading / reloading in separated process with Atlas::pollLoading for each Res<Atlas>
-                int loading = (*p_atlas)->getLoadingImagesCount();
-                if (loading == 0) {
-                    state = AssetState::Ready;
-                }
+        if (state == ASSET_STATE_LOADING) {
+            atlas_t* atlas = &REF_RESOLVE(res_atlas, res);
+            // we poll atlas loading / reloading in separated process with Atlas::pollLoading for each Res<Atlas>
+            int loading = atlas_get_loading_images_count(atlas);
+            if (loading == 0) {
+                state = ASSET_STATE_READY;
             }
         }
     }
 
     [[nodiscard]]
     float getProgress() const override {
-        if (state == AssetState::Loading) {
+        if (state == ASSET_STATE_LOADING) {
             float progress = 0.0f;
-            atlas_ptr* p_atlas = &REF_RESOLVE(res_atlas, res);
-            if (*p_atlas) {
-                progress = 1.0f;
-                const auto totalPages = (float) (*p_atlas)->pages.size();
-                float loadedPages = 0.0f;
-                for (auto page: (*p_atlas)->pages) {
-                    if (REF_RESOLVE(res_image, page).id) {
-                        loadedPages += 1.0f;
-                    }
+            atlas_t* atlas = &REF_RESOLVE(res_atlas, res);
+            progress = 1.0f;
+            const float totalPages = (float) arr_size(atlas->pages);
+            float loadedPages = 0.0f;
+            arr_for (p_page, atlas->pages) {
+                if (REF_RESOLVE(res_image, *p_page).id) {
+                    loadedPages += 1.0f;
                 }
-                if (totalPages > 0.0f) {
-                    progress += loadedPages / totalPages;
-                } else {
-                    progress = 2.0f;
-                }
+            }
+            if (totalPages > 0.0f) {
+                progress += loadedPages / totalPages;
+            } else {
+                progress = 2.0f;
             }
             return progress;
         }
@@ -147,32 +137,29 @@ public:
     }
 
     void do_unload() override {
-        atlas_ptr* p_atlas = &REF_RESOLVE(res_atlas, res);
-        if (*p_atlas) {
-            delete *p_atlas;
-            *p_atlas = nullptr;
-        }
+        atlas_t* atlas = &REF_RESOLVE(res_atlas, res);
+        atlas_clear(atlas);
     }
 
     R(atlas_ptr) res;
-    String name;
+    ek::String name;
     uint8_t loaded_scale_ = 0;
     uint32_t formatMask = 1;
 };
 
-class DynamicAtlasAsset : public Asset {
-public:
+struct DynamicAtlasAsset : public Asset {
+
     DynamicAtlasAsset(string_hash_t name, uint32_t flags) : res{R_DYNAMIC_ATLAS(name)}, flags_{flags} {
     }
 
     // do not reload dynamic atlas, because references to texture* should be invalidated,
     // but current strategy not allow that
     void do_load() override {
-        const int page_size = dynamic_atlas_estimate_better_size(manager_->scale_factor, 512, 2048);
+        const int page_size = dynamic_atlas_estimate_better_size(asset_manager.scale_factor, 512, 2048);
         dynamic_atlas_t* ptr = &REF_RESOLVE(res_dynamic_atlas, res);
         EK_ASSERT(ptr->pages_ == NULL);
         dynamic_atlas_create(ptr, page_size, page_size, (flags_ & 1) != 0, (flags_ & 2) != 0);
-        state = AssetState::Ready;
+        state = ASSET_STATE_READY;
     }
 
     void do_unload() override {
@@ -184,16 +171,16 @@ public:
     uint32_t flags_ = 0;
 };
 
-class SceneAsset : public Asset {
-public:
-    explicit SceneAsset(string_hash_t name, String path) :
+struct SceneAsset : public Asset {
+
+    explicit SceneAsset(string_hash_t name, ek::String path) :
             res{R_SG(name)},
             path_{std::move(path)} {
     }
 
     void do_load() override {
         char full_path[1024];
-        ek_path_join(full_path, sizeof full_path, manager_->base_path.c_str(), path_.c_str());
+        ek_path_join(full_path, sizeof full_path, asset_manager.base_path, path_.c_str());
         ek_local_res_load(full_path,
                           [](ek_local_res* lr) {
                               SceneAsset* this_ = (SceneAsset*) lr->userdata;
@@ -202,7 +189,7 @@ public:
                                   sg_load(file, lr->buffer, (uint32_t) lr->length);
                               }
                               ek_local_res_close(lr);
-                              this_->state = AssetState::Ready;
+                              this_->state = ASSET_STATE_READY;
                           }, this);
     }
 
@@ -214,19 +201,19 @@ public:
     }
 
     R(SGFile) res;
-    String path_;
+    ek::String path_;
 };
 
-class BitmapFontAsset : public Asset {
-public:
-    BitmapFontAsset(string_hash_t name, String path) :
+struct BitmapFontAsset : public Asset {
+
+    BitmapFontAsset(string_hash_t name, ek::String path) :
             res{R_FONT(name)},
             path_{std::move(path)} {
     }
 
     void do_load() override {
         char full_path[1024];
-        ek_path_join(full_path, sizeof full_path, manager_->base_path.c_str(), path_.c_str());
+        ek_path_join(full_path, sizeof full_path, asset_manager.base_path, path_.c_str());
         ek_local_res_load(
                 full_path,
                 [](ek_local_res* lr) {
@@ -245,7 +232,7 @@ public:
                     } else {
                         ek_local_res_close(lr);
                     }
-                    this_->state = AssetState::Ready;
+                    this_->state = ASSET_STATE_READY;
                 }, this);
     }
 
@@ -262,12 +249,12 @@ public:
     // keep data instance
     ek_local_res local_res;
     R(Font) res;
-    String path_;
+    ek::String path_;
 
 };
 
-class ImageAsset : public Asset {
-public:
+struct ImageAsset : public Asset {
+
     ImageAsset(string_hash_t name, image_data_t data) :
             res{R_IMAGE(name)},
             data_{data} {
@@ -276,7 +263,7 @@ public:
 
     void do_load() override {
         loader = ek_texture_loader_create();
-        ek_texture_loader_set_path(&loader->basePath, manager_->base_path.c_str());
+        ek_texture_loader_set_path(&loader->basePath, asset_manager.base_path);
         const int num = (int) arr_size(data_.images);
         EK_ASSERT(num > 0 && num <= EK_TEXTURE_LOADER_IMAGES_MAX_COUNT);
         for (int i = 0; i < num; ++i) {
@@ -289,7 +276,7 @@ public:
             loader->formatMask = data_.format_mask;
         }
         ek_texture_loader_load(loader);
-        state = AssetState::Loading;
+        state = ASSET_STATE_LOADING;
     }
 
     void poll() override {
@@ -303,7 +290,7 @@ public:
                 if (error == 0) {
                     REF_RESOLVE(res_image, res) = loader->image;
                 }
-                state = AssetState::Ready;
+                state = ASSET_STATE_READY;
                 ek_texture_loader_destroy(loader);
                 loader = nullptr;
             }
@@ -312,7 +299,7 @@ public:
 
     [[nodiscard]]
     float getProgress() const override {
-        if (state == AssetState::Loading) {
+        if (state == ASSET_STATE_LOADING) {
             return loader ? loader->progress : 0.0f;
         }
         return Asset::getProgress();
@@ -337,9 +324,9 @@ public:
     bool premultiplyAlpha = true;
 };
 
-class StringsAsset : public Asset {
-public:
-    StringsAsset(String name, const lang_name_t* langs, uint32_t langs_num) :
+struct StringsAsset : public Asset {
+
+    StringsAsset(ek::String name, const lang_name_t* langs, uint32_t langs_num) :
             name_{std::move(name)} {
         total = langs_num;
         for (uint32_t i = 0; i < langs_num; ++i) {
@@ -354,7 +341,7 @@ public:
         char lang_path[1024];
         for (uint32_t i = 0; i < total; ++i) {
             auto* loader = &loaders_[i];
-            ek_snprintf(lang_path, sizeof lang_path, "%s/%s/%s.mo", manager_->base_path.c_str(), name_.c_str(),
+            ek_snprintf(lang_path, sizeof lang_path, "%s/%s/%s.mo", asset_manager.base_path, name_.c_str(),
                         loader->lang.str);
             ek_local_res_load(
                     lang_path,
@@ -370,7 +357,7 @@ public:
                         }
                         ++asset->loaded;
                         if (asset->loaded >= asset->total) {
-                            asset->state = AssetState::Ready;
+                            asset->state = ASSET_STATE_READY;
                         }
                     },
                     loader
@@ -389,21 +376,21 @@ public:
         ek_local_res lr;
     };
 
-    String name_;
+    ek::String name_;
     lang_loader loaders_[LANG_MAX_COUNT];
     uint32_t loaded = 0;
     uint32_t total = 0;
 };
 
-class ModelAsset : public Asset {
-public:
-    explicit ModelAsset(String name) :
+struct ModelAsset : public Asset {
+
+    explicit ModelAsset(ek::String name) :
             name_{std::move(name)} {
     }
 
     void do_load() override {
         char full_path[1024];
-        ek_snprintf(full_path, sizeof full_path, "%s/%s.model", manager_->base_path.c_str(), name_.c_str());
+        ek_snprintf(full_path, sizeof full_path, "%s/%s.model", asset_manager.base_path, name_.c_str());
         ek_local_res_load(
                 full_path,
                 [](ek_local_res* lr) {
@@ -419,7 +406,7 @@ public:
                         log_error("MODEL resource not found: %s", this_->name_.c_str());
                         this_->error = 1;
                     }
-                    this_->state = AssetState::Ready;
+                    this_->state = ASSET_STATE_READY;
                 },
                 this
         );
@@ -430,17 +417,16 @@ public:
         static_mesh_destroy(pp);
     }
 
-    String name_;
+    ek::String name_;
 };
 
 bool isTimeBudgetAllowStartNextJob(uint64_t since) {
     return ek_ticks_to_sec(ek_ticks(&since)) < 0.008;
 }
 
-class TrueTypeFontAsset : public Asset {
-public:
+struct TrueTypeFontAsset : public Asset {
 
-    TrueTypeFontAsset(string_hash_t name, String path, string_hash_t glyphCache, float baseFontSize) :
+    TrueTypeFontAsset(string_hash_t name, ek::String path, string_hash_t glyphCache, float baseFontSize) :
             res{R_FONT(name)},
             baseFontSize_{baseFontSize},
             path_{std::move(path)},
@@ -449,7 +435,7 @@ public:
 
     void do_load() override {
         char full_path[1024];
-        ek_path_join(full_path, sizeof full_path, manager_->base_path.c_str(), path_.c_str());
+        ek_path_join(full_path, sizeof full_path, asset_manager.base_path, path_.c_str());
         ek_local_res_load(
                 full_path,
                 [](ek_local_res* lr) {
@@ -463,7 +449,7 @@ public:
 
                     // `lr` ownership moves to font impl
                     if (ek_local_res_success(lr)) {
-                        TrueTypeFont* ttfFont = new TrueTypeFont(this_->manager_->scale_factor, this_->baseFontSize_,
+                        TrueTypeFont* ttfFont = new TrueTypeFont(asset_manager.scale_factor, this_->baseFontSize_,
                                                                  this_->glyphCache_);
                         ttfFont->loadFromMemory(lr);
                         fnt->base = ttfFont;
@@ -471,7 +457,7 @@ public:
                         ek_local_res_close(lr);
                     }
 
-                    this_->state = AssetState::Ready;
+                    this_->state = ASSET_STATE_READY;
                 }, this);
     }
 
@@ -485,7 +471,7 @@ public:
 
     R(Font) res;
     float baseFontSize_;
-    String path_;
+    ek::String path_;
     string_hash_t glyphCache_;
 };
 
@@ -543,7 +529,7 @@ Asset* unpack_asset(calo_reader_t* r, string_hash_t type) {
     return nullptr;
 }
 
-PackAsset::PackAsset(String name) :
+PackAsset::PackAsset(ek::String name) :
         name_{std::move(name)} {
 }
 
@@ -551,7 +537,7 @@ void PackAsset::do_load() {
     assetListLoaded = false;
     assetsLoaded = 0;
     char full_path[1024];
-    ek_path_join(full_path, sizeof full_path, manager_->base_path.c_str(), name_.c_str());
+    ek_path_join(full_path, sizeof full_path, asset_manager.base_path, name_.c_str());
     ek_local_res_load(
             full_path,
             [](ek_local_res* lr) {
@@ -567,7 +553,7 @@ void PackAsset::do_load() {
                             Asset* asset = unpack_asset(&reader, type);
                             if (asset) {
                                 this_->assets.push_back(asset);
-                                this_->manager_->add(asset);
+                                assets_add(asset);
                             }
                         } else {
                             break;
@@ -592,7 +578,7 @@ void PackAsset::do_unload() {
 }
 
 void PackAsset::poll() {
-    if (state != AssetState::Loading || !assetListLoaded) {
+    if (state != ASSET_STATE_LOADING || !assetListLoaded) {
         return;
     }
 
@@ -601,19 +587,19 @@ void PackAsset::poll() {
     unsigned numAssetsLoaded = 0;
     for (auto asset: assets) {
         const auto initialState = asset->state;
-        if (asset->state == AssetState::Initial) {
+        if (asset->state == ASSET_STATE_INITIAL) {
             if (isTimeBudgetAllowStartNextJob(timer)) {
 //                    log_debug("Loading BEGIN: %s", asset->name_.c_str());
                 asset->load();
             }
         }
-        if (asset->state == AssetState::Loading) {
+        if (asset->state == ASSET_STATE_LOADING) {
             if (isTimeBudgetAllowStartNextJob(timer)) {
                 asset->poll();
             }
         }
-        if (asset->state == AssetState::Ready) {
-            if (initialState != AssetState::Ready) {
+        if (asset->state == ASSET_STATE_READY) {
+            if (initialState != ASSET_STATE_READY) {
 //                    log_debug("Loading END: %s", asset->name_.c_str());
             }
             ++numAssetsLoaded;
@@ -628,17 +614,17 @@ void PackAsset::poll() {
 
     assetsLoaded = numAssetsLoaded;
     if (numAssetsLoaded >= assets.size()) {
-        state = AssetState::Ready;
+        state = ASSET_STATE_READY;
     }
 }
 
 float PackAsset::getProgress() const {
     switch (state) {
-        case AssetState::Ready:
+        case ASSET_STATE_READY:
             return 1.0f;
-        case AssetState::Initial:
+        case ASSET_STATE_INITIAL:
             return 0.0f;
-        case AssetState::Loading:
+        case ASSET_STATE_LOADING:
             // calculate sub-assets progress
             if (!assets.empty()) {
                 float acc = 0.0f;
@@ -656,4 +642,3 @@ float PackAsset::getProgress() const {
     return 0.0f;
 }
 
-}

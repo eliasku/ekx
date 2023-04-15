@@ -5,10 +5,17 @@
 #include <ek/log.h>
 #include <ek/assert.h>
 #include <ek/math.h>
+#include <ek/buf.h>
 
-namespace ek {
+asset_manager_t asset_manager;
 
-inline uint8_t get_scale_uid(float scale) {
+void assets_init(void) {
+    asset_manager.base_path = "assets";
+    asset_manager.scale_factor = 1;
+    asset_manager.scale_uid = 1;
+}
+
+static uint8_t get_scale_uid(float scale) {
     if (scale > 3.0f) {
         return 4;
     } else if (scale > 2.0f) {
@@ -19,51 +26,48 @@ inline uint8_t get_scale_uid(float scale) {
     return 1;
 }
 
-void AssetManager::load_all() {
-    for (auto asset : assets) {
-        asset->load();
+void assets_load_all(void) {
+    arr_for (asset, asset_manager.assets) {
+        (*asset)->load();
     }
 }
 
-void AssetManager::unload_all() {
-    for (auto asset : assets) {
-        asset->unload();
+void assets_unload_all(void) {
+    arr_for (asset, asset_manager.assets) {
+        (*asset)->unload();
     }
 }
 
-void AssetManager::clear() {
-    unload_all();
+void assets_clear(void) {
+    assets_unload_all();
 
-    for (auto* asset : assets) {
-        delete asset;
+    arr_for (asset, asset_manager.assets) {
+        delete (*asset);
     }
-    assets.clear();
+    arr_reset((void**)&asset_manager.assets);
 }
 
-void AssetManager::set_scale_factor(float scale) {
+void assets_set_scale_factor(float scale) {
     auto new_uid = get_scale_uid(scale);
-    scale_factor = clamp(scale, 1, 4);
-    if (scale_uid != new_uid) {
-        log_debug("asset manager: content scale changed to %d%%", (int) (100 * scale_factor));
-        scale_uid = new_uid;
+    asset_manager.scale_factor = clamp(scale, 1, 4);
+    if (asset_manager.scale_uid != new_uid) {
+        log_debug("asset manager: content scale changed to %d%%", (int) (100 * asset_manager.scale_factor));
+        asset_manager.scale_uid = new_uid;
         // todo: maybe better naming `update`?
-        load_all();
+        assets_load_all();
     }
 }
 
-void AssetManager::add(Asset* asset) {
+void assets_add(asset_ptr asset) {
     EK_ASSERT(asset);
-    asset->manager_ = this;
-    assets.push_back(asset);
+    arr_push(asset_manager.assets, asset);
 }
 
-bool AssetManager::is_assets_ready() const {
-    for (auto* asset : assets) {
-        if (asset->state != AssetState::Ready) {
+bool assets_is_all_loaded() {
+    arr_for (asset, asset_manager.assets) {
+        if ((*asset)->state != ASSET_STATE_READY) {
             return false;
         }
     }
     return true;
-}
-
 }

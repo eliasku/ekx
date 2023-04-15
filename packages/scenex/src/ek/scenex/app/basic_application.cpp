@@ -9,7 +9,7 @@
 #include <ek/scenex/scene_factory.h>
 #include <ek/scenex/text/font.h>
 #include <ek/scenex/2d/dynamic_atlas.h>
-#include <ek/scenex/2d/Atlas.hpp>
+#include <ek/scenex/2d/atlas.h>
 #include <ek/scenex/particles/particle_system.h>
 
 /** systems **/
@@ -147,7 +147,7 @@ void basic_application::initialize() {
 
 void basic_application::preload() {
     log_debug("base application: preloading, content scale: %d%%.", (int) (100 * scale_factor));
-    asset_manager.set_scale_factor(scale_factor);
+    assets_set_scale_factor(scale_factor);
     dispatcher.onPreload();
     if (preloadOnStart) {
         preload_root_assets_pack();
@@ -171,7 +171,7 @@ void basic_application::onFrame() {
     game_display_update(&display);
     Viewport_update(&display.info);
     scale_factor = get_viewport(root)->output.scale;
-    asset_manager.set_scale_factor(scale_factor);
+    assets_set_scale_factor(scale_factor);
 
     /** base app BEGIN **/
 
@@ -247,7 +247,7 @@ void basic_application::onFrame() {
     }
     sg_commit();
 
-    if (!started_ && asset_manager.is_assets_ready()) {
+    if (!started_ && assets_is_all_loaded()) {
         log_debug("Start Game");
         onAppStart();
         dispatcher.onStart();
@@ -266,7 +266,7 @@ void basic_application::onFrame() {
 
 void basic_application::preload_root_assets_pack() {
     rootAssetObject = new PackAsset("pack.bin");
-    asset_manager.add(rootAssetObject);
+    assets_add(rootAssetObject);
     if (rootAssetObject) {
         rootAssetObject->load();
     }

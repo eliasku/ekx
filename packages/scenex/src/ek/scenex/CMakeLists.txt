@@ -15,7 +15,7 @@ target_sources(${PROJECT_NAME} PUBLIC
         base/tween.h
         base/destroy_timer.h
 
-        2d/Atlas.cpp
+        2d/atlas.c
         2d/sprite.c
         2d/dynamic_atlas.c
 
@@ -59,7 +59,7 @@ target_sources(${PROJECT_NAME} PUBLIC
         systems/hit_test.h
         systems/hit_test.c
         systems/main_flow.h
-        systems/main_flow.cpp
+        systems/main_flow.c
 
         asset2/Assets.cpp
 

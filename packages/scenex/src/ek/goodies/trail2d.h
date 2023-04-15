@@ -56,7 +56,7 @@ trail_renderer2d_t*
 add_trail_renderer2d(entity_t e, entity_t target);
 
 #define get_trail2d(e) ((trail2d_t*)get_component(&Trail2D, e))
-#define add_trail2d(e) ((trail2d_t*)get_component(&Trail2D, e))
+#define add_trail2d(e) ((trail2d_t*)add_component(&Trail2D, e))
 
 #ifdef __cplusplus
 }

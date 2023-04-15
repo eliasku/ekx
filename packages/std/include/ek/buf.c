@@ -231,3 +231,7 @@ const char* str_get(void* buf) {
 void str_copy(void** p_dest, const void* src) {
     arr_assign_(p_dest, 1, src);
 }
+
+void str_init_c_str(void** p_dest, const char* c_str) {
+    arr_init_from(p_dest, 1, c_str, (uint32_t)(strlen(c_str) + 1));
+}

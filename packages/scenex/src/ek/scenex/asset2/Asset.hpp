@@ -4,35 +4,28 @@
 #include <ek/ds/PodArray.hpp>
 #include <ek/ds/String.hpp>
 
-namespace ek {
+typedef enum {
+    ASSET_STATE_INITIAL = 0,
+    ASSET_STATE_LOADING = 1,
+    ASSET_STATE_READY = 2,
+} asset_state_t;
 
-class AssetManager;
-
-enum class AssetState {
-    Initial = 0,
-    Loading = 1,
-    Ready = 2
-};
-
-class Asset {
-    friend class AssetManager;
-
-public:
+struct Asset {
     Asset() = default;
 
     virtual ~Asset() = default;
 
     virtual void load() {
-        if (state == AssetState::Initial) {
-            state = AssetState::Loading;
+        if (state == ASSET_STATE_INITIAL) {
+            state = ASSET_STATE_LOADING;
             this->do_load();
         }
     }
 
     virtual void unload() {
-        if (state == AssetState::Ready) {
+        if (state == ASSET_STATE_READY) {
             this->do_unload();
-            state = AssetState::Initial;
+            state = ASSET_STATE_INITIAL;
         }
     }
 
@@ -44,53 +37,59 @@ public:
 
     [[nodiscard]]
     virtual float getProgress() const {
-        return state == AssetState::Ready ? 1.0f : 0.0f;
+        return state == ASSET_STATE_READY ? 1.0f : 0.0f;
     }
 
-    AssetState state = AssetState::Initial;
+    asset_state_t state = ASSET_STATE_INITIAL;
     int error = 0;
     float weight_ = 1.0f;
-
-protected:
-    AssetManager* manager_ = nullptr;
 };
 
-class AssetManager {
-public:
-    void add(Asset* asset);
+typedef Asset* asset_ptr;
 
-    void load_all();
+typedef struct {
+    const char* base_path;
+    asset_ptr* assets;
+    float scale_factor;
+    uint8_t scale_uid;
+} asset_manager_t;
 
-    void unload_all();
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-    void clear();
+extern asset_manager_t asset_manager;
 
-    void set_scale_factor(float scale);
+void assets_init(void);
 
-    [[nodiscard]] bool is_assets_ready() const;
+void assets_add(asset_ptr asset);
 
-    String base_path{"assets"};
-    PodArray<Asset*> assets;
-    float scale_factor = 2.0f;
-    uint8_t scale_uid = 2;
-};
+void assets_load_all(void);
 
+void assets_unload_all(void);
 
-class PackAsset : public Asset {
-public:
-    explicit PackAsset(String name);
+void assets_clear(void);
+
+void assets_set_scale_factor(float scale);
+
+bool assets_is_all_loaded(void);
+
+#ifdef __cplusplus
+}
+#endif
+
+struct PackAsset : public Asset {
+    explicit PackAsset(ek::String name);
     void do_load() override;
     void do_unload() override;
 
     void poll() override;
     [[nodiscard]] float getProgress() const override;
 
-    String name_;
-    PodArray<Asset*> assets;
+    ek::String name_;
+    ek::PodArray<Asset*> assets;
     unsigned assetsLoaded = 0;
     bool assetListLoaded = false;
 };
-
-}
 
 #endif // SCENEX_ASSET_H
