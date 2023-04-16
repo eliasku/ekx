@@ -21,7 +21,7 @@
 #include <ekx/app/game_display.h>
 #include <ekx/app/frame_timer.h>
 #include <ek/scenex/text/text_engine.h>
-#include <ek/scenex/asset2/Asset.hpp>
+#include <ek/scenex/assets/Asset.hpp>
 #include "GameAppDispatcher.hpp"
 #include "root_app_callbacks.h"
 
@@ -70,7 +70,7 @@ public:
 
 public:
     bool preloadOnStart = true;
-    Asset* rootAssetObject = nullptr;
+    asset_ptr rootAssetObject = nullptr;
 
 protected:
     void doUpdateFrame(float dt);

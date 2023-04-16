@@ -1,6 +1,4 @@
-#pragma once
-
-#include "Asset.hpp"
+#include "asset_manager.h"
 
 #include <ek/log.h>
 #include <ek/assert.h>
@@ -28,13 +26,13 @@ static uint8_t get_scale_uid(float scale) {
 
 void assets_load_all(void) {
     arr_for (asset, asset_manager.assets) {
-        (*asset)->load();
+        load_asset(*asset);
     }
 }
 
 void assets_unload_all(void) {
     arr_for (asset, asset_manager.assets) {
-        (*asset)->unload();
+        unload_asset(*asset);
     }
 }
 
@@ -42,13 +40,13 @@ void assets_clear(void) {
     assets_unload_all();
 
     arr_for (asset, asset_manager.assets) {
-        delete (*asset);
+        delete_asset(*asset);
     }
     arr_reset((void**)&asset_manager.assets);
 }
 
 void assets_set_scale_factor(float scale) {
-    auto new_uid = get_scale_uid(scale);
+    uint8_t new_uid = get_scale_uid(scale);
     asset_manager.scale_factor = clamp(scale, 1, 4);
     if (asset_manager.scale_uid != new_uid) {
         log_debug("asset manager: content scale changed to %d%%", (int) (100 * asset_manager.scale_factor));
@@ -65,7 +63,7 @@ void assets_add(asset_ptr asset) {
 
 bool assets_is_all_loaded() {
     arr_for (asset, asset_manager.assets) {
-        if ((*asset)->state != ASSET_STATE_READY) {
+        if (get_asset_state(*asset) != ASSET_STATE_READY) {
             return false;
         }
     }

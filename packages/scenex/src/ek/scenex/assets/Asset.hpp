@@ -3,17 +3,12 @@
 
 #include <ek/ds/PodArray.hpp>
 #include <ek/ds/String.hpp>
+#include "asset_manager.h"
 
-typedef enum {
-    ASSET_STATE_INITIAL = 0,
-    ASSET_STATE_LOADING = 1,
-    ASSET_STATE_READY = 2,
-} asset_state_t;
+struct asset_ {
+    asset_() = default;
 
-struct Asset {
-    Asset() = default;
-
-    virtual ~Asset() = default;
+    virtual ~asset_() = default;
 
     virtual void load() {
         if (state == ASSET_STATE_INITIAL) {
@@ -45,40 +40,7 @@ struct Asset {
     float weight_ = 1.0f;
 };
 
-typedef Asset* asset_ptr;
-
-typedef struct {
-    const char* base_path;
-    asset_ptr* assets;
-    float scale_factor;
-    uint8_t scale_uid;
-} asset_manager_t;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern asset_manager_t asset_manager;
-
-void assets_init(void);
-
-void assets_add(asset_ptr asset);
-
-void assets_load_all(void);
-
-void assets_unload_all(void);
-
-void assets_clear(void);
-
-void assets_set_scale_factor(float scale);
-
-bool assets_is_all_loaded(void);
-
-#ifdef __cplusplus
-}
-#endif
-
-struct PackAsset : public Asset {
+struct PackAsset : public asset_ {
     explicit PackAsset(ek::String name);
     void do_load() override;
     void do_unload() override;
@@ -87,7 +49,7 @@ struct PackAsset : public Asset {
     [[nodiscard]] float getProgress() const override;
 
     ek::String name_;
-    ek::PodArray<Asset*> assets;
+    ek::PodArray<asset_ptr> assets;
     unsigned assetsLoaded = 0;
     bool assetListLoaded = false;
 };

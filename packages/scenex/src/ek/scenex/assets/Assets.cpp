@@ -1,4 +1,4 @@
-#include "Asset_impl.hpp"
+#include "Asset.hpp"
 
 #include <ek/log.h>
 #include <ek/assert.h>
@@ -23,10 +23,23 @@
 
 #include <ekx/app/localization.h>
 
+void load_asset(asset_ptr asset) {
+    asset->load();
+}
+void unload_asset(asset_ptr asset) {
+    asset->unload();
+}
+void delete_asset(asset_ptr asset) {
+    delete asset;
+}
 
-Asset* unpack_asset(calo_reader_t* r, string_hash_t type);
+asset_state_t get_asset_state(asset_ptr asset) {
+    return asset->state;
+}
 
-class AudioAsset : public Asset {
+asset_ptr unpack_asset(calo_reader_t* r, string_hash_t type);
+
+class AudioAsset : public asset_ {
 public:
     AudioAsset(string_hash_t name, ek::String filepath, uint32_t flags_) :
             res{R_AUDIO(name)},
@@ -76,7 +89,7 @@ public:
     uint32_t flags;
 };
 
-struct AtlasAsset : public Asset {
+struct AtlasAsset : public asset_ {
 
     AtlasAsset(const char* name_, uint32_t formatMask_) : res{R_ATLAS(H(name_))},
                                                           name{name_} {
@@ -133,7 +146,7 @@ struct AtlasAsset : public Asset {
             }
             return progress;
         }
-        return Asset::getProgress();
+        return asset_::getProgress();
     }
 
     void do_unload() override {
@@ -147,7 +160,7 @@ struct AtlasAsset : public Asset {
     uint32_t formatMask = 1;
 };
 
-struct DynamicAtlasAsset : public Asset {
+struct DynamicAtlasAsset : public asset_ {
 
     DynamicAtlasAsset(string_hash_t name, uint32_t flags) : res{R_DYNAMIC_ATLAS(name)}, flags_{flags} {
     }
@@ -171,7 +184,7 @@ struct DynamicAtlasAsset : public Asset {
     uint32_t flags_ = 0;
 };
 
-struct SceneAsset : public Asset {
+struct SceneAsset : public asset_ {
 
     explicit SceneAsset(string_hash_t name, ek::String path) :
             res{R_SG(name)},
@@ -204,7 +217,7 @@ struct SceneAsset : public Asset {
     ek::String path_;
 };
 
-struct BitmapFontAsset : public Asset {
+struct BitmapFontAsset : public asset_ {
 
     BitmapFontAsset(string_hash_t name, ek::String path) :
             res{R_FONT(name)},
@@ -253,7 +266,7 @@ struct BitmapFontAsset : public Asset {
 
 };
 
-struct ImageAsset : public Asset {
+struct ImageAsset : public asset_ {
 
     ImageAsset(string_hash_t name, image_data_t data) :
             res{R_IMAGE(name)},
@@ -302,7 +315,7 @@ struct ImageAsset : public Asset {
         if (state == ASSET_STATE_LOADING) {
             return loader ? loader->progress : 0.0f;
         }
-        return Asset::getProgress();
+        return asset_::getProgress();
     }
 
     void do_unload() override {
@@ -324,7 +337,7 @@ struct ImageAsset : public Asset {
     bool premultiplyAlpha = true;
 };
 
-struct StringsAsset : public Asset {
+struct StringsAsset : public asset_ {
 
     StringsAsset(ek::String name, const lang_name_t* langs, uint32_t langs_num) :
             name_{std::move(name)} {
@@ -382,7 +395,7 @@ struct StringsAsset : public Asset {
     uint32_t total = 0;
 };
 
-struct ModelAsset : public Asset {
+struct ModelAsset : public asset_ {
 
     explicit ModelAsset(ek::String name) :
             name_{std::move(name)} {
@@ -424,7 +437,7 @@ bool isTimeBudgetAllowStartNextJob(uint64_t since) {
     return ek_ticks_to_sec(ek_ticks(&since)) < 0.008;
 }
 
-struct TrueTypeFontAsset : public Asset {
+struct TrueTypeFontAsset : public asset_ {
 
     TrueTypeFontAsset(string_hash_t name, ek::String path, string_hash_t glyphCache, float baseFontSize) :
             res{R_FONT(name)},
@@ -475,7 +488,7 @@ struct TrueTypeFontAsset : public Asset {
     string_hash_t glyphCache_;
 };
 
-Asset* unpack_asset(calo_reader_t* r, string_hash_t type) {
+asset_ptr unpack_asset(calo_reader_t* r, string_hash_t type) {
     if (type == H("audio")) {
         string_hash_t name = read_u32(r);
         uint32_t flags = read_u32(r);
@@ -550,7 +563,7 @@ void PackAsset::do_load() {
                     while (reader.p < end) {
                         string_hash_t type = read_u32(&reader);
                         if (type) {
-                            Asset* asset = unpack_asset(&reader, type);
+                            asset_ptr asset = unpack_asset(&reader, type);
                             if (asset) {
                                 this_->assets.push_back(asset);
                                 assets_add(asset);

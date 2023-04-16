@@ -61,7 +61,8 @@ target_sources(${PROJECT_NAME} PUBLIC
         systems/main_flow.h
         systems/main_flow.c
 
-        asset2/Assets.cpp
+        assets/Assets.cpp
+        assets/asset_manager.c
 
         scene_factory.h
         scene_factory.c
