@@ -1,13 +1,11 @@
-#pragma once
+#ifndef SCENEX_GAME_APP_DISPATCHER_H
+#define SCENEX_GAME_APP_DISPATCHER_H
 
 #include "GameAppListener.hpp"
 #include <ek/ds/Array.hpp>
 
-namespace ek {
-
-class GameAppDispatcher : public GameAppListener {
-public:
-    PodArray<GameAppListener*> listeners{};
+struct GameAppDispatcher : public GameAppListener {
+    ek::PodArray<GameAppListener*> listeners{};
 
     ~GameAppDispatcher() override = default;
 
@@ -53,7 +51,7 @@ public:
         }
     }
 
-    void onEvent(const ek_app_event& event) override {
+    void onEvent(ek_app_event event) override {
         for (auto* listener : listeners) {
             if(listener) listener->onEvent(event);
         }
@@ -66,4 +64,4 @@ public:
     }
 };
 
-}
+#endif // SCENEX_GAME_APP_DISPATCHER_H

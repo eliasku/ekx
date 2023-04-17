@@ -3,27 +3,22 @@
 
 namespace ImGui {
 
-struct InputTextCallback_UserData
-{
-    ek::String*             Str;
-    ImGuiInputTextCallback  ChainCallback;
-    void*                   ChainCallbackUserData;
+struct InputTextCallback_UserData {
+    ek::String* Str;
+    ImGuiInputTextCallback ChainCallback;
+    void* ChainCallbackUserData;
 };
 
-static int InputTextCallback_ek_String(ImGuiInputTextCallbackData* data)
-{
-    InputTextCallback_UserData* user_data = (InputTextCallback_UserData*)data->UserData;
-    if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
-    {
+static int InputTextCallback_ek_String(ImGuiInputTextCallbackData* data) {
+    InputTextCallback_UserData* user_data = (InputTextCallback_UserData*) data->UserData;
+    if (data->EventFlag == ImGuiInputTextFlags_CallbackResize) {
         // Resize string callback
         // If for some reason we refuse the new length (BufTextLen) and/or capacity (BufSize) we need to set them back to what we want.
         auto* str = user_data->Str;
         IM_ASSERT(data->Buf == str->c_str());
         str->reserve(data->BufTextLen);
-        data->Buf = (char*)str->c_str();
-    }
-    else if (user_data->ChainCallback)
-    {
+        data->Buf = (char*) str->c_str();
+    } else if (user_data->ChainCallback) {
         // Forward to user callback, if any
         data->UserData = user_data->ChainCallbackUserData;
         return user_data->ChainCallback(data);
@@ -31,8 +26,8 @@ static int InputTextCallback_ek_String(ImGuiInputTextCallbackData* data)
     return 0;
 }
 
-bool InputText(const char* label, ek::String* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
-{
+bool InputText(const char* label, ek::String* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback,
+               void* user_data) {
     IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
     flags |= ImGuiInputTextFlags_CallbackResize;
 
@@ -43,8 +38,8 @@ bool InputText(const char* label, ek::String* str, ImGuiInputTextFlags flags, Im
     return InputText(label, str->data(), str->capacity() + 1, flags, InputTextCallback_ek_String, &cb_user_data);
 }
 
-bool InputTextMultiline(const char* label, ek::String* str, const ImVec2& size, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
-{
+bool InputTextMultiline(const char* label, ek::String* str, const ImVec2& size, ImGuiInputTextFlags flags,
+                        ImGuiInputTextCallback callback, void* user_data) {
     IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
     flags |= ImGuiInputTextFlags_CallbackResize;
 
@@ -52,14 +47,13 @@ bool InputTextMultiline(const char* label, ek::String* str, const ImVec2& size, 
     cb_user_data.Str = str;
     cb_user_data.ChainCallback = callback;
     cb_user_data.ChainCallbackUserData = user_data;
-    return InputTextMultiline(label, str->data(), str->capacity() + 1, size, flags, InputTextCallback_ek_String, &cb_user_data);
+    return InputTextMultiline(label, str->data(), str->capacity() + 1, size, flags, InputTextCallback_ek_String,
+                              &cb_user_data);
 }
 
-void HelpMarker(const char* desc)
-{
+void HelpMarker(const char* desc) {
     ImGui::TextDisabled(ICON_FA_QUESTION_CIRCLE);
-    if (ImGui::IsItemHovered())
-    {
+    if (ImGui::IsItemHovered()) {
         ImGui::BeginTooltip();
         ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
         ImGui::TextUnformatted(desc);
@@ -77,7 +71,7 @@ bool Color32Edit(const char* label, color_t* color) {
     return changed;
 }
 
-bool EditRect(const char* label, float * xywh, float v_speed, const char* format, float power) {
+bool EditRect(const char* label, float* xywh, float v_speed, const char* format, float power) {
     ImGui::PushID(xywh);
     ImGui::LabelText(label, "x: %0.2f y: %0.2f w: %0.2f h: %0.2f", xywh[0], xywh[1], xywh[2], xywh[3]);
     bool changed = ImGui::DragFloat2("Position", xywh, v_speed, 0, 0, format, power);
@@ -90,7 +84,7 @@ bool ToolbarButton(const char* label, bool active, const char* tooltip) {
     PushStyleColor(ImGuiCol_Button, active ? 0xFFFF7700 : 0x11111111);
     PushStyleColor(ImGuiCol_Text, active ? 0xFFFFFFFF : 0xFFCCCCCC);
     bool res = Button(label);
-    if(tooltip && IsItemHovered()) {
+    if (tooltip && IsItemHovered()) {
         SetTooltip("%s", tooltip);
     }
     PopStyleColor(2);
@@ -110,11 +104,11 @@ void get_debug_node_path(entity_t e, char buffer[1024]) {
         entity = node->parent;
     }
     uint32_t len = 0;
-    while(depth-- > 0) {
+    while (depth-- > 0) {
         buffer[len++] = '/';
         const char* str = names[depth];
         uint32_t size = strlen(str);
-        if(size > 0) {
+        if (size > 0) {
             memcpy(buffer + len, str, size);
             len += size;
         }
@@ -154,11 +148,11 @@ void guiTextLayerEffect(text_layer_effect_t* layer) {
 }
 
 void guiSprite(const sprite_t* sprite) {
-    if(!sprite) {
+    if (!sprite) {
         ImGui::TextColored(ImColor{1.0f, 0.0f, 0.0f}, "ERROR: sprite resource slot could not be null");
         return;
     }
-    if(!sprite->image_id || !(sprite->state & SPRITE_LOADED)) {
+    if (!sprite->image_id || !(sprite->state & SPRITE_LOADED)) {
         ImGui::TextColored(ImColor{1.0f, 0.0f, 0.0f}, "sprite is not loaded");
         return;
     }
@@ -170,7 +164,7 @@ void guiSprite(const sprite_t* sprite) {
     auto rc = sprite->rect;
     auto uv0 = sprite->tex.position;
     auto uv1 = rect_rb(sprite->tex);
-    void* tex_id = (void*)(uintptr_t)sprite_image.id;
+    void* tex_id = (void*) (uintptr_t) sprite_image.id;
     if (sprite->state & SPRITE_ROTATED) {
         ImGui::BeginChild("s", ImVec2{rc.w, rc.h});
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
@@ -196,28 +190,21 @@ void guiSprite(const sprite_t* sprite) {
     }
 }
 
+static const char* font_type_names[2] = {
+        [FONT_TYPE_BITMAP] = "Bitmap Font",
+        [FONT_TYPE_TTF] = "TTF Font",
+};
+
 void guiFont(const font_t* font) {
-    if(!font) {
+    if (!font) {
         ImGui::TextColored(ImColor{1.0f, 0.0f, 0.0f}, "ERROR: font resource slot could not be null");
         return;
     }
-    if(!font->base) {
-        ImGui::TextColored(ImColor{1.0f, 0.0f, 0.0f}, "null");
+    if (!font->loaded_) {
+        ImGui::TextColored(ImColor{1.0f, 0.0f, 0.0f}, "not loaded");
         return;
     }
-    switch (font->base->getFontType()) {
-        case FONT_TYPE_BITMAP: {
-            auto* bm = (const BitmapFont*)font->base;
-            ImGui::Text("Font Type: Bitmap");
-            ImGui::Text("Glyphs: %u", bm->map._data.size());
-        }
-            break;
-        case FONT_TYPE_TTF: {
-            auto* ttf = (const TrueTypeFont*)font->base;
-            ImGui::Text("Font Type: TrueType");
-            ImGui::Text("Glyphs: %u", ttf->map.size());
-        }
-            break;
-    }
+    ImGui::Text("Type: %s", font_type_names[font->fontType]);
+    ImGui::Text("Glyphs: %u", arr_size(font->map.entries));
 }
 

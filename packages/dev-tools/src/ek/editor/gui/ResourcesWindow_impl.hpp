@@ -9,8 +9,6 @@
 #include <ek/scenex/text/font.h>
 #include <ek/scenex/2d/dynamic_atlas.h>
 #include <ek/scenex/text/font.h>
-#include <ek/scenex/text/TrueTypeFont.hpp>
-#include <ek/scenex/text/BitmapFont.hpp>
 
 namespace ek {
 

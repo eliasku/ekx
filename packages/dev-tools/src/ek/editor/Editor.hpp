@@ -30,16 +30,14 @@ struct EditorSettings {
 
 class basic_application;
 
-class Editor : public GameAppListener {
-public:
+struct Editor : public GameAppListener {
     Editor();
 
     ~Editor() override;
 
-    void onEvent(const ek_app_event& event) override;
+    void onEvent(ek_app_event event) override;
     void onPostFrame() override;
 
-public:
     // GameApp callbacks
     void onRenderOverlay() override;
     void onRenderFrame() override;
@@ -48,8 +46,6 @@ public:
     void onPreRender() override;
 
     void drawGUI();
-
-    static void invalidateSettings();
 
     HierarchyWindow hierarchy{};
     InspectorWindow inspector{};
@@ -65,6 +61,8 @@ public:
 
     void load();
     void save();
+
+    static void invalidateSettings();
 };
 
 }

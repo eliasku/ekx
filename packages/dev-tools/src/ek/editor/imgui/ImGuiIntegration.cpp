@@ -176,7 +176,7 @@ void ImGuiIntegration::init_font_image() {
     ImGui::GetIO().Fonts->TexID = (ImTextureID) (uintptr_t) font_image.id;
 }
 
-void ImGuiIntegration::on_event(const ek_app_event& event) {
+void ImGuiIntegration::on_event(ek_app_event event) {
     auto& io = ImGui::GetIO();
     switch (event.type) {
         case EK_APP_EVENT_KEY_UP:

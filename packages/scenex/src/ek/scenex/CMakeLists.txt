@@ -36,11 +36,7 @@ target_sources(${PROJECT_NAME} PUBLIC
         2d/movieclip.h
         2d/movieclip.c
 
-        text/BitmapFont.cpp
-        text/TrueTypeFont.cpp
-        text/font_.cpp
-        text/font_base.cpp
-        text/font_base.h
+        text/font.c
         text/text_engine.c
         text/text_format.c
 
@@ -54,7 +50,7 @@ target_sources(${PROJECT_NAME} PUBLIC
         particles/particle_system.h
 
         app/basic_application.cpp
-        app/root_app_callbacks.cpp
+        app/root_app_callbacks.c
 
         systems/hit_test.h
         systems/hit_test.c

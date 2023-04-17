@@ -3,10 +3,7 @@
 
 #include <ek/app.h>
 
-namespace ek {
-
-class GameAppListener {
-public:
+struct GameAppListener {
     virtual ~GameAppListener() = default;
 
     virtual void onBeforeFrameBegin() {}
@@ -24,11 +21,9 @@ public:
 
     virtual void onStart() {}
 
-    virtual void onEvent(const ek_app_event&) {}
+    virtual void onEvent(ek_app_event) {}
 
     virtual void onPostFrame() {}
 };
-
-}
 
 #endif // SCENEX_GAME_APP_LISTENER_H

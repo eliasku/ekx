@@ -25,24 +25,16 @@
 #include "GameAppDispatcher.hpp"
 #include "root_app_callbacks.h"
 
-namespace ek {
-class basic_application;
-}
+struct basic_application;
+extern basic_application* g_game_app;
 
-extern ek::basic_application* g_game_app;
-
-void init_game_app(ek::basic_application* game);
-
-struct Asset;
-
-namespace ek {
+void init_game_app(::basic_application* game);
 
 void basic_app_on_frame();
 
 void basic_app_on_event(ek_app_event);
 
-class basic_application {
-public:
+struct basic_application {
     game_display display = {};
     frame_timer_t frame_timer = {};
 
@@ -52,7 +44,7 @@ public:
     GameAppDispatcher dispatcher{};
 
     /////
-    entity_t root;
+    entity_t root = NULL_ENTITY;
 
     basic_application();
 
@@ -68,7 +60,6 @@ public:
 
     void onEvent(ek_app_event event);
 
-public:
     bool preloadOnStart = true;
     asset_ptr rootAssetObject = nullptr;
 
@@ -131,8 +122,6 @@ inline void run_app() {
     ek_app.on_ready = [] { init_game_app(new T()); };
     ek_app.on_frame = launcher_on_frame;
     ek_app.on_event = root_app_on_event;
-}
-
 }
 
 #endif // SCENEX_BASIC_APPLICATION_H

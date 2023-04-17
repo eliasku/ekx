@@ -35,15 +35,21 @@
 #include <ek/scenex/base/destroy_timer.h>
 #include <ek/scenex/base/node_events.h>
 
-ek::basic_application* g_game_app = nullptr;
+basic_application* g_game_app = nullptr;
 
-void init_game_app(ek::basic_application* app) {
+void init_game_app(basic_application* app) {
     EK_ASSERT(!g_game_app);
     EK_ASSERT(app);
     g_game_app = app;
 }
 
-namespace ek {
+void terminate_game_app(void) {
+    if(g_game_app) {
+        g_game_app->terminate();
+        delete g_game_app;
+        g_game_app = NULL;
+    }
+}
 
 void drawPreloader(float progress, float zoneWidth, float zoneHeight) {
     canvas_set_empty_image();
@@ -82,8 +88,7 @@ basic_application::basic_application() {
 #endif
 }
 
-basic_application::~basic_application() {
-}
+basic_application::~basic_application() = default;
 
 void registerSceneXComponents() {
     //// basic scene
@@ -389,7 +394,5 @@ void setup_resource_managers() {
     setup_res_atlas();
     setup_res_font();
     setup_res_sg();
-}
-
 }
 

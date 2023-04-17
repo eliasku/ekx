@@ -104,7 +104,7 @@ void draw_text_block(const char* text, const text_block_t* info) {
         if (!layer->visible) {
             continue;
         }
-        if (font_type(font) == FONT_TYPE_BITMAP && layer->blurRadius > 0.0f &&
+        if (font->fontType == FONT_TYPE_BITMAP && layer->blurRadius > 0.0f &&
             length_sqr_vec2(layer->offset) <= 0.1f) {
             // skip {0;0} strokes for bitmap fonts
             continue;
@@ -149,7 +149,7 @@ void draw_text_block_layer(const char* text, const text_layer_effect_t* layer, c
             codepoint = utf8_next(&it);
             if (font_get_glyph(font, codepoint, &gdata)) {
                 if (kerning && prevCodepointOnLine) {
-                    current.x += font_base_kerning(gdata.source, prevCodepointOnLine, codepoint) * size;
+                    current.x += font_kerning(gdata.source, prevCodepointOnLine, codepoint) * size;
                 }
                 if (gdata.image.id) {
                     if (prev_image_id != gdata.image.id) {
@@ -280,7 +280,7 @@ void get_text_block_size(const char* text, text_block_t* info) {
         }
         if (font_get_glyph_metrics(font, codepoint, &metrics)) {
             const float kern = (kerning && prevCodepointOnLine) ?
-                               font_base_kerning(metrics.source, prevCodepointOnLine, codepoint) * size :
+                               font_kerning(metrics.source, prevCodepointOnLine, codepoint) * size :
                                0.0f;
             float right = x + kern + size * fmaxf(RECT_R(metrics.rect), metrics.advanceWidth);
             if (format.wordWrap && right > text_engine.max_width && text_engine.max_width > 0) {

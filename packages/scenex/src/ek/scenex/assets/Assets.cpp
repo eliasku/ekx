@@ -15,8 +15,6 @@
 #include <ek/scenex/3d/scene3d.h>
 
 #include <ek/scenex/text/font.h>
-#include <ek/scenex/text/TrueTypeFont.hpp>
-#include <ek/scenex/text/BitmapFont.hpp>
 
 #include <utility>
 #include <ek/scenex/2d/dynamic_atlas.h>
@@ -26,9 +24,11 @@
 void load_asset(asset_ptr asset) {
     asset->load();
 }
+
 void unload_asset(asset_ptr asset) {
     asset->unload();
 }
+
 void delete_asset(asset_ptr asset) {
     delete asset;
 }
@@ -64,8 +64,7 @@ public:
         if (failed || completed) {
             if (failed) {
                 log_debug("failed to load sound %s", path_.c_str());
-            }
-            else {
+            } else {
                 log_debug("loaded audio sound %s", path_.c_str());
             };
             state = ASSET_STATE_READY;
@@ -233,15 +232,14 @@ struct BitmapFontAsset : public asset_ {
                     BitmapFontAsset* this_ = (BitmapFontAsset*) lr->userdata;
                     if (ek_local_res_success(lr)) {
                         font_t* fnt = &REF_RESOLVE(res_font, this_->res);
-                        if (fnt->base) {
+                        if (fnt->loaded_) {
                             EK_ASSERT(false && "Font is not unloaded before");
-                            delete fnt->base;
+                            font_destroy(fnt);
                         }
                         // keep lr instance
                         this_->local_res = *lr;
-                        auto* bmFont = new BitmapFont();
-                        bmFont->load(lr->buffer, lr->length);
-                        fnt->base = bmFont;
+                        font_init(fnt, FONT_TYPE_BITMAP);
+                        font_load_bmfont(fnt, lr->buffer, lr->length);
                     } else {
                         ek_local_res_close(lr);
                     }
@@ -251,9 +249,8 @@ struct BitmapFontAsset : public asset_ {
 
     void do_unload() override {
         font_t* fnt = &REF_RESOLVE(res_font, res);
-        if (fnt->base) {
-            delete fnt->base;
-            fnt->base = nullptr;
+        if (fnt->loaded_) {
+            font_destroy(fnt);
         }
         ek_local_res_close(&local_res);
         local_res.closeFunc = nullptr;
@@ -363,7 +360,7 @@ struct StringsAsset : public asset_ {
                         StringsAsset* asset = loader_->asset;
                         if (ek_local_res_success(lr)) {
                             loader_->lr = *lr;
-                            add_lang(loader_->lang, lr->buffer, (uint32_t)lr->length);
+                            add_lang(loader_->lang, lr->buffer, (uint32_t) lr->length);
                         } else {
                             log_error("Strings resource not found: %s", loader_->lang.str);
                             asset->error = 1;
@@ -455,17 +452,16 @@ struct TrueTypeFontAsset : public asset_ {
                     TrueTypeFontAsset* this_ = (TrueTypeFontAsset*) lr->userdata;
 
                     font_t* fnt = &REF_RESOLVE(res_font, this_->res);
-                    if (fnt->base) {
+                    if (fnt->loaded_) {
                         EK_ASSERT(false && "Font is not unloaded before");
-                        delete fnt->base;
+                        font_destroy(fnt);
                     }
 
                     // `lr` ownership moves to font impl
                     if (ek_local_res_success(lr)) {
-                        TrueTypeFont* ttfFont = new TrueTypeFont(asset_manager.scale_factor, this_->baseFontSize_,
-                                                                 this_->glyphCache_);
-                        ttfFont->loadFromMemory(lr);
-                        fnt->base = ttfFont;
+                        font_init_ttf(fnt, asset_manager.scale_factor, this_->baseFontSize_,
+                                           this_->glyphCache_);
+                        ttf_loadFromMemory(fnt, lr);
                     } else {
                         ek_local_res_close(lr);
                     }
@@ -476,9 +472,8 @@ struct TrueTypeFontAsset : public asset_ {
 
     void do_unload() override {
         font_t* fnt = &REF_RESOLVE(res_font, res);
-        if (fnt->base) {
-            delete fnt->base;
-            fnt->base = nullptr;
+        if (fnt->loaded_) {
+            font_destroy(fnt);
         }
     }
 

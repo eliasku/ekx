@@ -85,7 +85,7 @@ void Editor::onPostFrame() {
     invalidateSettings();
 }
 
-void Editor::onEvent(const ek_app_event& event) {
+void Editor::onEvent(ek_app_event event) {
     EK_ASSERT(g_editor_config);
     auto& settings = *g_editor_config;
     switch (event.type) {
