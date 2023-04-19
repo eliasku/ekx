@@ -90,11 +90,11 @@ public:
 
 struct AtlasAsset : public asset_ {
 
-    AtlasAsset(const char* name_, uint32_t formatMask_) : res{R_ATLAS(H(name_))},
-                                                          name{name_} {
+    AtlasAsset(const char* name_, uint32_t format_mask_) : res{R_ATLAS(H(name_))},
+                                                           name{name_} {
         // we need to load atlas image and atlas meta
         weight_ = 2;
-        formatMask = formatMask_;
+        format_mask = format_mask_;
     }
 
     void load() override {
@@ -103,7 +103,7 @@ struct AtlasAsset : public asset_ {
 
             atlas_t* atlas = &REF_RESOLVE(res_atlas, res);
             atlas_clear(atlas);
-            atlas->formatMask = formatMask;
+            atlas->format_mask = format_mask;
 
             // do not switch to loading state, because after first load system does not poll pack's Asset objects
             state = ASSET_STATE_LOADING;
@@ -118,9 +118,12 @@ struct AtlasAsset : public asset_ {
         if (state == ASSET_STATE_LOADING) {
             atlas_t* atlas = &REF_RESOLVE(res_atlas, res);
             // we poll atlas loading / reloading in separated process with Atlas::pollLoading for each Res<Atlas>
-            int loading = atlas_get_loading_images_count(atlas);
-            if (loading == 0) {
-                state = ASSET_STATE_READY;
+            bool atlas_meta_loaded = atlas->state_flags & 1;
+            if (atlas_meta_loaded) {
+                bool images_loaded = atlas->state_flags & 2;
+                if (images_loaded) {
+                    state = ASSET_STATE_READY;
+                }
             }
         }
     }
@@ -128,20 +131,17 @@ struct AtlasAsset : public asset_ {
     [[nodiscard]]
     float getProgress() const override {
         if (state == ASSET_STATE_LOADING) {
-            float progress = 0.0f;
             atlas_t* atlas = &REF_RESOLVE(res_atlas, res);
-            progress = 1.0f;
-            const float totalPages = (float) arr_size(atlas->pages);
-            float loadedPages = 0.0f;
-            arr_for (p_page, atlas->pages) {
-                if (REF_RESOLVE(res_image, *p_page).id) {
-                    loadedPages += 1.0f;
+            float progress = (float)(atlas->state_flags & 1);
+            const uint32_t pages_num = arr_size(atlas->pages);
+            if (pages_num) {
+                uint32_t pages_loaded = 0;
+                arr_for (p_page, atlas->pages) {
+                    if (REF_RESOLVE(res_image, *p_page).id) {
+                        ++pages_loaded;
+                    }
                 }
-            }
-            if (totalPages > 0.0f) {
-                progress += loadedPages / totalPages;
-            } else {
-                progress = 2.0f;
+                progress += (float) pages_loaded / (float) pages_num;
             }
             return progress;
         }
@@ -156,7 +156,7 @@ struct AtlasAsset : public asset_ {
     R(atlas_ptr) res;
     ek::String name;
     uint8_t loaded_scale_ = 0;
-    uint32_t formatMask = 1;
+    uint32_t format_mask = 1;
 };
 
 struct DynamicAtlasAsset : public asset_ {
@@ -460,7 +460,7 @@ struct TrueTypeFontAsset : public asset_ {
                     // `lr` ownership moves to font impl
                     if (ek_local_res_success(lr)) {
                         font_init_ttf(fnt, asset_manager.scale_factor, this_->baseFontSize_,
-                                           this_->glyphCache_);
+                                      this_->glyphCache_);
                         ttf_loadFromMemory(fnt, lr);
                     } else {
                         ek_local_res_close(lr);

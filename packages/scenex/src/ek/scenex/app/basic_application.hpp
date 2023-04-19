@@ -22,7 +22,7 @@
 #include <ekx/app/frame_timer.h>
 #include <ek/scenex/text/text_engine.h>
 #include <ek/scenex/assets/Asset.hpp>
-#include "GameAppDispatcher.hpp"
+#include "game_app_callbacks.h"
 #include "root_app_callbacks.h"
 
 struct basic_application;
@@ -41,8 +41,6 @@ struct basic_application {
 /**** assets ***/
     float scale_factor = 1.0f;
 
-    GameAppDispatcher dispatcher{};
-
     /////
     entity_t root = NULL_ENTITY;
 
@@ -54,7 +52,7 @@ struct basic_application {
 
     virtual void terminate();
 
-    virtual void preload();
+    void preload();
 
     void onFrame();
 

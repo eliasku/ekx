@@ -51,6 +51,7 @@ target_sources(${PROJECT_NAME} PUBLIC
 
         app/basic_application.cpp
         app/root_app_callbacks.c
+        app/game_app_callbacks.c
 
         systems/hit_test.h
         systems/hit_test.c

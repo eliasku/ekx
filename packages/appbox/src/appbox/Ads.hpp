@@ -4,7 +4,7 @@
 #include <ek/core/target.h>
 #include <ek/util/Signal.hpp>
 #include <ek/ds/String.hpp>
-#include <ek/scenex/app/GameAppListener.hpp>
+#include <ek/scenex/app/game_app_callbacks.h>
 #include <functional>
 
 typedef struct {
@@ -17,12 +17,12 @@ typedef struct {
 
 namespace ek {
 
-class Ads : public GameAppListener {
-public:
-    void onStart() override;
+struct Ads {
+    void onStart();
 
     explicit Ads(ads_premium_config config_);
-    ~Ads() override;
+
+    ~Ads();
 
     void purchaseRemoveAds() const;
 

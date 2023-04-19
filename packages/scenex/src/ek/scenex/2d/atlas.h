@@ -18,12 +18,9 @@ typedef struct {
     // loading routine
     ek_texture_loader_ptr* loaders;
     /* str_buf */ void* base_path;
-    uint32_t formatMask;
+    uint32_t format_mask;
+    uint32_t state_flags;
 } atlas_t;
-
-int atlas_get_loading_images_count(const atlas_t* atlas);
-
-int atlas_poll_loading(atlas_t* atlas);
 
 void atlas_clear(atlas_t* atlas);
 

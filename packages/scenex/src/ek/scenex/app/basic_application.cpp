@@ -153,7 +153,7 @@ void basic_application::initialize() {
 void basic_application::preload() {
     log_debug("base application: preloading, content scale: %d%%.", (int) (100 * scale_factor));
     assets_set_scale_factor(scale_factor);
-    dispatcher.onPreload();
+    dispatcher_pre_load();
     if (preloadOnStart) {
         preload_root_assets_pack();
     }
@@ -172,7 +172,7 @@ void basic_application::onFrame() {
 
     root_app_on_frame();
 
-    dispatcher.onBeforeFrameBegin();
+    dispatcher_before_frame_begin();
     game_display_update(&display);
     Viewport_update(&display.info);
     scale_factor = get_viewport(root)->output.scale;
@@ -193,7 +193,7 @@ void basic_application::onFrame() {
 
     /// PRE-RENDER
     onPreRender();
-    dispatcher.onPreRender();
+    dispatcher_pre_render();
 
     sg_pass_action pass_action{};
     pass_action.colors[0].action = started_ ? SG_ACTION_DONTCARE : SG_ACTION_CLEAR;
@@ -222,7 +222,7 @@ void basic_application::onFrame() {
             drawPreloader(0.1f + 0.9f * rootAssetObject->getProgress(), display.info.size.x, display.info.size.y);
         }
 
-        dispatcher.onRenderFrame();
+        dispatcher_render_frame();
 
         elapsed = ek_ticks_to_sec(ek_ticks(&timer));
         profiler_add_time(PROFILE_RENDER, (float) (elapsed * 1000));
@@ -237,7 +237,7 @@ void basic_application::onFrame() {
 
         if (game_display_dev_begin(&display)) {
 
-            dispatcher.onRenderOverlay();
+            dispatcher_render_overlay();
 
             canvas_begin(ek_app.viewport.width, ek_app.viewport.height);
             onFrameEnd();
@@ -255,12 +255,12 @@ void basic_application::onFrame() {
     if (!started_ && assets_is_all_loaded()) {
         log_debug("Start Game");
         onAppStart();
-        dispatcher.onStart();
+        dispatcher_start();
         started_ = true;
     }
 
     input_state_post_update();
-    dispatcher.onPostFrame();
+    dispatcher_post_frame();
 
     elapsed = ek_ticks_to_sec(ek_ticks(&timer));
     profiler_add_time(PROFILE_END, (float) (elapsed * 1000));
@@ -282,7 +282,7 @@ void basic_application::onEvent(const ek_app_event event) {
 
     input_state_process_event(&event, &display.info);
 
-    dispatcher.onEvent(event);
+    dispatcher_event(event);
 
     root_app_on_event(event);
     if (event.type == EK_APP_EVENT_RESIZE) {
@@ -295,7 +295,7 @@ void basic_application::onEvent(const ek_app_event event) {
 }
 
 void basic_application::doUpdateFrame(float dt) {
-    dispatcher.onUpdate();
+    dispatcher_update();
     scene_pre_update(root, dt);
     onUpdateFrame(dt);
     scene_post_update(root);

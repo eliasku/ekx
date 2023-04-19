@@ -7,85 +7,45 @@
 
 namespace ek {
 
-void Editor::onRenderOverlay() {
-    gui_.end_frame();
+void Editor_onRenderOverlay(void* userdata) {
+    g_editor->gui_.end_frame();
 
     bool dirty = false;
-    for (auto* wnd: windows) {
+    for (auto* wnd: g_editor->windows) {
         dirty |= wnd->dirty;
     }
     if (dirty) {
-        save();
+        g_editor->save();
     }
 }
 
-void Editor::onRenderFrame() {
-
-}
-
-void Editor::onUpdate() {
+void Editor_onUpdate(void* userdata) {
     //project.update_scale_factor(app_->scale_factor, settings.notifyAssetsOnScaleFactorChanged);
-    gui_.begin_frame((float)g_game_app->frame_timer.dt);
+    g_editor->gui_.begin_frame((float)g_game_app->frame_timer.dt);
     if (g_editor_config->showEditor) {
-        drawGUI();
+        g_editor->drawGUI();
     }
 }
 
-void Editor::onBeforeFrameBegin() {
-    auto& display = g_game_app->display;
-    if (g_editor_config->showEditor && !display.simulated) {
-        display.simulated = true;
-    } else if (!g_editor_config->showEditor && display.simulated) {
-        display.simulated = false;
+void Editor_onBeforeFrameBegin(void* userdata) {
+    game_display* display = &g_game_app->display;
+    if (g_editor_config->showEditor && !display->simulated) {
+        display->simulated = true;
+    } else if (!g_editor_config->showEditor && display->simulated) {
+        display->simulated = false;
     }
 }
-
-Editor::Editor() {
-    windows.push_back(&scene);
-    windows.push_back(&game);
-    windows.push_back(&inspector);
-    windows.push_back(&hierarchy);
-    // project
-    windows.push_back(&console);
-    windows.push_back(&stats);
-    windows.push_back(&resources);
-    windows.push_back(&memory);
-
-    load();
-    g_game_app->dispatcher.listeners.push_back(this);
+void Editor_onPreRender(void* userdata) {
+    g_editor->scene.onPreRender();
 }
 
-Editor::~Editor() {
-    g_game_app->dispatcher.listeners.remove(this);
+void Editor_onPostFrame(void* userdata) {
+    g_editor->gui_.on_frame_completed();
+    g_editor->invalidateSettings();
 }
 
-void Editor::load() {
-    log_debug("load editor layout state");
-    pugi::xml_document doc{};
-    if (!doc.load_file("EditorLayoutState.xml")) {
-        return;
-    }
-    auto node = doc.first_child();
-    for (auto* wnd: windows) {
-        wnd->load(node);
-    }
-}
 
-void Editor::save() {
-    pugi::xml_document xml;
-    auto node = xml.append_child("EditorLayoutState");
-    for (auto* wnd: windows) {
-        wnd->save(node);
-    }
-    xml.save_file("EditorLayoutState.xml");
-}
-
-void Editor::onPostFrame() {
-    gui_.on_frame_completed();
-    invalidateSettings();
-}
-
-void Editor::onEvent(ek_app_event event) {
+void Editor_onEvent(void* userdata, ek_app_event event) {
     EK_ASSERT(g_editor_config);
     auto& settings = *g_editor_config;
     switch (event.type) {
@@ -110,8 +70,68 @@ void Editor::onEvent(ek_app_event event) {
         default:
             break;
     }
-    gui_.on_event(event);
+    g_editor->gui_.on_event(event);
 }
+
+game_app_callback_t cb_Editor_onRenderOverlay;
+game_app_callback_t cb_Editor_onUpdate;
+game_app_callback_t cb_Editor_onBeforeFrameBegin;
+game_app_callback_t cb_Editor_onPreRender;
+game_app_callback_t cb_Editor_onPostFrame;
+game_app_callback_t cb_Editor_onEvent;
+
+Editor::Editor() {
+    windows.push_back(&scene);
+    windows.push_back(&game);
+    windows.push_back(&inspector);
+    windows.push_back(&hierarchy);
+    // project
+    windows.push_back(&console);
+    windows.push_back(&stats);
+    windows.push_back(&resources);
+    windows.push_back(&memory);
+
+    load();
+
+    cb_Editor_onRenderOverlay.fn = (void*)Editor_onRenderOverlay;
+    cb_Editor_onUpdate.fn = (void*)Editor_onUpdate;
+    cb_Editor_onBeforeFrameBegin.fn = (void*)Editor_onBeforeFrameBegin;
+    cb_Editor_onPreRender.fn = (void*)Editor_onPreRender;
+    cb_Editor_onPostFrame.fn = (void*)Editor_onPostFrame;
+    cb_Editor_onEvent.fn = (void*)Editor_onEvent;
+
+    game_app_add_callback(&game_app_callbacks.on_render_overlay, &cb_Editor_onRenderOverlay);
+    game_app_add_callback(&game_app_callbacks.on_update, &cb_Editor_onUpdate);
+    game_app_add_callback(&game_app_callbacks.on_before_frame_begin, &cb_Editor_onBeforeFrameBegin);
+    game_app_add_callback(&game_app_callbacks.on_pre_render, &cb_Editor_onPreRender);
+    game_app_add_callback(&game_app_callbacks.on_post_frame, &cb_Editor_onPostFrame);
+    game_app_add_callback(&game_app_callbacks.on_event, &cb_Editor_onEvent);
+}
+
+Editor::~Editor() = default;
+
+void Editor::load() {
+    log_debug("load editor layout state");
+    pugi::xml_document doc{};
+    if (!doc.load_file("EditorLayoutState.xml")) {
+        return;
+    }
+    auto node = doc.first_child();
+    for (auto* wnd: windows) {
+        wnd->load(node);
+    }
+}
+
+void Editor::save() {
+    pugi::xml_document xml;
+    auto node = xml.append_child("EditorLayoutState");
+    for (auto* wnd: windows) {
+        wnd->save(node);
+    }
+    xml.save_file("EditorLayoutState.xml");
+}
+
+
 
 const char* editorSettingsPath = "editor_settings.xml";
 
@@ -155,10 +175,6 @@ void Editor::invalidateSettings() {
             settings.dirty = false;
         }
     }
-}
-
-void Editor::onPreRender() {
-    scene.onPreRender();
 }
 
 }

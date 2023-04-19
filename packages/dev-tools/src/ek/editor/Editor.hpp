@@ -10,7 +10,7 @@
 #include "gui/SceneWindow.hpp"
 #include "gui/ConsoleWindow.hpp"
 #include "gui/ResourcesWindow.hpp"
-#include <ek/scenex/app/GameAppListener.hpp>
+#include <ek/scenex/app/game_app_callbacks.h>
 
 namespace ek {
 
@@ -30,20 +30,10 @@ struct EditorSettings {
 
 class basic_application;
 
-struct Editor : public GameAppListener {
+struct Editor {
     Editor();
 
-    ~Editor() override;
-
-    void onEvent(ek_app_event event) override;
-    void onPostFrame() override;
-
-    // GameApp callbacks
-    void onRenderOverlay() override;
-    void onRenderFrame() override;
-    void onUpdate() override;
-    void onBeforeFrameBegin() override;
-    void onPreRender() override;
+    ~Editor();
 
     void drawGUI();
 

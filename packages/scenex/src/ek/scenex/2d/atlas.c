@@ -21,6 +21,8 @@ void setup_res_atlas(void) {
     rr->data_size = sizeof(R->data[0]);
 }
 
+static void atlas_poll_loading(atlas_t* atlas);
+
 void update_res_atlas(void) {
     for (res_id id = 0; id < res_atlas.rr.num; ++id) {
         atlas_t* atlas = &res_atlas.data[id];
@@ -52,7 +54,7 @@ static void load_atlas_meta(atlas_t* atlas, ek_local_res* lr) {
     arr_for (p_loader, atlas->loaders) {
         ek_texture_loader_destroy(*p_loader);
     }
-    arr_reset((void**)&atlas->loaders);
+    arr_reset((void**) &atlas->loaders);
 
     arr_for(page, atlas_info.pages) {
         res_id image_asset = R_IMAGE(H(page->image_path));
@@ -86,7 +88,7 @@ static void load_atlas_meta(atlas_t* atlas, ek_local_res* lr) {
 
         const uint32_t index = (uint32_t) (page - atlas_info.pages);
         ek_texture_loader* loader = atlas->loaders[index];
-        loader->formatMask = atlas->formatMask;
+        loader->formatMask = atlas->format_mask;
         ek_texture_loader_set_path(&loader->basePath, str_get(atlas->base_path));
         loader->imagesToLoad = 1;
         ek_texture_loader_set_path(&loader->urls[0], page_image_path);
@@ -95,9 +97,10 @@ static void load_atlas_meta(atlas_t* atlas, ek_local_res* lr) {
 }
 
 static void on_atlas_res_loaded(ek_local_res* lr) {
-    atlas_t* this_ = (atlas_t*) lr->userdata;
+    atlas_t* atlas = (atlas_t*) lr->userdata;
+    atlas->state_flags |= 1;
     if (ek_local_res_success(lr)) {
-        load_atlas_meta(this_, lr);
+        load_atlas_meta(atlas, lr);
     }
     ek_local_res_close(lr);
 }
@@ -110,58 +113,42 @@ void atlas_load(atlas_t* atlas, const char* path, float scale_factor) {
     ek_path_dirname(dir_buf, sizeof dir_buf, path);
     str_init_c_str(&atlas->base_path, dir_buf);
 
+    atlas->state_flags = 0;
     ek_local_res_load(meta_file_path, on_atlas_res_loaded, atlas);
 }
 
-int atlas_poll_loading(atlas_t* atlas) {
-    int toLoad = (int) arr_size(atlas->loaders);
-    if (toLoad > 0) {
+static void atlas_poll_loading(atlas_t* atlas) {
+    bool meta_loaded = atlas->state_flags & 1;
+    bool images_loaded = atlas->state_flags & 2;
+    if (meta_loaded && !images_loaded) {
+        uint32_t images_loading = arr_size(atlas->loaders);
         for (uint32_t i = 0; i < arr_size(atlas->loaders); ++i) {
-            ek_texture_loader * loader = atlas->loaders[i];
+            ek_texture_loader* loader = atlas->loaders[i];
             if (loader) {
                 ek_texture_loader_update(loader);
                 if (!loader->loading) {
                     if (loader->status == 0) {
-                        // ref = ek_ref_make(sg_image, loader->urls[0].path)
-                        // ek_ref_clear(ref)
-                        // item = ek_ref_get_item(ref)
-                        // item->handle = loader->image;
-                        // item->finalizer = sg_image_REF_finalizer
                         const res_id image_id = R_IMAGE(H(loader->urls[0].path));
                         REF_RESOLVE(res_image, image_id) = loader->image;
                         ek_texture_loader_destroy(loader);
                         atlas->loaders[i] = NULL;
                     }
-                    --toLoad;
+                    --images_loading;
                 }
             } else {
-                --toLoad;
+                --images_loading;
             }
         }
-        if (toLoad == 0) {
+        if (images_loading == 0) {
             arr_for (p_loader, atlas->loaders) {
                 if (*p_loader) {
                     ek_texture_loader_destroy(*p_loader);
                 }
             }
-            arr_reset((void**)&atlas->loaders);
-            return 0;
-        } else {
-            return toLoad;
+            arr_reset((void**) &atlas->loaders);
+            atlas->state_flags |= 2;
         }
     }
-    return 0;
-}
-
-int atlas_get_loading_images_count(const atlas_t* atlas) {
-    int loading = 0;
-    for (uint32_t i = 0; i < arr_size(atlas->loaders); ++i) {
-        ek_texture_loader* loader = atlas->loaders[i];
-        if (loader) {
-            ++loading;
-        }
-    }
-    return loading;
 }
 
 void atlas_clear(atlas_t* atlas) {
@@ -181,9 +168,11 @@ void atlas_clear(atlas_t* atlas) {
         spr->state = 0;
     }
 
-    arr_reset((void**)&atlas->pages);
-    arr_reset((void**)&atlas->sprites);
-    arr_reset((void**)&atlas->loaders);
+    arr_reset((void**) &atlas->pages);
+    arr_reset((void**) &atlas->sprites);
+    arr_reset((void**) &atlas->loaders);
     arr_reset(&atlas->base_path);
+
+    atlas->state_flags = 0;
 }
 
