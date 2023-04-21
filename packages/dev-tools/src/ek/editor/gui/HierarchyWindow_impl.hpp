@@ -17,7 +17,7 @@
 namespace ek {
 
 entity_t HierarchyWindow::getSiblingNext(entity_t e) {
-    const auto* node = Node_get(e);
+    const auto* node = get_node(e);
     return node ? node->sibling_next : NULL_ENTITY;
 }
 
@@ -26,7 +26,7 @@ const char* HierarchyWindow::getEntityIcon(entity_t e) {
     if (get_viewport(e)) return ICON_FA_TV;
     if (get_bounds2d(e)) return ICON_FA_EXPAND;
     if (get_button(e)) return ICON_FA_HAND_POINTER;
-    if (interactive_get(e)) return ICON_FA_FINGERPRINT;
+    if (get_interactive(e)) return ICON_FA_FINGERPRINT;
     if (get_movieclip(e)) return ICON_FA_FILM;
     if (get_sprite2d(e)) return ICON_FA_IMAGE;
     if (get_ninepatch2d(e)) return ICON_FA_COMPRESS;
@@ -35,7 +35,7 @@ const char* HierarchyWindow::getEntityIcon(entity_t e) {
     if (get_arc2d(e)) return ICON_FA_CIRCLE_NOTCH;
     if (get_display2d(e)) return ICON_FA_PAINT_BRUSH;
     if (get_transform2d(e)) return ICON_FA_DICE_D6;
-    if (Node_get(e)) return ICON_FA_BOX;
+    if (get_node(e)) return ICON_FA_BOX;
 
     if (Transform3D.index && get_transform3d(e)) return ICON_FA_DICE_D20;
 
@@ -62,7 +62,7 @@ bool HierarchyWindow::isSelectedInHierarchy(entity_t ref) {
 }
 
 bool HierarchyWindow::hasChildren(entity_t e) {
-    node_t* node = Node_get(e);
+    node_t* node = get_node(e);
     if (node) {
         auto first = node->child_first;
         return first.id && is_entity(first);
@@ -129,7 +129,7 @@ void HierarchyWindow::drawEntityInTree(entity_t e, bool parentedVisible, bool pa
 
     auto nodeVisible = parentedVisible;
     auto nodeTouchable = parentedTouchable;
-    auto* node = Node_get(e);
+    auto* node = get_node(e);
     if (node) {
         nodeVisible = nodeVisible && !(node->flags & NODE_HIDDEN);
         nodeTouchable = nodeTouchable && !(node->flags & NODE_UNTOUCHABLE);
@@ -179,7 +179,7 @@ void HierarchyWindow::drawEntityFiltered(entity_t e, bool parentedVisible, bool 
         ImGui::Text("INVALID ENTITY");
         return;
     }
-    auto* node = Node_get(e);
+    auto* node = get_node(e);
     const char* name = node ? hsp_get(node->tag) : NULL;
     auto nodeVisible = parentedVisible;
     auto nodeTouchable = parentedTouchable;

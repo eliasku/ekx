@@ -40,9 +40,9 @@ typedef struct interactive {
     bool ev_tap_back;
 } interactive_t;
 
-void interactive_init(void);
-interactive_t* interactive_add(entity_t e);
-interactive_t* interactive_get(entity_t e);
+void setup_interactive(void);
+interactive_t* add_interactive(entity_t e);
+interactive_t* get_interactive(entity_t e);
 void interactive_handle(interactive_t* interactive, entity_t e, string_hash_t type);
 void interactive_clear_all_events(void);
 

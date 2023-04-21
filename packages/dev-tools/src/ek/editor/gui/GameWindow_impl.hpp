@@ -5,31 +5,31 @@
 namespace ek {
 
 void GameWindow::onDraw() {
-    auto& display = g_game_app->display;
+    game_display* display = &game_app_state.display;
     const ImVec2 displayPos = ImGui::GetCursorScreenPos();
     const ImVec2 displaySize = ImGui::GetContentRegionAvail();
-    if (display.color.id && displaySize.x > 0 && displaySize.y > 0) {
-        auto texId = (void*) static_cast<uintptr_t>(display.color.id);
+    if (display->color.id && displaySize.x > 0 && displaySize.y > 0) {
+        auto texId = (void*) static_cast<uintptr_t>(display->color.id);
 
-        const float scale = fmin(displaySize.x / display.info.size.x, displaySize.y / display.info.size.y);
+        const float scale = fmin(displaySize.x / display->info.size.x, displaySize.y / display->info.size.y);
 
-        const sg_image_desc info = sg_query_image_desc(display.color);
-        const float texCoordX1 = display.info.size.x / (float)info.width;
-        const float texCoordY1 = display.info.size.y / (float)info.height;
+        const sg_image_desc info = sg_query_image_desc(display->color);
+        const float texCoordX1 = display->info.size.x / (float)info.width;
+        const float texCoordY1 = display->info.size.y / (float)info.height;
 
         ImDrawList* drawList = ImGui::GetWindowDrawList();
         drawList->AddImage(texId, {displayPos.x, displayPos.y},
-                           {displayPos.x + scale * display.info.size.x,
-                            displayPos.y + scale * display.info.size.y},
+                           {displayPos.x + scale * display->info.size.x,
+                            displayPos.y + scale * display->info.size.y},
                            {0, 0},
                            {texCoordX1, texCoordY1});
 
         {
             // update size;
-            const float k = display.info.dpiScale;
-            display.info.destinationViewport = k * rect(displayPos.x, displayPos.y,displaySize.x, displaySize.y);
-            display.info.window = vec2(displaySize.x, displaySize.y);
-            display.info.size = k * vec2(displaySize.x, displaySize.y);
+            const float k = display->info.dpiScale;
+            display->info.destinationViewport = k * rect(displayPos.x, displayPos.y,displaySize.x, displaySize.y);
+            display->info.window = vec2(displaySize.x, displaySize.y);
+            display->info.size = k * vec2(displaySize.x, displaySize.y);
         }
     }
     g_input_state.hovered_by_editor_gui = !ImGui::IsWindowHovered(0);

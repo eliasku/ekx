@@ -10,21 +10,21 @@ extern "C" {
 
 typedef struct game_display_info {
     // when game drawing inside window viewport
-    rect_t destinationViewport;// = {};
-    vec2_t size;// = vec2(1,1);
-    vec2_t window;// = vec2(1,1);
-    vec4_t insets;// = {};
-    vec4_t userInsetsAbsolute;// = {};
-    vec4_t userInsetsRelative;// = {};
-    float dpiScale;// = 1.0f;
+    rect_t destinationViewport;
+    vec2_t size;
+    vec2_t window;
+    vec4_t insets;
+    vec4_t userInsetsAbsolute;
+    vec4_t userInsetsRelative;
+    float dpiScale;
 } game_display_info;
 
 typedef struct game_display {
-    game_display_info info;//{};
+    game_display_info info;
     sg_pass pass;
     sg_image color;
     sg_image depthStencil;
-    void* screenshotBuffer;
+    void* screenshot_buffer;
     bool simulated;
     bool colorFirstClearFlag;
 } game_display;

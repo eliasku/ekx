@@ -27,7 +27,7 @@ static entity_t hit_test_2d_n(entity_t e, const node_t* node, vec2_t parentPosit
 
     entity_t it = node->child_last;
     while (it.id) {
-        const node_t* child_node = Node_get(it);
+        const node_t* child_node = get_node(it);
         const entity_t hit = hit_test_2d_n(it, child_node, local);
         if (hit.id) {
             return hit;
@@ -48,5 +48,5 @@ static entity_t hit_test_2d_n(entity_t e, const node_t* node, vec2_t parentPosit
 }
 
 entity_t hit_test_2d(entity_t e, vec2_t parentPosition) {
-    return hit_test_2d_n(e, Node_get(e), parentPosition);
+    return hit_test_2d_n(e, get_node(e), parentPosition);
 }

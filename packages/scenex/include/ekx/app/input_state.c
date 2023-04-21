@@ -162,7 +162,7 @@ bool is_key_up(ek_key_code code) {
     return false;
 }
 
-void input_state_post_update() {
+void input_state_post_update(void) {
     // update keyboard state
     if (g_input_state.reset_keys) {
         memset(g_input_state.keys, 0, sizeof(g_input_state.keys));

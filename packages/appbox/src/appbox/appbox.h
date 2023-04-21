@@ -48,10 +48,12 @@ void appbox_init_language_button(entity_t e);
 
 void appbox_setup(appbox_config_t config);
 
+void appbox_on_game_start(void);
+
 extern appbox_context_t g_appbox;
 
 #ifdef __cplusplus
-};
+}
 #endif
 
 #endif // APPBOX_H

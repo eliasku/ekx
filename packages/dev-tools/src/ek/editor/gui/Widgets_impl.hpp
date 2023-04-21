@@ -98,7 +98,7 @@ void get_debug_node_path(entity_t e, char buffer[1024]) {
     const char* names[32];
     int depth = 0;
     while (entity.id && depth < 32) {
-        const node_t* node = Node_get(entity);
+        const node_t* node = get_node(entity);
         const string_hash_t tag = node->tag;
         names[depth++] = tag ? hsp_get(tag) : "_";
         entity = node->parent;

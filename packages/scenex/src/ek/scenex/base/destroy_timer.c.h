@@ -6,7 +6,7 @@
 destroy_manager_t g_destroy_manager;
 
 void destroy_later(entity_t e, float delay, time_layer_t timer) {
-    if(is_entity(e)) {
+    if (is_entity(e)) {
         destroy_timer_t t;
         t.entity = e;
         t.delay = delay;
@@ -23,20 +23,20 @@ void destroy_children_later(entity_t e, float delay, time_layer_t timer) {
     }
 }
 
-void update_destroy_queue() {
+void update_destroy_queue(void) {
     uint32_t i = 0;
     uint32_t end = arr_size(g_destroy_manager.timers);
-    while(i < end) {
+    while (i < end) {
         destroy_timer_t* timer = &g_destroy_manager.timers[i];
         entity_t e = timer->entity;
-        if(is_entity(e)) {
+        if (is_entity(e)) {
             if (timer->delay > 0.0f) {
                 timer->delay -= g_time_layers[timer->time_layer].dt;
                 ++i;
                 continue;
             }
 
-            if (Node_has(e)) {
+            if (get_node(e)) {
                 destroy_node(e);
             } else {
                 destroy_entity(e);
@@ -44,11 +44,11 @@ void update_destroy_queue() {
         }
 
         --end;
-        if(i < end) {
+        if (i < end) {
             g_destroy_manager.timers[i] = g_destroy_manager.timers[end];
         }
     }
-    if(end < arr_size(g_destroy_manager.timers)) {
+    if (end < arr_size(g_destroy_manager.timers)) {
         arr_resize(g_destroy_manager.timers, end);
     }
 }

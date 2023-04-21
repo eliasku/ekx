@@ -12,6 +12,7 @@
 #include <ek/scenex/base/tween.h>
 #include <ek/scenex/2d/display2d.h>
 #include <ek/scenex/base/node_events.h>
+#include <ek/scenex/base/node.h>
 
 const float tweenDelay = 0.05f;
 const float tweenDuration = 0.3f;
@@ -94,7 +95,7 @@ static void on_popup_close_button(const node_event_t* event){
 void init_basic_popup(entity_t e) {
     entity_t node_close = find(e, H("btn_close"));
     if (node_close.id) {
-        interactive_t* i = interactive_get(node_close);
+        interactive_t* i = get_interactive(node_close);
         if (i) {
             i->back_button = true;
             button_t* btn = get_button(node_close);
@@ -128,7 +129,7 @@ void open_popup(entity_t e) {
         return;
     }
 
-    if (Node_get(e)->parent.id == g_popup_manager.layer.id) {
+    if (get_node(e)->parent.id == g_popup_manager.layer.id) {
         return;
     }
 
@@ -212,7 +213,7 @@ entity_t createBackQuad(void) {
             false
     );
 
-    interactive_add(e);
+    add_interactive(e);
 
     // intercept back-button if popup manager is active
     add_node_event_listener(e, INTERACTIVE_EVENT_BACK_BUTTON, on_popup_back_button);

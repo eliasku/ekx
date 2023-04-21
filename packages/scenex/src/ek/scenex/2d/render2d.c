@@ -45,7 +45,7 @@ void render2d_draw(entity_t e, const world_transform2d_t* world_transform) {
 
     entity_t it = get_first_child(e);
     while (it.id) {
-        const node_t* child = Node_get(it);
+        const node_t* child = get_node(it);
         if (!(child->flags & NODE_HIDDEN)) {
             const world_transform2d_t* child_world_transform = get_world_transform2d(it);
             if (child_world_transform) {
@@ -102,7 +102,7 @@ void render2d_draw_stack(entity_t e) {
 
     entity_t it = get_first_child(e);
     while (it.id) {
-        const node_t* child = Node_get(it);
+        const node_t* child = get_node(it);
         if (!(child->flags & NODE_HIDDEN)) {
             const transform2d_t* child_transform = get_transform2d(it);
             if (child_transform) {

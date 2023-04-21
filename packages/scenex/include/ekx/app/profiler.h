@@ -65,7 +65,7 @@ void profiler_init(void);
 void profiler_update(float dt);
 void profiler_draw(const game_display_info* display_info);
 void profiler_render_begin(float drawable_area);
-void profiler_render_end();
+void profiler_render_end(void);
 void profiler_add_time(uint32_t metric, float time);
 
 #ifdef __cplusplus

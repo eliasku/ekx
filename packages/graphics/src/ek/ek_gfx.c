@@ -128,20 +128,12 @@ bool ek_gfx_read_pixels(sg_image image, void* pixels) {
     if (temp_texture) {
         MTLRegion region = MTLRegionMake2D(0, 0, width, height);
         NSUInteger rowbyte = width * 4;
-        [temp_texture
-        getBytes:
-        pixels
-        bytesPerRow:
-        rowbyte
-        fromRegion:
-        region
-        mipmapLevel:
-        0];
+        [temp_texture getBytes: pixels bytesPerRow: rowbyte fromRegion: region mipmapLevel:0];
         return true;
     }
 #else // OSX
-    (void) image;
-    (void) pixels;
+    UNUSED(image);
+    UNUSED(pixels);
 #endif
     return false;
 }

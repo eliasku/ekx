@@ -37,8 +37,8 @@ public:
     FixedArray<Slot, 64>* _acc = nullptr;
 
     template<typename Fn>
-    Listener push(Fn&& listener, string_hash_t type, bool once) {
-        const auto id = _nextId++;
+    Listener push(string_hash_t type, bool once, Fn&& listener) {
+        const uint32_t id = _nextId++;
         Slot s{Function{listener}, type, id, once};
         if (_acc) {
             _acc->emplace_back(std::move(s));
@@ -49,13 +49,13 @@ public:
     }
 
     template<typename Fn>
-    Listener add(Fn&& listener, string_hash_t type = 0) {
-        return push(listener, type, false);
+    Listener add(string_hash_t type, Fn&& listener) {
+        return push(type, false, listener);
     }
 
     template<typename Fn>
-    Listener once(Fn&& listener, string_hash_t type = 0) {
-        return push(listener, type, true);
+    Listener once(string_hash_t type, Fn&& listener) {
+        return push(type, true, listener);
     }
 
     bool remove(Listener id) {
@@ -110,13 +110,13 @@ public:
 
     template<typename Fn>
     auto& operator+=(Fn&& invocation) {
-        push(invocation, 0, false);
+        push(0, false, invocation);
         return *this;
     }
 
     template<typename Fn>
     auto& operator<<(Fn&& invocation) {
-        push(invocation, 0, true);
+        push(0, true, invocation);
         return *this;
     }
 

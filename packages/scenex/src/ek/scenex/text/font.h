@@ -56,7 +56,7 @@ typedef struct {
 } glyph_t;
 
 // Font resource
-typedef struct font_ {
+struct font_ {
     font_type_t fontType;
     R(font_t) fallback;
 
@@ -92,7 +92,7 @@ typedef struct font_ {
             float descender;
         };
     };
-} font_t;
+};
 
 void
 font_draw(const font_t* font,

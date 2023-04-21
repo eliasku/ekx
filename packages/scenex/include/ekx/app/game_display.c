@@ -147,8 +147,8 @@ void game_display_update_simulated(game_display* display) {
         }
         display->pass = sg_make_pass(&pass_desc);
 
-        free(display->screenshotBuffer);
-        display->screenshotBuffer = malloc(w * h * 4);
+        free(display->screenshot_buffer);
+        display->screenshot_buffer = malloc(w * h * 4);
     }
 }
 
@@ -170,16 +170,19 @@ void game_display_update(game_display* display) {
 }
 
 void game_display_screenshot(const game_display* display, const char* filename) {
-    (void) filename;
 #ifdef EK_UITEST
-    if (display->simulated && display->screenshotBuffer) {
+    if (display->simulated && display->screenshot_buffer) {
         // TODO: get w/h
-        const auto wi = display->color->desc.width;
-        const auto he = display->color->desc.height;
-        if (color->getPixels(screenshotBuffer)) {
-            stbi_write_png(filename, wi, he, 4, screenshotBuffer, 4 * wi);
+        const sg_image_desc desc = sg_query_image_desc(display->color);
+        const int wi = desc.width;
+        const int he = desc.height;
+        if(ek_gfx_read_pixels(display->color, display->screenshot_buffer)) {
+            stbi_write_png(filename, wi, he, 4, display->screenshot_buffer, 4 * wi);
         }
     }
+#else
+    UNUSED(display);
+    UNUSED(filename);
 #endif
 }
 

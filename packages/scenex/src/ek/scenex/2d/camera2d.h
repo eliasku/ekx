@@ -68,4 +68,5 @@ void Camera2D_setup(void);
 #ifdef __cplusplus
 }
 #endif
+
 #endif // SCENEX_CAMERA2D_H

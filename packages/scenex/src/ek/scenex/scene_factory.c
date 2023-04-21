@@ -28,7 +28,7 @@ void setup_res_sg(void) {
 
 entity_t create_node2d(string_hash_t tag) {
     entity_t e = create_entity();
-    Node_add(e)->tag = tag;
+    add_node(e)->tag = tag;
     add_transform2d(e);
     return e;
 }
@@ -158,7 +158,7 @@ void apply(entity_t e, const sg_node_data_t* data) {
     }
 
     if (data->flags & SG_NODE_BUTTON) {
-        interactive_add(e)->cursor = EK_MOUSE_CURSOR_BUTTON;
+        add_interactive(e)->cursor = EK_MOUSE_CURSOR_BUTTON;
         add_button(e);
     }
 }
@@ -167,7 +167,7 @@ entity_t create_and_merge(const sg_file_t* sg,
                           const sg_node_data_t* data,
                           const sg_node_data_t* over) {
     entity_t e = create_entity();
-    Node_add(e);
+    add_node(e);
     add_transform2d(e);
     if (data) {
         apply(e, data);

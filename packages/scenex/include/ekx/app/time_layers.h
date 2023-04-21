@@ -24,6 +24,7 @@ enum {
 
 typedef uint8_t time_layer_t;
 
+extern float g_time_dt;
 extern time_layer_state_t g_time_layers[TIME_LAYER_MAX_COUNT];
 
 void init_time_layers(void);

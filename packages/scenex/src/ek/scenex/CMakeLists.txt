@@ -4,14 +4,13 @@ target_sources(${PROJECT_NAME} PUBLIC
 
         3d/render_system.c.h
 
-        ekx_app.cpp
         ekx_app.c
 
         base/node.h
         base/node.c
         base/interactive.c
         base/node_events.h
-        base/NodeEvents.cpp
+        base/node_events.cpp
         base/tween.h
         base/destroy_timer.h
 
@@ -49,9 +48,7 @@ target_sources(${PROJECT_NAME} PUBLIC
         particles/particle_system.c
         particles/particle_system.h
 
-        app/basic_application.cpp
-        app/root_app_callbacks.c
-        app/game_app_callbacks.c
+        app/base_game.c
 
         systems/hit_test.h
         systems/hit_test.c
@@ -63,4 +60,6 @@ target_sources(${PROJECT_NAME} PUBLIC
 
         scene_factory.h
         scene_factory.c
+
+        uitest.c
         )

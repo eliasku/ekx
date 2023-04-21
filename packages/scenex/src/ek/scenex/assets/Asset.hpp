@@ -37,7 +37,7 @@ struct asset_ {
 
     asset_state_t state = ASSET_STATE_INITIAL;
     int error = 0;
-    float weight_ = 1.0f;
+    float weight = 1.0f;
 };
 
 struct PackAsset : public asset_ {

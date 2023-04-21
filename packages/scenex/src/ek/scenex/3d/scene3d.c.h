@@ -199,7 +199,7 @@ static void update_world_matrix3d(entity_t e, const mat4_t* parent) {
         tr->world = mat4_mul(tr->local, *parent);
         parent = &tr->world;
     }
-    node_t* node = Node_get(e);
+    node_t* node = get_node(e);
     if (node) {
         entity_t it = node->child_first;
         while (it.id) {
@@ -227,7 +227,7 @@ void update_world_transform3d(void) {
     const mat4_t identity = mat4_identity();
     for (uint32_t i = 1; i < Transform3D.size; ++i) {
         const entity_t e = get_entity(&Transform3D, i);
-        const node_t* node = Node_get(e);
+        const node_t* node = get_node(e);
         if (!node || !node->parent.id) {
             update_world_matrix3d(e, &identity);
         }

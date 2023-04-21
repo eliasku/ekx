@@ -65,6 +65,12 @@ void ek_buf_set_capacity(void** ptr, uint32_t newCapacity, uint32_t elementSize)
     const uint32_t size = sizeof(ek_buf_header_t) + newCapacity * elementSize;
     EK_PROFILE_ALLOC("buf realloc", size);
     ek_buf_header_t* hdr = (ek_buf_header_t*) realloc(prevHeader, size);
+    // ek_buf_header_t* hdr = NULL;
+    // if (prevHeader) {
+    //     hdr = (ek_buf_header_t*) realloc(prevHeader, size);
+    // } else {
+    //     hdr = (ek_buf_header_t*) malloc(size);
+    // }
     hdr->capacity = newCapacity;
     if (!prevHeader) {
         hdr->length = 0;
@@ -233,5 +239,5 @@ void str_copy(void** p_dest, const void* src) {
 }
 
 void str_init_c_str(void** p_dest, const char* c_str) {
-    arr_init_from(p_dest, 1, c_str, (uint32_t)(strlen(c_str) + 1));
+    arr_init_from(p_dest, 1, c_str, (uint32_t) (strlen(c_str) + 1));
 }

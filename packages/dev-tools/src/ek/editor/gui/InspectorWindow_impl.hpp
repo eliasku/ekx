@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Widgets.hpp"
+#include <ek/scenex/text/font.h>
 #include <ecx/ecx.hpp>
 #include <ek/editor/imgui/imgui.hpp>
 #include <ek/scenex/2d/text2d.h>
@@ -203,6 +204,10 @@ inline void gui_interactive(interactive_t* inter) {
     ImGui::LabelText("cursor", inter->cursor == EK_MOUSE_CURSOR_BUTTON ? "button" : "?");
 }
 
+inline void gui_node_events(node_events_t* p) {
+    ImGui::LabelText("Listeners", "TODO: count");
+}
+
 inline void spriteRefInfo(R(sprite_t) ref) {
     sprite_t spr = REF_RESOLVE(res_sprite, ref);
     ImGui::LabelText("Image", "ref: %u", spr.image_id);
@@ -327,7 +332,7 @@ void InspectorWindow::gui_inspector(entity_t e) {
     ImGui::PushID(e.id);
     ImGui::LabelText("ID", "#%02X_%04X", e.gen, e.idx);
 
-    const node_t* node = Node_get(e);
+    const node_t* node = get_node(e);
     if (node) {
         ImGui::LabelText("Tag", "%s [0x%08X]", hsp_get(node->tag), node->tag);
 
@@ -355,9 +360,9 @@ void InspectorWindow::gui_inspector(entity_t e) {
         guiComponentPanel("Mesh Renderer", get_mesh_renderer(e), guiMeshRenderer);
     }
 
-    guiComponentPanel("Interactive", interactive_get(e), gui_interactive);
+    guiComponentPanel("Interactive", get_interactive(e), gui_interactive);
 
-    guiComponentPanel<NodeEventHandler>(e, "Event Handler", [](auto& c) {});
+    guiComponentPanel("Node Events", get_node_events(e), gui_node_events);
 
     // particles
     guiComponentPanel("ParticleEmitter2D", get_particle_emitter2d(e), guiParticleEmitter2D);

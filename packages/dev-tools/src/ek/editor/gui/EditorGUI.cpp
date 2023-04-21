@@ -1,6 +1,6 @@
 #include <ek/editor/Editor.hpp>
 
-#include <ek/scenex/app/basic_application.hpp>
+#include <ek/scenex/app/base_game.h>
 #include <ek/editor/imgui/imgui.hpp>
 #include <ekx/app/input_state.h>
 #include "FontIconsPreview.hpp"
@@ -20,10 +20,8 @@
 namespace ek {
 
 void Editor::drawGUI() {
-    auto* baseApp = g_game_app;
-    if (baseApp) {
-        hierarchy.root = baseApp->root;
-    }
+    // TODO: 2d/3d root
+    hierarchy.root = game_app_state.root;
 
     static bool fontIconsWindow = false;
     static bool imGuiDemoWindow = false;
@@ -43,14 +41,12 @@ void Editor::drawGUI() {
             ImGui::MenuItem("Emulate Touch Input", nullptr, &g_input_state.emulate_touch);
             ///
             ImGui::Separator();
-            if (g_game_app) {
-                ImGui::Text("User Insets Absolute");
-                ImGui::DragFloat4("##userInsetsAbsolute",
-                                  g_game_app->display.info.userInsetsAbsolute.data);
-                ImGui::Text("User Insets Relative");
-                ImGui::SliderFloat4("##userInsetsRelative",
-                                    g_game_app->display.info.userInsetsRelative.data, 0.0f,1.0f);
-            }
+            ImGui::Text("User Insets Absolute");
+            ImGui::DragFloat4("##userInsetsAbsolute",
+                              game_app_state.display.info.userInsetsAbsolute.data);
+            ImGui::Text("User Insets Relative");
+            ImGui::SliderFloat4("##userInsetsRelative",
+                                game_app_state.display.info.userInsetsRelative.data, 0.0f,1.0f);
 
             ImGui::Separator();
 

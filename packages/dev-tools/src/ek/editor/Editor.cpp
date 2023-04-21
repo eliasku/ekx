@@ -1,13 +1,12 @@
 #include "Editor.hpp"
+#include "editor_api.h"
 
-#include <ek/scenex/app/basic_application.hpp>
+#include <ek/scenex/app/base_game.h>
 #include <pugixml.hpp>
 #include <ek/log.h>
 #include <ek/assert.h>
 
-namespace ek {
-
-void Editor_onRenderOverlay(void* userdata) {
+void editor_render_overlay(void) {
     g_editor->gui_.end_frame();
 
     bool dirty = false;
@@ -19,33 +18,33 @@ void Editor_onRenderOverlay(void* userdata) {
     }
 }
 
-void Editor_onUpdate(void* userdata) {
+void editor_update(void) {
     //project.update_scale_factor(app_->scale_factor, settings.notifyAssetsOnScaleFactorChanged);
-    g_editor->gui_.begin_frame((float)g_game_app->frame_timer.dt);
+    g_editor->gui_.begin_frame((float)game_app_state.frame_timer.dt);
     if (g_editor_config->showEditor) {
         g_editor->drawGUI();
     }
 }
 
-void Editor_onBeforeFrameBegin(void* userdata) {
-    game_display* display = &g_game_app->display;
+void editor_before_frame_begin(void) {
+    game_display* display = &game_app_state.display;
     if (g_editor_config->showEditor && !display->simulated) {
         display->simulated = true;
     } else if (!g_editor_config->showEditor && display->simulated) {
         display->simulated = false;
     }
 }
-void Editor_onPreRender(void* userdata) {
-    g_editor->scene.onPreRender();
+
+void editor_pre_render(void) {
+    g_editor->scene.pre_render();
 }
 
-void Editor_onPostFrame(void* userdata) {
+void editor_post_frame(void) {
     g_editor->gui_.on_frame_completed();
     g_editor->invalidateSettings();
 }
 
-
-void Editor_onEvent(void* userdata, ek_app_event event) {
+void editor_event(ek_app_event event) {
     EK_ASSERT(g_editor_config);
     auto& settings = *g_editor_config;
     switch (event.type) {
@@ -73,12 +72,7 @@ void Editor_onEvent(void* userdata, ek_app_event event) {
     g_editor->gui_.on_event(event);
 }
 
-game_app_callback_t cb_Editor_onRenderOverlay;
-game_app_callback_t cb_Editor_onUpdate;
-game_app_callback_t cb_Editor_onBeforeFrameBegin;
-game_app_callback_t cb_Editor_onPreRender;
-game_app_callback_t cb_Editor_onPostFrame;
-game_app_callback_t cb_Editor_onEvent;
+namespace ek {
 
 Editor::Editor() {
     windows.push_back(&scene);
@@ -92,20 +86,6 @@ Editor::Editor() {
     windows.push_back(&memory);
 
     load();
-
-    cb_Editor_onRenderOverlay.fn = (void*)Editor_onRenderOverlay;
-    cb_Editor_onUpdate.fn = (void*)Editor_onUpdate;
-    cb_Editor_onBeforeFrameBegin.fn = (void*)Editor_onBeforeFrameBegin;
-    cb_Editor_onPreRender.fn = (void*)Editor_onPreRender;
-    cb_Editor_onPostFrame.fn = (void*)Editor_onPostFrame;
-    cb_Editor_onEvent.fn = (void*)Editor_onEvent;
-
-    game_app_add_callback(&game_app_callbacks.on_render_overlay, &cb_Editor_onRenderOverlay);
-    game_app_add_callback(&game_app_callbacks.on_update, &cb_Editor_onUpdate);
-    game_app_add_callback(&game_app_callbacks.on_before_frame_begin, &cb_Editor_onBeforeFrameBegin);
-    game_app_add_callback(&game_app_callbacks.on_pre_render, &cb_Editor_onPreRender);
-    game_app_add_callback(&game_app_callbacks.on_post_frame, &cb_Editor_onPostFrame);
-    game_app_add_callback(&game_app_callbacks.on_event, &cb_Editor_onEvent);
 }
 
 Editor::~Editor() = default;
@@ -180,13 +160,18 @@ void Editor::invalidateSettings() {
 }
 
 ek::Editor* g_editor = nullptr;
-void init_editor(void) {
+void editor_setup(void) {
     EK_ASSERT(!g_editor);
+    EK_ASSERT(g_editor_config);
     g_editor = new ek::Editor();
 }
 
 ek::EditorSettings* g_editor_config = nullptr;
-void init_editor_config(void) {
+void editor_load_settings(void) {
     g_editor_config = new ek::EditorSettings();
     g_editor_config->load();
+    if (g_editor_config->width > 0 && g_editor_config->height > 0) {
+        ek_app.config.window_width = g_editor_config->width;
+        ek_app.config.window_height = g_editor_config->height;
+    }
 }

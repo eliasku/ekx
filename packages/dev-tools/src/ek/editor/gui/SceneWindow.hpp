@@ -63,7 +63,7 @@ public:
     int currentTool = 0;
     int localGlobal = 0;
 
-    void onPreRender();
+    void pre_render();
 
     void drawScene();
 

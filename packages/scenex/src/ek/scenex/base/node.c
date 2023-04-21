@@ -6,13 +6,15 @@
 #include <ek/assert.h>
 #include <stdarg.h>
 
+#define has_node(e) (get_component_handle(&Node, e) != 0)
+
 ecx_component_type Node;
 
 static void Node_ctor(component_handle_t handle) {
     ((node_t*) Node.data[0])[handle] = (node_t){0};
 }
 
-void Node_register(void) {
+void setup_Node(void) {
     const ecx_component_type_decl decl = (ecx_component_type_decl) {
             "Node",
             512,
@@ -24,19 +26,19 @@ void Node_register(void) {
 }
 
 entity_t get_first_child(entity_t e) {
-    return Node_get(e)->child_first;
+    return get_node(e)->child_first;
 }
 
 entity_t get_next_child(entity_t e) {
-    return Node_get(e)->sibling_next;
+    return get_node(e)->sibling_next;
 }
 
 entity_t get_last_child(entity_t e) {
-    return Node_get(e)->child_last;
+    return get_node(e)->child_last;
 }
 
 entity_t get_prev_child(entity_t e) {
-    return Node_get(e)->sibling_prev;
+    return get_node(e)->sibling_prev;
 }
 
 entity_t get_child_at(entity_t e, int index) {
@@ -53,14 +55,14 @@ entity_t get_child_at(entity_t e, int index) {
 }
 
 void destroy_children(entity_t e) {
-    node_t* node = Node_get(e);
+    node_t* node = get_node(e);
     if (!node) {
         return;
     }
     entity_t child = node->child_first;
     while (child.id) {
         entity_t temp = child;
-        node_t* child_node = Node_get(child);
+        node_t* child_node = get_node(child);
         child = child_node->sibling_next;
 
         destroy_children(temp);
@@ -73,7 +75,7 @@ void destroy_children(entity_t e) {
 }
 
 bool is_descendant(entity_t e, entity_t ancestor) {
-    if (!Node_has(e) || !Node_has(ancestor)) {
+    if (!has_node(e) || !has_node(ancestor)) {
         return false;
     }
 
@@ -88,7 +90,7 @@ bool is_descendant(entity_t e, entity_t ancestor) {
 }
 
 void remove_from_parent(entity_t e) {
-    node_t* entityNode = Node_get(e);
+    node_t* entityNode = get_node(e);
     if (!entityNode) {
         return;
     }
@@ -102,15 +104,15 @@ void remove_from_parent(entity_t e) {
     entity_t next = entityNode->sibling_next;
 
     if (prev.id) {
-        Node_get(prev)->sibling_next = next;
+        get_node(prev)->sibling_next = next;
     } else {
-        Node_get(par)->child_first = next;
+        get_node(par)->child_first = next;
     }
 
     if (next.id) {
-        Node_get(next)->sibling_prev = prev;
+        get_node(next)->sibling_prev = prev;
     } else {
-        Node_get(par)->child_last = prev;
+        get_node(par)->child_last = prev;
     }
 
     entityNode->parent = NULL_ENTITY;
@@ -120,15 +122,15 @@ void remove_from_parent(entity_t e) {
 
 void append_strict(entity_t e, entity_t child) {
     EK_ASSERT(e.id != child.id);
-    EK_ASSERT(Node_has(e));
-    EK_ASSERT(Node_has(child));
+    EK_ASSERT(has_node(e));
+    EK_ASSERT(has_node(child));
     EK_ASSERT(!get_parent(child).id);
 
-    node_t* entity_node = Node_get(e);
-    node_t* child_node = Node_get(child);
+    node_t* entity_node = get_node(e);
+    node_t* child_node = get_node(child);
     entity_t tail = entity_node->child_last;
     if (tail.id) {
-        Node_get(tail)->sibling_next = child;
+        get_node(tail)->sibling_next = child;
         child_node->sibling_prev = tail;
         entity_node->child_last = child;
     } else {
@@ -139,7 +141,7 @@ void append_strict(entity_t e, entity_t child) {
 }
 
 void append(entity_t e, entity_t child) {
-    Node_add(e);
+    add_node(e);
     if (get_parent(child).id) {
         remove_from_parent(child);
     }
@@ -148,17 +150,17 @@ void append(entity_t e, entity_t child) {
 
 void prepend_strict(entity_t e, entity_t child) {
     EK_ASSERT(e.id != child.id);
-    EK_ASSERT(Node_has(e));
-    EK_ASSERT(Node_has(child));
+    EK_ASSERT(has_node(e));
+    EK_ASSERT(has_node(child));
     EK_ASSERT(!get_parent(child).id);
 
-    node_t* entity_node = Node_get(e);
-    node_t* child_node = Node_get(child);
+    node_t* entity_node = get_node(e);
+    node_t* child_node = get_node(child);
     entity_t head = entity_node->child_first;
 
     if (head.id) {
         child_node->sibling_next = head;
-        Node_get(head)->sibling_prev = child;
+        get_node(head)->sibling_prev = child;
         entity_node->child_first = child;
     } else {
         entity_node->child_first = child;
@@ -168,22 +170,22 @@ void prepend_strict(entity_t e, entity_t child) {
 }
 
 void prepend(entity_t e, entity_t child) {
-    Node_add(e);
-    if (Node_add(child)->parent.id) {
+    add_node(e);
+    if (add_node(child)->parent.id) {
         remove_from_parent(child);
     }
     prepend_strict(e, child);
 }
 
 void remove_children(entity_t e) {
-    node_t* entity_node = Node_get(e);
+    node_t* entity_node = get_node(e);
     if (!entity_node) {
         return;
     }
 
     entity_t child = entity_node->child_first;
     while (child.id) {
-        node_t* child_node = Node_get(child);
+        node_t* child_node = get_node(child);
         child = child_node->sibling_next;
         child_node->parent = NULL_ENTITY;
         child_node->sibling_next = NULL_ENTITY;
@@ -194,38 +196,38 @@ void remove_children(entity_t e) {
 }
 
 void insert_after(entity_t e, entity_t child_after) {
-    node_t* entity_node = Node_get(e);
+    node_t* entity_node = get_node(e);
     EK_ASSERT(entity_node->parent.id);
-    node_t* child_after_node = Node_add(child_after);
+    node_t* child_after_node = add_node(child_after);
     remove_from_parent(child_after);
     entity_t next = entity_node->sibling_next;
     entity_node->sibling_next = child_after;
     child_after_node->sibling_prev = e;
     if (next.id) {
-        Node_get(next)->sibling_prev = child_after;
+        get_node(next)->sibling_prev = child_after;
         child_after_node->sibling_next = next;
     } else {
-        Node_get(entity_node->parent)->child_last = child_after;
+        get_node(entity_node->parent)->child_last = child_after;
     }
     child_after_node->parent = entity_node->parent;
 }
 
 void insert_before_strict(entity_t e, entity_t child_before) {
-    EK_ASSERT(Node_has(e));
-    EK_ASSERT(Node_has(child_before));
-    EK_ASSERT(!Node_get(child_before)->parent.id);
-    EK_ASSERT(Node_get(e)->parent.id);
+    EK_ASSERT(has_node(e));
+    EK_ASSERT(has_node(child_before));
+    EK_ASSERT(!get_node(child_before)->parent.id);
+    EK_ASSERT(get_node(e)->parent.id);
 
-    node_t* entity_node = Node_get(e);
-    node_t* child_node = Node_get(child_before);
+    node_t* entity_node = get_node(e);
+    node_t* child_node = get_node(child_before);
     entity_t prev = entity_node->sibling_prev;
     entity_node->sibling_prev = child_before;
     child_node->sibling_next = e;
     if (prev.id) {
-        Node_get(prev)->sibling_next = child_before;
+        get_node(prev)->sibling_next = child_before;
         child_node->sibling_prev = prev;
     } else {
-        Node_get(entity_node->parent)->child_first = child_before;
+        get_node(entity_node->parent)->child_first = child_before;
     }
     child_node->parent = entity_node->parent;
 }
@@ -234,7 +236,7 @@ void insert_before(entity_t e, entity_t child_before) {
     EK_ASSERT(get_parent(e).id);
 
     // TODO: a lot of places just require assign if not exists
-    if (Node_add(child_before)->parent.id) {
+    if (add_node(child_before)->parent.id) {
         remove_from_parent(child_before);
     }
 
@@ -243,12 +245,12 @@ void insert_before(entity_t e, entity_t child_before) {
 
 uint32_t count_children(entity_t e) {
     uint32_t num = 0u;
-    node_t* node = Node_get(e);
+    node_t* node = get_node(e);
     if (node) {
         entity_t child = node->child_first;
         while (child.id) {
             ++num;
-            child = Node_get(child)->sibling_next;
+            child = get_node(child)->sibling_next;
         }
     }
     return num;
@@ -304,9 +306,9 @@ entity_t find_lower_common_ancestor(entity_t e1, entity_t e2) {
 
 
 entity_t find(entity_t e, string_hash_t tag) {
-    entity_t it = Node_get(e)->child_first;
+    entity_t it = get_node(e)->child_first;
     while (it.id) {
-        const node_t* n = Node_get(it);
+        const node_t* n = get_node(it);
         if (n->tag == tag) {
             return it;
         }
@@ -391,22 +393,22 @@ string_hash_t get_tag(entity_t e) {
 }
 
 bool is_visible(entity_t e) {
-    node_t* node = Node_get(e);
+    node_t* node = get_node(e);
     return node && !(node->flags & NODE_HIDDEN);
 }
 
 void set_visible(entity_t e, bool v) {
-    node_t* node = Node_get(e);
+    node_t* node = get_node(e);
     node->flags = v ? (node->flags & ~NODE_HIDDEN) : (node->flags | NODE_HIDDEN);
 }
 
 bool is_touchable(entity_t e) {
-    node_t* node = Node_get(e);
+    node_t* node = get_node(e);
     return node && !(node->flags & NODE_UNTOUCHABLE);
 }
 
 void set_touchable(entity_t e, bool v) {
-    node_t* node = Node_get(e);
+    node_t* node = get_node(e);
     node->flags = v ? (node->flags & ~NODE_UNTOUCHABLE) : (node->flags | NODE_UNTOUCHABLE);
 }
 

@@ -15,8 +15,10 @@
 
 const sg_face_winding DEFAULT_FACE_WINDING = SG_FACEWINDING_CCW;
 
+__attribute__((unused))
 static aabb3_t
 get_shadow_map_box(const mat4_t* camera_projection, const mat4_t* camera_view, const mat4_t* light_view) {
+    UNUSED(light_view);
     const mat4_t inv_proj_view = mat4_inverse(mat4_mul(*camera_projection, *camera_view));
     const vec3_t corners[8] = {
             vec3(-1, -1, -1),
@@ -92,7 +94,7 @@ struct {
     mat4_t view;
 } shadows;
 
-static void shadows_init() {
+static void shadows_init(void) {
     shadows.shader = ek_shader_make(render3d_shadow_map_shader_desc(sg_query_backend()));
     const uint32_t w = 2048;
     const uint32_t h = 2048;
@@ -130,7 +132,7 @@ static void shadows_init() {
     shadows.pass = sg_make_pass(&pass_desc);
 }
 
-static void shadows_begin() {
+static void shadows_begin(void) {
     sg_push_debug_group("3D shadows");
     const sg_image_desc info = sg_query_image_desc(shadows.rt);
     int w = info.width;
@@ -143,6 +145,8 @@ static void shadows_begin() {
 
 static void
 shadows_update_light_direction(const mat4_t* camera_projection, const mat4_t* camera_view) {
+    UNUSED(camera_projection);
+    UNUSED(camera_view);
 // find directional light
     vec3_t light_position = vec3(0, 0, 1);
 //        light3d_t light_data{};
@@ -170,7 +174,7 @@ shadows_update_light_direction(const mat4_t* camera_projection, const mat4_t* ca
                                               shadow_zone_size);
 }
 
-static void shadows_render_objects() {
+static void shadows_render_objects(void) {
     sg_bindings bindings = {0};
     mat4_t mvp;
 
@@ -410,7 +414,7 @@ static void render_system_prepare(void) {
     main3d_set_point_light_info(point_light_pos, &point_light);
 }
 
-static void render_system_prerender() {
+static void render_system_prerender(void) {
     shadows_begin();
     shadows_update_light_direction(&scene3d_render_system.camera_projection, &scene3d_render_system.camera_view);
     shadows_render_objects();

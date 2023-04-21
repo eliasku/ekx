@@ -7,7 +7,7 @@
 #include <ek/scenex/base/node.h>
 
 camera2d_t camera2d_default(void) {
-    camera2d_t cam = {0};
+    camera2d_t cam = INIT_ZERO;
 
     cam.contentScale = 1;
     cam.clearColor = vec4(0.5f, 0.5f, 0.5f, 1.0f);

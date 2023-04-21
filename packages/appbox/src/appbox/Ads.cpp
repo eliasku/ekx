@@ -1,7 +1,7 @@
 #include "Ads.hpp"
 
 #include <ek/time.h>
-#include <ek/scenex/app/basic_application.hpp>
+#include <ek/scenex/app/base_game.h>
 #include <ek/local_storage.h>
 #include <ek/admob.h>
 #include <ek/admob_wrapper.h>
@@ -31,22 +31,23 @@ static void ads_on_product_details(const product_details_t* details) {
 }
 
 static void on_game_start_ads_post_init(void* userdata) {
-    ek::Ads* ads = (ek::Ads*)userdata;
-    billing_get_purchases();
-    const char* product_ids[1] = {ads->config.sku_remove_ads };
-    billing_get_details(product_ids, 1);
+    UNUSED(userdata);
+    if (g_ads) {
+        billing_get_purchases();
+        const char* product_ids[1] = {g_ads->config.sku_remove_ads};
+        billing_get_details(product_ids, 1);
+    }
 }
 
-static void on_game_start_init_ads(void* userdata) {
-    // just wait billing service a little
-    // TODO: billing initialized promise
-    ek_timer_callback cb = INIT_ZERO;
-    cb.action = on_game_start_ads_post_init;
-    cb.userdata = userdata;
-    ek_set_timeout(cb, 3);
+void ads_on_game_start(void) {
+    if(g_ads && !g_ads->removed) {
+        // just wait billing service a little
+        // TODO: billing initialized promise
+        ek_timer_callback cb = INIT_ZERO;
+        cb.action = on_game_start_ads_post_init;
+        ek_set_timeout(cb, 3);
+    }
 }
-
-static game_app_callback_t on_game_start_callback;
 
 namespace ek {
 
@@ -61,15 +62,6 @@ Ads::Ads(ads_premium_config config_) :
 #endif
 
     removed = checkRemoveAdsPurchase();
-    if (!removed) {
-        on_game_start_callback.userdata = this;
-        on_game_start_callback.fn = (void*)on_game_start_init_ads;
-        game_app_add_callback(&game_app_callbacks.on_start, &on_game_start_callback);
-    }
-}
-
-void Ads::onStart() {
-
 }
 
 void Ads::purchaseRemoveAds() const {

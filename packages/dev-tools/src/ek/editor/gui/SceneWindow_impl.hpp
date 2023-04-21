@@ -270,7 +270,7 @@ void SceneWindow::drawSceneNodeBounds(entity_t e) {
     }
 }
 
-void SceneWindow::onPreRender() {
+void SceneWindow::pre_render() {
     if (display.color.id == SG_INVALID_ID) {
         return;
     }
@@ -287,7 +287,7 @@ void SceneWindow::onPreRender() {
 
 void SceneWindow::drawScene() {
     if (!is_entity(root)) {
-        root = g_game_app->root;
+        root = game_app_state.root;
     }
 
     canvas_begin_ex({0, 0, display.info.size.x, display.info.size.y}, view.view2.matrix, {0}, {0});
@@ -306,7 +306,7 @@ void SceneWindow::drawScene() {
 }
 
 entity_t SceneWindow::hitTest(entity_t e, vec2_t worldPos) {
-    const node_t* node = Node_get(e);
+    const node_t* node = get_node(e);
     if (node->flags & (NODE_HIDDEN | NODE_UNTOUCHABLE)) {
         return NULL_ENTITY;
     }
@@ -449,7 +449,7 @@ void SceneWindow::manipulateObject3D() {
                              nullptr);
 
 //        auto& localTransform = get_transform2d(sel);
-//        const auto parentWorldMatrix2D = Node_get(sel).get_world_transform2d(parent).matrix;
+//        const auto parentWorldMatrix2D = get_node(sel).get_world_transform2d(parent).matrix;
 //        const auto parentWorldMatrix3D = matrix2Dto3D(parentWorldMatrix2D);
 //        const auto inverseParentWorldMatrix3D = inverse(parentWorldMatrix3D);
 //        const auto newLocalMatrix3D = inverseParentWorldMatrix3D * worldMatrix3D;

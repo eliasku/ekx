@@ -31,7 +31,7 @@ static dynamic_atlas_page_t create_page(int width, int height, bool alpha_map, b
     r.x = r.padding;
     r.y = r.padding;
     r.lineHeight = 0;
-    r.dirtyRect = (irect_t){0, 0, width, height};
+    r.dirtyRect = (irect_t){{0, 0, width, height}};
     r.dirty = true;
     r.alphaMap = alpha_map;
     r.mipmaps = mipmaps;
@@ -55,7 +55,7 @@ static dynamic_atlas_page_t create_page(int width, int height, bool alpha_map, b
 }
 
 bool page_add_bitmap(dynamic_atlas_page_t * page, int spriteWidth, int spriteHeight, const uint8_t* pixelsData, size_t pixelsSize, dynamic_atlas_sprite_t* sprite) {
-    EK_ASSERT(pixelsSize >= spriteWidth * spriteHeight * page->bytesPerPixel);
+    EK_ASSERT(pixelsSize >= ((size_t)spriteWidth * spriteHeight * page->bytesPerPixel));
     EK_ASSERT(spriteWidth < page->width && spriteHeight < page->height);
 
     int placeX = page->x;
@@ -87,9 +87,9 @@ bool page_add_bitmap(dynamic_atlas_page_t * page, int spriteWidth, int spriteHei
             memcpy(page->data + placeX + (placeY + cy) * destStride, pixelsData + cy * srcStride, srcStride);
         }
         if (!page->dirty) {
-            page->dirtyRect = (irect_t){placeX, placeY, spriteWidth, spriteHeight};
+            page->dirtyRect = (irect_t){{placeX, placeY, spriteWidth, spriteHeight}};
         } else {
-            page->dirtyRect = irect_combine(page->dirtyRect, (irect_t){placeX, placeY, spriteWidth, spriteHeight});
+            page->dirtyRect = irect_combine(page->dirtyRect, (irect_t){{placeX, placeY, spriteWidth, spriteHeight}});
         }
         page->dirty = true;
     }
@@ -108,7 +108,7 @@ bool page_add_bitmap(dynamic_atlas_page_t * page, int spriteWidth, int spriteHei
 
 dynamic_atlas_sprite_t dynamic_atlas_add_bitmap(dynamic_atlas_t * atlas, int width, int height, const uint8_t* pixels, size_t pixels_size) {
     int bpp = atlas->alphaMap ? 1 : 4;
-    EK_ASSERT(pixels_size >= width * height * bpp);
+    EK_ASSERT(pixels_size >= ((size_t)width * height * bpp));
     EK_ASSERT(width < atlas->pageWidth && height < atlas->pageHeight);
 
     dynamic_atlas_sprite_t sprite;
@@ -154,7 +154,7 @@ int dynamic_atlas_estimate_better_size(float scale_factor, uint32_t base_size, u
 void dynamic_atlas_reset(dynamic_atlas_t* atlas) {
     arr_for (page, atlas->pages_) {
         memset(page->data, 0u, page->dataSize);
-        page->dirtyRect = (irect_t){0, 0, page->width, page->height};
+        page->dirtyRect = (irect_t){{0, 0, page->width, page->height}};
         page->dirty = true;
         page->x = page->padding;
         page->y = page->padding;

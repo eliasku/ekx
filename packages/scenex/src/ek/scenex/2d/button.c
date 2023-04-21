@@ -123,7 +123,7 @@ update_button_events(interactive_t* interactive, button_t* button, entity_t e, e
         play_button_sound(button->skin->sfx_down);
     }
     if (interactive->ev_tap) {
-        if (has_node_events(e)) {
+        if (get_node_events(e)) {
             queue[*queue_num] = e;
             ++(*queue_num);
         }
@@ -139,7 +139,7 @@ void Button_update(void) {
     for (uint32_t i = 1; i < Button.size; ++i) {
         const entity_t e = get_entity(&Button, i);
         button_t* btn = (button_t*) Button.data[0] + i;
-        interactive_t* interactive = interactive_get(e);
+        interactive_t* interactive = get_interactive(e);
         transform2d_t* transform = get_transform2d(e);
         if (interactive && transform) {
             float dt = g_time_layers[btn->time].dt;

@@ -10,7 +10,6 @@
 #include "gui/SceneWindow.hpp"
 #include "gui/ConsoleWindow.hpp"
 #include "gui/ResourcesWindow.hpp"
-#include <ek/scenex/app/game_app_callbacks.h>
 
 namespace ek {
 
@@ -27,8 +26,6 @@ struct EditorSettings {
 
     void load();
 };
-
-class basic_application;
 
 struct Editor {
     Editor();
@@ -58,7 +55,4 @@ struct Editor {
 }
 
 extern ek::EditorSettings* g_editor_config;
-void init_editor_config(void);
-
 extern ek::Editor* g_editor;
-void init_editor(void);

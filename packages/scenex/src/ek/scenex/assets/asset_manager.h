@@ -40,7 +40,11 @@ void assets_set_scale_factor(float scale);
 
 bool assets_is_all_loaded(void);
 
-// TODO: >C
+// main functions for management main pack loading
+void assets_root_pack_load(const char* filepath);
+void assets_root_pack_poll(void);
+float assets_root_pack_progress(void);
+
 void load_asset(asset_ptr asset);
 void unload_asset(asset_ptr asset);
 void delete_asset(asset_ptr asset);

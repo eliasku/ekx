@@ -76,7 +76,7 @@ void string_catalog_free(string_catalog* catalog) {
 
 const char* localize(const char* str) {
     localization_t l = s_localization;
-    if (str && *str && l.lang_index < l.lang_num) {
+    if (str && str[0] && l.lang_index < l.lang_num) {
         return string_catalog_get(&l.languages[l.lang_index], str);
     }
     return str;
@@ -84,7 +84,7 @@ const char* localize(const char* str) {
 
 bool set_language(lang_name_t name) {
     localization_t l = s_localization;
-    for (int i = 0; i < l.lang_num; ++i) {
+    for (uint32_t i = 0; i < l.lang_num; ++i) {
         if (memcmp(l.languages[i].name.str, name.str, LANG_CODE_CMP_LENGTH) == 0) {
             return set_language_index(i);
         }

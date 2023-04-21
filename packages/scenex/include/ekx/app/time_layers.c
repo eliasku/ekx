@@ -2,6 +2,7 @@
 
 #include <ek/assert.h>
 
+float g_time_dt;
 time_layer_state_t g_time_layers[TIME_LAYER_MAX_COUNT];
 
 #define TIME_LAYER_DELTA_TIME_MAX (0.3f)
@@ -24,11 +25,12 @@ void init_time_layers(void) {
     }
 }
 
-void update_time_layers(float raw_dt) {
-    if (raw_dt > TIME_LAYER_DELTA_TIME_MAX) {
-        raw_dt = TIME_LAYER_DELTA_TIME_MAX;
+void update_time_layers(float dt) {
+    g_time_dt = dt;
+    if (dt > TIME_LAYER_DELTA_TIME_MAX) {
+        dt = TIME_LAYER_DELTA_TIME_MAX;
     }
-    const float dt = update_time_layer(g_time_layers, raw_dt);
+    dt = update_time_layer(g_time_layers, dt);
     update_time_layer(g_time_layers + 1, dt);
     update_time_layer(g_time_layers + 2, dt);
     update_time_layer(g_time_layers + 3, dt);

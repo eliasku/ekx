@@ -155,10 +155,9 @@ uint32_t find_many(entity_t* out, entity_t e, ...);
 entity_t get_parent(entity_t e);
 
 extern ecx_component_type Node;
-void Node_register(void);
-#define Node_get(e) ((node_t*)get_component(&Node, e))
-#define Node_add(e) ((node_t*)add_component(&Node, e))
-#define Node_has(e) (get_component_handle(&Node, e) != 0)
+void setup_Node(void);
+#define get_node(e) ((node_t*)get_component(&Node, e))
+#define add_node(e) ((node_t*)add_component(&Node, e))
 
 #ifdef __cplusplus
 };

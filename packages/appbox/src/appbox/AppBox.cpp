@@ -69,6 +69,10 @@ void appbox_setup(appbox_config_t config) {
     }
 }
 
+void appbox_on_game_start(void) {
+    ads_on_game_start();
+}
+
 void set_state_on_off(entity_t e, bool enabled) {
     auto on = find(e, H("state_on"));
     auto off = find(e, H("state_off"));
@@ -84,9 +88,9 @@ void appbox_init_default_controls(entity_t e) {
         if (e_version.id) {
 #ifndef NDEBUG
             set_text_f(e_version, "%s #%s_d", g_appbox.config.version_name, g_appbox.config.version_code);
-            interactive_add(e_version);
+            add_interactive(e_version);
             add_button(e_version);
-            ecs::add<NodeEventHandler>(e_version)->on(BUTTON_EVENT_CLICK, [](const node_event_t*) {
+            add_node_event_listener(e_version, BUTTON_EVENT_CLICK, +[](const node_event_t*) {
                 // force crash
                 volatile uint8_t* invalid_ptr = (uint8_t*)NULL;
                 *invalid_ptr = 0;
@@ -100,9 +104,9 @@ void appbox_init_default_controls(entity_t e) {
         // PRIVACY POLICY
         entity_t e_pp = find(e, H("privacy_policy"));
         if (e_pp.id) {
-            interactive_add(e_pp);
+            add_interactive(e_pp);
             add_button(e_pp);
-            add_node_event_listener(e_pp, BUTTON_EVENT_CLICK, [](const node_event_t*) {
+            add_node_event_listener(e_pp, BUTTON_EVENT_CLICK, +[](const node_event_t*) {
                 ek_app_open_url(g_appbox.config.privacy_policy_url);
             });
         }
@@ -120,7 +124,7 @@ void appbox_init_default_controls(entity_t e) {
                         set_visible(btn, false);
                     }
                 };
-                ecs::add<NodeEventHandler>(btn)->on(BUTTON_EVENT_CLICK, [](const node_event_t*) {
+                add_node_event_listener(btn, BUTTON_EVENT_CLICK, +[](const node_event_t*) {
                     g_ads->purchaseRemoveAds();
                 });
             }
@@ -129,7 +133,7 @@ void appbox_init_default_controls(entity_t e) {
     {
         entity_t btn = find(e, H("restore_purchases"));
         if (btn.id) {
-            ecs::add<NodeEventHandler>(btn)->on(BUTTON_EVENT_CLICK, [](const node_event_t*) {
+            add_node_event_listener(btn, BUTTON_EVENT_CLICK, +[](const node_event_t*) {
                 billing_get_purchases();
             });
         }
@@ -140,7 +144,7 @@ void appbox_init_default_controls(entity_t e) {
         {
             entity_t btn = find(e, H("sound"));
             if (btn.id) {
-                ecs::add<NodeEventHandler>(btn)->on(BUTTON_EVENT_CLICK, [](const node_event_t* event) {
+                add_node_event_listener(btn, BUTTON_EVENT_CLICK, +[](const node_event_t* event) {
                     set_state_on_off(event->source, audio_toggle_pref(AUDIO_PREF_SOUND));
                 });
                 set_state_on_off(btn, g_audio.prefs & AUDIO_PREF_SOUND);
@@ -149,7 +153,7 @@ void appbox_init_default_controls(entity_t e) {
         {
             entity_t btn = find(e, H("music"));
             if (btn.id) {
-                ecs::add<NodeEventHandler>(btn)->on(BUTTON_EVENT_CLICK, [](const node_event_t* event) {
+                add_node_event_listener(btn, BUTTON_EVENT_CLICK, [](const node_event_t* event) {
                     set_state_on_off(event->source, audio_toggle_pref(AUDIO_PREF_MUSIC));
                 });
                 set_state_on_off(btn, g_audio.prefs & AUDIO_PREF_MUSIC);
@@ -158,7 +162,7 @@ void appbox_init_default_controls(entity_t e) {
         {
             entity_t btn = find(e, H("vibro"));
             if (btn.id) {
-                ecs::add<NodeEventHandler>(btn)->on(BUTTON_EVENT_CLICK, [](const node_event_t* event) {
+                add_node_event_listener(btn, BUTTON_EVENT_CLICK, [](const node_event_t* event) {
                     set_state_on_off(event->source, audio_toggle_pref(AUDIO_PREF_VIBRO));
                     if (g_audio.prefs & AUDIO_PREF_VIBRO) {
                         vibrate(50);
@@ -201,7 +205,7 @@ void appbox_rate_us(void) {
 //    entity_t x = find(e, tag);
 //    if (link && *link) {
 //        add_button(x);
-//        ecs::add<NodeEventHandler>(x)->on(BUTTON_EVENT_CLICK, [link](const node_event_t& ) {
+//        add_node_events(x)->signal.add(BUTTON_EVENT_CLICK, [link](const node_event_t& ) {
 //            ek_app_open_url(link);
 //        });
 //    } else {
@@ -224,7 +228,7 @@ void appbox_init_language_button(entity_t e) {
     using namespace ek;
     entity_t btn = find(e, H("language"));
     if (btn.id) {
-        ecs::add<NodeEventHandler>(btn)->on(BUTTON_EVENT_CLICK, [](const node_event_t*) {
+        add_node_event_listener(btn, BUTTON_EVENT_CLICK, [](const node_event_t*) {
             uint32_t index = s_localization.lang_index;
             uint32_t num = s_localization.lang_num;
             // check if languages are available

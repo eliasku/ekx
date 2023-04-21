@@ -193,7 +193,7 @@ rect_t ninepatch2d_get_bounds(entity_t e) {
     if (src) {
         return REF_RESOLVE(res_sprite, src).rect;
     }
-    return (rect_t) {};
+    return (rect_t) {0};
 }
 
 bool ninepatch2d_hit_test(entity_t e, vec2_t point) {

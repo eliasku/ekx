@@ -1,29 +1,39 @@
-#pragma once
+#ifndef SCENEX_UITEST_H
+#define SCENEX_UITEST_H
 
 #ifdef EK_UITEST
 
-#include <ek/assert.hpp>
-#include <cstdlib>
-#include <ek/scenex/app/basic_application.hpp>
-#include <ek/scenex/Localization.hpp>
-#include <ek/scenex/2d/Button.hpp>
-#include <ek/scenex/base/Node.hpp>
-#include <functional>
-#include <unordered_map>
+#include <ecx/ecx.h>
+#include <ek/scenex/app/base_game.h>
+#include <ek/scenex/base/node.h>
 
-namespace ek::uitest {
-
-extern basic_application* _baseApp;
-extern std::string lang;
-extern int step;
-
-void screenshot(const char* name);
-void done();
-void fail();
-void click(const std::vector<std::string>& path);
-void UITest(const char* name, const std::function<void()>& run);
-void initialize(basic_application* baseApp);
-
-}
-
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+extern int uitest_step;
+void uitest_screenshot(const char* name);
+void uitest_done();
+void uitest_fail();
+void uitest_click_entity(entity_t e);
+#define uitest_click(...) uitest_click_entity(find_by_path(game_app_state.root, __VA_ARGS__))
+
+void uitest(const char* name, void(*run)(void));
+void uitest_setup(void);
+void uitest_start(void);
+
+#define UITEST_SETUP uitest_setup()
+#define UITEST_START uitest_start()
+
+#ifdef __cplusplus
+}
+#endif
+
+#else
+
+#define UITEST_SETUP ((void)(0))
+#define UITEST_START ((void)(0))
+
+#endif // EK_UITEST
+
+#endif // SCENEX_UITEST_H

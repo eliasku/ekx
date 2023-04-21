@@ -2,12 +2,13 @@
 #define SCENEX_NODE_EVENTS_H
 
 #include <ecx/ecx.h>
-#include "node.h"
 
 #ifdef __cplusplus
+
 #include <utility>
 #include <ek/util/Signal.hpp>
 #include <ecx/ecx.hpp>
+
 #endif
 
 #ifdef __cplusplus
@@ -31,14 +32,19 @@ typedef struct {
     bool processed;
 } node_event_t;
 
+typedef struct node_events_ node_events_t;
+
 node_event_t node_event(string_hash_t event_type, entity_t e);
 
 /*** events functions ***/
+extern ecx_component_type NodeEvents;
+void setup_node_events(void);
+#define get_node_events(e) ((node_events_t*)get_component(&NodeEvents, e))
+#define add_node_events(e) ((node_events_t*)add_component(&NodeEvents, e))
 
 bool emit_node_event(entity_t e, const node_event_t* event);
-bool has_node_events(entity_t e);
-void add_node_event_listener(entity_t e, string_hash_t event_type, void(*callback)(const node_event_t* event));
-void add_node_event_listener_once(entity_t e, string_hash_t event_type, void(*callback)(const node_event_t* event));
+void add_node_event_listener(entity_t e, string_hash_t event_type, void(* callback)(const node_event_t* event));
+void add_node_event_listener_once(entity_t e, string_hash_t event_type, void(* callback)(const node_event_t* event));
 
 void dispatch_broadcast(entity_t e, const node_event_t* event);
 void dispatch_bubble(entity_t e, const node_event_t* event);
@@ -56,21 +62,9 @@ void notify_parents(entity_t e, string_hash_t event_type);
 
 #ifdef __cplusplus
 
-typedef struct NodeEventHandler {
-    template<typename Fn>
-    void on(string_hash_t type, Fn&& listener) {
-        signal.add(listener, type);
-    }
-
-    template<typename Fn>
-    void once(string_hash_t type, Fn&& listener) {
-        signal.once(listener, type);
-    }
-
-    ek::Signal<const node_event_t*> signal;
-} node_events_t;
-
-ECX_COMP_TYPE_CXX(NodeEventHandler);
+struct node_events_ {
+    ek::Signal<const node_event_t*> signal{};
+};
 
 #endif
 

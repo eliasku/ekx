@@ -404,11 +404,12 @@ void font_destroy(font_t* font) {
 }
 
 bool ttf_initFromMemory(font_t* font, const uint8_t* data, size_t size) {
-    const uint8_t* fontData = data;
-    const int fontIndex = 0;
-    const int fontOffset = stbtt_GetFontOffsetForIndex(fontData, fontIndex);
-    EK_ASSERT(fontOffset >= 0 && "fontData is incorrect, or fontIndex cannot be found.");
-    if (stbtt_InitFont(&font->info, fontData, fontOffset)) {
+    UNUSED(size);
+    const uint8_t* font_data = data;
+    const int font_idx = 0;
+    const int font_offset = stbtt_GetFontOffsetForIndex(font_data, font_idx);
+    EK_ASSERT(font_offset >= 0 && "fontData is incorrect, or fontIndex cannot be found.");
+    if (stbtt_InitFont(&font->info, font_data, font_offset)) {
         int ascent, descent, lineGap;
         // Store normalized line height. The real line height is got
         // by multiplying the lineh by font size.

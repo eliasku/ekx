@@ -25,7 +25,7 @@ void destroy_children_later(entity_t e, float delay, time_layer_t timer);
 
 extern destroy_manager_t g_destroy_manager;
 
-void update_destroy_queue();
+void update_destroy_queue(void);
 
 #ifdef __cplusplus
 }

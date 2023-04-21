@@ -38,7 +38,7 @@ bool dispatch_back_event(entity_t e, const node_event_t* event) {
         if (emit_node_event(e, event) && event->processed) {
             processed = true;
         }
-        interactive_t* i = interactive_get(e);
+        interactive_t* i = get_interactive(e);
         if (i && i->back_button) {
             i->ev_tap = true;
             i->ev_tap_back = true;
@@ -77,15 +77,15 @@ bool interaction_system_list_contains_target(const entity_t list[32], entity_t e
 void fire_interaction(string_hash_t event, bool prev, bool onlyIfChanged) {
     uint32_t off = prev ? 0 : 1;
     entity_t* targets = get_targets(off);
-    entity_t* oppositeTargets = get_targets(off + 1);
+    entity_t* opposite_targets = get_targets(off + 1);
 
     for (uint32_t i = 0; i < 32; ++i) {
         entity_t target = targets[i];
         if (is_entity(target)) {
-            // TODO: we actually could check NodeEventHandler and dispatch events, if Interactive component set - we
+            // TODO: we actually could check NodeEvents and dispatch events, if Interactive component set - we
             //  just update state
-            interactive_t* interactive = interactive_get(target);
-            if (interactive && !(onlyIfChanged && interaction_system_list_contains_target(oppositeTargets, target))) {
+            interactive_t* interactive = get_interactive(target);
+            if (interactive && !(onlyIfChanged && interaction_system_list_contains_target(opposite_targets, target))) {
                 interactive_handle(interactive, target, event);
             }
         } else {
@@ -122,7 +122,7 @@ ek_mouse_cursor search_interactive_targets(entity_t list[32]) {
     entity_t drag_entity = g_interaction_system.dragEntity_;
     if (is_entity(drag_entity)) {
         it = drag_entity;
-        const interactive_t* interactive = interactive_get(it);
+        const interactive_t* interactive = get_interactive(it);
         if (interactive && is_entity(interactive->camera)) {
             camera = interactive->camera;
             pointer = vec2_transform(g_interaction_system.pointerScreenPosition_,
@@ -136,7 +136,7 @@ ek_mouse_cursor search_interactive_targets(entity_t list[32]) {
     ek_mouse_cursor cursor = EK_MOUSE_CURSOR_PARENT;
     uint32_t len = 0;
     while (it.id) {
-        interactive_t* interactive = interactive_get(it);
+        interactive_t* interactive = get_interactive(it);
         if (interactive) {
             interactive->pointer = pointer;
             interactive->camera = camera;
@@ -156,7 +156,7 @@ ek_mouse_cursor search_interactive_targets(entity_t list[32]) {
     return cursor;
 }
 
-void update_interaction_system() {
+void update_interaction_system(void) {
     entity_t* currTargets = get_targets(1);
     // clear current list
     currTargets[0] = NULL_ENTITY;

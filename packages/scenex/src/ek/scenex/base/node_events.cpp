@@ -1,16 +1,33 @@
 #include "node_events.h"
 #include "node.h"
 
-bool has_node_events(entity_t e) {
-    return ecs::has<node_events_t>(e);
+ecx_component_type NodeEvents;
+
+static void NodeEvents_ctor(component_handle_t i) {
+    node_events_t* p = ((node_events_t*) NodeEvents.data[0]) + i;
+    new(p)node_events_();
+}
+
+static void NodeEvents_dtor(component_handle_t i) {
+    node_events_t* p = ((node_events_t*) NodeEvents.data[0]) + i;
+    p->~node_events_();
+    //memset(p, 0, sizeof(node_events_t));
+}
+
+void setup_node_events(void) {
+    init_component_type(&NodeEvents, (ecx_component_type_decl) {
+            "NodeEvents", 8, 1, {sizeof(node_events_t)}
+    });
+    NodeEvents.ctor = NodeEvents_ctor;
+    NodeEvents.dtor = NodeEvents_dtor;
 }
 
 void add_node_event_listener(entity_t e, string_hash_t event_type, void(* callback)(const node_event_t* event)) {
-    ecs::add<node_events_t>(e)->signal.add(callback, event_type);
+    add_node_events(e)->signal.add(event_type, callback);
 }
 
 void add_node_event_listener_once(entity_t e, string_hash_t event_type, void(* callback)(const node_event_t* event)) {
-    ecs::add<node_events_t>(e)->signal.once(callback, event_type);
+    add_node_events(e)->signal.once(event_type, callback);
 }
 
 node_event_t node_event(string_hash_t event_type, entity_t e) {
@@ -25,7 +42,7 @@ node_event_t node_event(string_hash_t event_type, entity_t e) {
 
 bool emit_node_event(entity_t e, const node_event_t* event) {
     EK_ASSERT(is_entity(e));
-    node_events_t* eh = ecs::try_get<node_events_t>(e);
+    node_events_t* eh = get_node_events(e);
     if (eh) {
         node_event_t* mutable_event = (node_event_t*) event;
         mutable_event->receiver = e;

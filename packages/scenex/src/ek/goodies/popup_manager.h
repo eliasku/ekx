@@ -35,8 +35,6 @@ void clear_popups(void);
 
 void close_all_popups(void);
 
-void update_popup_managers(float dt);
-
 uint32_t count_active_popups(void);
 
 extern popup_manager_t g_popup_manager;

@@ -1,12 +1,14 @@
 #pragma once
 
-#include <ek/scenex/app/basic_application.hpp>
+#include "Widgets.hpp"
+
+#include <ek/scenex/app/base_game.h>
 #include <ek/scenex/base/node.h>
 #include <ek/scenex/interaction_system.h>
 #include <ek/canvas.h>
 
 #include <ek/editor/imgui/imgui.hpp>
-#include "Widgets.hpp"
+#include <ekx/app/profiler.h>
 
 namespace ek {
 
@@ -16,15 +18,10 @@ static float getterProfilerTrackValue(void* data, int idx) {
 }
 
 void StatsWindow::onDraw() {
-    auto* base_app = g_game_app;
-    if (!base_app) {
-        return;
-    }
-
     auto stats = canvas.stats;
     const float drawableArea = ek_app.viewport.width * ek_app.viewport.height;
     ImGui::Text("%ld µs | dc: %u | tri: %u | fill: %d%%",
-                (long) (base_app->frame_timer.dt * 1000000.0f),
+                (long) (game_app_state.frame_timer.dt * 1000000.0f),
                 stats.draw_calls,
                 stats.triangles,
                 (int) (100.0f * stats.fill_area / drawableArea)

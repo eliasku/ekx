@@ -3,13 +3,13 @@
 
 ecx_component_type interactive_type;
 
-void interactive_init(void) {
+void setup_interactive(void) {
     init_component_type(&interactive_type, (ecx_component_type_decl) {
             "interactive", 8, 1, {sizeof(interactive_t)}
     });
 }
 
-interactive_t* interactive_add(entity_t e) {
+interactive_t* add_interactive(entity_t e) {
     EK_ASSERT(interactive_type.index);
     interactive_t* c = (interactive_t*) add_component(&interactive_type, e);
     *c = (interactive_t) {0};
@@ -17,7 +17,7 @@ interactive_t* interactive_add(entity_t e) {
     return c;
 }
 
-interactive_t* interactive_get(entity_t e) {
+interactive_t* get_interactive(entity_t e) {
     return (interactive_t*) get_component(&interactive_type, e);
 }
 

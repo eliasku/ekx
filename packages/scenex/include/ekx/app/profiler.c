@@ -47,7 +47,7 @@ void write_track_value(struct profiler_track* track, float hist_value, float val
 }
 
 
-void profiler_init() {
+void profiler_init(void) {
 #ifdef ENABLE_PROFILER
     struct profiler_track* track;
     for (uint32_t i = 0; i < PROFILE_TRACKS_MAX_COUNT; ++i) {
@@ -134,7 +134,7 @@ void profiler_render_begin(float drawable_area) {
 #endif
 }
 
-void profiler_render_end() {
+void profiler_render_end(void) {
 #ifdef ENABLE_PROFILER
     s_profile_metrics.tracks[PROFILE_FILL_RATE].accum += canvas.stats.fill_area;
     s_profile_metrics.tracks[PROFILE_FILL_RATE].accum /= s_profile_metrics.drawable_area;

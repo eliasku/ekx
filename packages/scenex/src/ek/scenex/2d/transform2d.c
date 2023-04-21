@@ -7,7 +7,7 @@ static world_transform2d_t world_transform2d_identity(void) {
 }
 
 static transform2d_t transform2d_identity(void) {
-    return (transform2d_t) {mat3x2_identity(), color2_identity(), vec2(1, 1), vec2(0, 0)};
+    return (transform2d_t) {{mat3x2_identity()}, color2_identity(), vec2(1, 1), vec2(0, 0)};
 }
 
 

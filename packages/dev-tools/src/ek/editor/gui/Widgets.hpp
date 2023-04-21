@@ -3,6 +3,8 @@
 #include <ek/ds/String.hpp>
 #include <ek/scenex/2d/sprite.h>
 
+typedef struct font_ font_t;
+
 namespace ImGui {
 
 void HelpMarker(const char* desc);

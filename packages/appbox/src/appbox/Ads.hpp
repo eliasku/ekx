@@ -4,7 +4,6 @@
 #include <ek/core/target.h>
 #include <ek/util/Signal.hpp>
 #include <ek/ds/String.hpp>
-#include <ek/scenex/app/game_app_callbacks.h>
 #include <functional>
 
 typedef struct {
@@ -18,8 +17,6 @@ typedef struct {
 namespace ek {
 
 struct Ads {
-    void onStart();
-
     explicit Ads(ads_premium_config config_);
 
     ~Ads();
@@ -55,3 +52,6 @@ private:
 
 extern ek::Ads* g_ads;
 void ads_init(ads_premium_config config);
+// call when app is loaded
+void ads_on_game_start(void);
+

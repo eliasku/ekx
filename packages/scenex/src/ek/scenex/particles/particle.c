@@ -12,7 +12,6 @@ particle_t particle(void) {
     return r;
 }
 
-
 static void apply_particle_values(particle_t* p) {
     switch (p->scale_mode) {
         case PARTICLE_SCALE_COS_OUT: {
@@ -94,7 +93,7 @@ void draw_particle(particle_t* p) {
     const float vis_angle = p->angle_base + p->rotation + p->angle_velocity_factor * atan2f(p->velocity.y, p->velocity.x);
     canvas_save_transform();
     canvas_transform_pivot(p->position, vis_angle, p->scale, p->pivot);
-    canvas_concat_color((color2_t){p->color, p->offset});
+    canvas_concat_color((color2_t){{p->color, p->offset}});
     if (p->sprite) {
         const sprite_t* spr = &REF_RESOLVE(res_sprite, p->sprite);
         draw_sprite(spr);

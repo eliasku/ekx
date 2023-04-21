@@ -45,8 +45,10 @@ void play_sound(string_hash_t name, float vol, float pitch) {
 }
 
 void play_sound_at(string_hash_t name, const vec2_t position, float volume, float pitch) {
+    UNUSED(position);
     if (g_audio.prefs & AUDIO_PREF_SOUND) {
         float relVolume = volume;
+        // TODO: positioning
         //auto spatialPanning = -1 .. 1;
         play_sound(name, relVolume, pitch);
     }

@@ -1,14 +1,14 @@
 #pragma once
 
 #include "ResourcesWindow.hpp"
-
 #include <gen_sg.h>
-#include <ek/scenex/scene_factory.h>
+
+#include <ek/audio.h>
+#include <ek/scenex/text/font.h>
 #include <ek/scenex/3d/scene3d.h>
 #include <ek/scenex/2d/atlas.h>
-#include <ek/scenex/text/font.h>
 #include <ek/scenex/2d/dynamic_atlas.h>
-#include <ek/scenex/text/font.h>
+#include <ek/scenex/scene_factory.h>
 
 namespace ek {
 

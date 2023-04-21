@@ -93,7 +93,7 @@ struct AtlasAsset : public asset_ {
     AtlasAsset(const char* name_, uint32_t format_mask_) : res{R_ATLAS(H(name_))},
                                                            name{name_} {
         // we need to load atlas image and atlas meta
-        weight_ = 2;
+        weight = 2;
         format_mask = format_mask_;
     }
 
@@ -132,7 +132,7 @@ struct AtlasAsset : public asset_ {
     float getProgress() const override {
         if (state == ASSET_STATE_LOADING) {
             atlas_t* atlas = &REF_RESOLVE(res_atlas, res);
-            float progress = (float)(atlas->state_flags & 1);
+            float progress = (float) (atlas->state_flags & 1);
             const uint32_t pages_num = arr_size(atlas->pages);
             if (pages_num) {
                 uint32_t pages_loaded = 0;
@@ -268,7 +268,7 @@ struct ImageAsset : public asset_ {
     ImageAsset(string_hash_t name, image_data_t data) :
             res{R_IMAGE(name)},
             data_{data} {
-        weight_ = (float) arr_size(data_.images);
+        weight = (float) arr_size(data_.images);
     }
 
     void do_load() override {
@@ -334,44 +334,36 @@ struct ImageAsset : public asset_ {
     bool premultiplyAlpha = true;
 };
 
+struct StringsAsset;
+
+struct lang_loader {
+    StringsAsset* asset;
+    lang_name_t lang;
+    ek_local_res lr;
+};
+
+void on_lang_loaded(ek_local_res* lr);
+
 struct StringsAsset : public asset_ {
 
-    StringsAsset(ek::String name, const lang_name_t* langs, uint32_t langs_num) :
-            name_{std::move(name)} {
+    StringsAsset(const char* name, const lang_name_t* langs, uint32_t langs_num) :
+            name_{name} {
         total = langs_num;
         for (uint32_t i = 0; i < langs_num; ++i) {
             loaders_[i].lang = langs[i];
             loaders_[i].asset = this;
         }
-        weight_ = (float) langs_num;
+        weight = (float) langs_num;
     }
 
     void do_load() override {
         loaded = 0;
         char lang_path[1024];
         for (uint32_t i = 0; i < total; ++i) {
-            auto* loader = &loaders_[i];
+            lang_loader* loader = &loaders_[i];
             ek_snprintf(lang_path, sizeof lang_path, "%s/%s/%s.mo", asset_manager.base_path, name_.c_str(),
                         loader->lang.str);
-            ek_local_res_load(
-                    lang_path,
-                    [](ek_local_res* lr) {
-                        lang_loader* loader_ = (lang_loader*) lr->userdata;
-                        StringsAsset* asset = loader_->asset;
-                        if (ek_local_res_success(lr)) {
-                            loader_->lr = *lr;
-                            add_lang(loader_->lang, lr->buffer, (uint32_t) lr->length);
-                        } else {
-                            log_error("Strings resource not found: %s", loader_->lang.str);
-                            asset->error = 1;
-                        }
-                        ++asset->loaded;
-                        if (asset->loaded >= asset->total) {
-                            asset->state = ASSET_STATE_READY;
-                        }
-                    },
-                    loader
-            );
+            ek_local_res_load(lang_path, on_lang_loaded, loader);
         }
     }
 
@@ -380,17 +372,27 @@ struct StringsAsset : public asset_ {
         // ek_local_res_close(&data);
     }
 
-    struct lang_loader {
-        StringsAsset* asset;
-        lang_name_t lang;
-        ek_local_res lr;
-    };
-
     ek::String name_;
     lang_loader loaders_[LANG_MAX_COUNT];
     uint32_t loaded = 0;
     uint32_t total = 0;
 };
+
+void on_lang_loaded(ek_local_res* lr) {
+    lang_loader* loader = (lang_loader*) lr->userdata;
+    StringsAsset* asset = loader->asset;
+    if (ek_local_res_success(lr)) {
+        loader->lr = *lr;
+        add_lang(loader->lang, lr->buffer, (uint32_t) lr->length);
+    } else {
+        log_error("Strings resource not found: %s", loader->lang.str);
+        asset->error = 1;
+    }
+    ++asset->loaded;
+    if (asset->loaded >= asset->total) {
+        asset->state = ASSET_STATE_READY;
+    }
+}
 
 struct ModelAsset : public asset_ {
 
@@ -430,7 +432,7 @@ struct ModelAsset : public asset_ {
     ek::String name_;
 };
 
-bool isTimeBudgetAllowStartNextJob(uint64_t since) {
+bool is_time_budget_allow_start_next_job(uint64_t since) {
     return ek_ticks_to_sec(ek_ticks(&since)) < 0.008;
 }
 
@@ -592,36 +594,34 @@ void PackAsset::poll() {
 
     uint64_t timer = ek_ticks(nullptr);
 
-    unsigned numAssetsLoaded = 0;
-    for (auto asset: assets) {
-        const auto initialState = asset->state;
-        if (asset->state == ASSET_STATE_INITIAL) {
-            if (isTimeBudgetAllowStartNextJob(timer)) {
-//                    log_debug("Loading BEGIN: %s", asset->name_.c_str());
+    uint32_t loaded_assets_num = 0;
+    for (asset_ptr asset: assets) {
+//        const asset_state_t initial_state = asset->state;
+        if (is_time_budget_allow_start_next_job(timer)) {
+            if (asset->state == ASSET_STATE_INITIAL) {
+                //log_debug("Loading BEGIN: %s", asset->name_.c_str());
                 asset->load();
             }
-        }
-        if (asset->state == ASSET_STATE_LOADING) {
-            if (isTimeBudgetAllowStartNextJob(timer)) {
+            if (asset->state == ASSET_STATE_LOADING) {
                 asset->poll();
             }
         }
         if (asset->state == ASSET_STATE_READY) {
-            if (initialState != ASSET_STATE_READY) {
-//                    log_debug("Loading END: %s", asset->name_.c_str());
-            }
-            ++numAssetsLoaded;
+            //if (initial_state != ASSET_STATE_READY) {
+            // log_debug("Loading END: %s", asset->name_.c_str());
+            //}
+            ++loaded_assets_num;
         }
     }
 
-    if (!isTimeBudgetAllowStartNextJob(timer)) {
+    if (!is_time_budget_allow_start_next_job(timer)) {
         uint64_t since = timer;
         double elapsed = ek_ticks_to_sec(ek_ticks(&since));
         log_info("Assets loading jobs spend %d ms", (int) (elapsed * 1000));
     }
 
-    assetsLoaded = numAssetsLoaded;
-    if (numAssetsLoaded >= assets.size()) {
+    assetsLoaded = loaded_assets_num;
+    if (loaded_assets_num >= assets.size()) {
         state = ASSET_STATE_READY;
     }
 }
@@ -637,10 +637,12 @@ float PackAsset::getProgress() const {
             if (!assets.empty()) {
                 float acc = 0.0f;
                 float total = 0.0f;
-                for (auto asset: assets) {
-                    const float w = asset->weight_;
-                    acc += w * asset->getProgress();
-                    total += w;
+                for (asset_ptr asset: assets) {
+                    const float w = asset->weight;
+                    if (w > 0.0f) {
+                        acc += w * asset->getProgress();
+                        total += w;
+                    }
                 }
                 if (total > 0.0f) {
                     return acc / total;
@@ -650,3 +652,23 @@ float PackAsset::getProgress() const {
     return 0.0f;
 }
 
+static PackAsset* root_pack_asset;
+
+// main functions for management main pack loading
+void assets_root_pack_load(const char* filepath) {
+    EK_ASSERT(!root_pack_asset);
+    log_debug("load root pack asset, content scale: %d%%.", (int) (100 * asset_manager.scale_factor));
+    root_pack_asset = new PackAsset(filepath);
+    assets_add(root_pack_asset);
+    root_pack_asset->load();
+}
+
+void assets_root_pack_poll(void) {
+    EK_ASSERT(root_pack_asset);
+    root_pack_asset->poll();
+}
+
+float assets_root_pack_progress(void) {
+    EK_ASSERT(root_pack_asset);
+    return root_pack_asset->getProgress();
+}
