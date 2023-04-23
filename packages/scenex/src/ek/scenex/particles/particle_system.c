@@ -21,7 +21,7 @@ void ParticleLayer2D_ctor(component_handle_t i) {
 
 void ParticleLayer2D_dtor(component_handle_t i) {
     particle_layer2d_t* l = ((particle_layer2d_t*) ParticleLayer2D.data[0]) + i;
-    arr_reset((void**) &l->particles);
+    arr_reset(l->particles);
 }
 
 void setup_particle2d(void) {

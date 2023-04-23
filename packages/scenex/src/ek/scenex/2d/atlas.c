@@ -54,7 +54,7 @@ static void load_atlas_meta(atlas_t* atlas, ek_local_res* lr) {
     arr_for (p_loader, atlas->loaders) {
         ek_texture_loader_destroy(*p_loader);
     }
-    arr_reset((void**) &atlas->loaders);
+    arr_reset(atlas->loaders);
 
     arr_for(page, atlas_info.pages) {
         res_id image_asset = R_IMAGE(H(page->image_path));
@@ -145,7 +145,7 @@ static void atlas_poll_loading(atlas_t* atlas) {
                     ek_texture_loader_destroy(*p_loader);
                 }
             }
-            arr_reset((void**) &atlas->loaders);
+            arr_reset(atlas->loaders);
             atlas->state_flags |= 2;
         }
     }
@@ -168,10 +168,10 @@ void atlas_clear(atlas_t* atlas) {
         spr->state = 0;
     }
 
-    arr_reset((void**) &atlas->pages);
-    arr_reset((void**) &atlas->sprites);
-    arr_reset((void**) &atlas->loaders);
-    arr_reset(&atlas->base_path);
+    arr_reset(atlas->pages);
+    arr_reset(atlas->sprites);
+    arr_reset(atlas->loaders);
+    arr_reset(atlas->base_path);
 
     atlas->state_flags = 0;
 }

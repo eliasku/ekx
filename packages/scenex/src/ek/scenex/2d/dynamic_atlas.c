@@ -142,7 +142,7 @@ void dynamic_atlas_destroy(dynamic_atlas_t* atlas) {
         free(page->data);
         sg_destroy_image(page->image);
     }
-    arr_reset((void**)&atlas->pages_);
+    arr_reset(atlas->pages_);
 }
 
 int dynamic_atlas_estimate_better_size(float scale_factor, uint32_t base_size, uint32_t max_size) {

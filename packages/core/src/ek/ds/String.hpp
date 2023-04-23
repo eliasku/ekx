@@ -68,7 +68,7 @@ public:
     }
 
     String& operator=(String&& m) noexcept {
-        arr_reset((void**) &_buffer);
+        arr_reset(_buffer);
         _buffer = m._buffer;
         m._buffer = nullptr;
         return *this;
@@ -76,7 +76,7 @@ public:
 
     ~String() noexcept {
         ek_core_dbg_dec(EK_CORE_DBG_STRING);
-        arr_reset((void**) &_buffer);
+        arr_reset(_buffer);
     }
 
     [[nodiscard]]

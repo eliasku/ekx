@@ -34,12 +34,12 @@ void play_sound(string_hash_t name, float vol, float pitch) {
             }
             else {
                 // is not ready?
-                log_debug("audio: snd id is 0, %s", hsp_get(name));
+                // log_debug("audio: snd id is 0, %s", hsp_get(name));
             }
         }
         else {
             // no id
-            log_debug("audio: res is 0, %s", hsp_get(name));
+            // log_debug("audio: res is 0, %s", hsp_get(name));
         }
     }
 }

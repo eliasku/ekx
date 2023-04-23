@@ -48,10 +48,9 @@ public:
     PodArray<const char*> candidates;
     PodArray<char*> history;
     // -1: new line, 0..History.Size-1 browsing history
-    int historyPos = 0;
+    int history_pos = 0;
 
-    uint8_t filterMask = 0xFF;
-    ImGuiTextFilter textFilter{};
+    ImGuiTextFilter text_filter{};
     bool autoScroll = true;
     bool scrollDownRequired = false;
 

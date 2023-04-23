@@ -87,24 +87,24 @@ int onConsoleInputCommandCallback(ImGuiInputTextCallbackData* data) {
         }
         case ImGuiInputTextFlags_CallbackHistory: {
             // Example of HISTORY
-            const int prev_history_pos = con->historyPos;
+            const int prev_history_pos = con->history_pos;
             if (data->EventKey == ImGuiKey_UpArrow) {
-                if (con->historyPos == -1) {
-                    con->historyPos = static_cast<int>(con->history.size()) - 1;
-                } else if (con->historyPos > 0) {
-                    --con->historyPos;
+                if (con->history_pos == -1) {
+                    con->history_pos = static_cast<int>(con->history.size()) - 1;
+                } else if (con->history_pos > 0) {
+                    --con->history_pos;
                 }
             } else if (data->EventKey == ImGuiKey_DownArrow) {
-                if (con->historyPos != -1) {
-                    if (++con->historyPos >= con->history.size()) {
-                        con->historyPos = -1;
+                if (con->history_pos != -1) {
+                    if (++con->history_pos >= con->history.size()) {
+                        con->history_pos = -1;
                     }
                 }
             }
 
             // A better implementation would preserve the data on the current input line along with cursor position.
-            if (prev_history_pos != con->historyPos) {
-                const char* history_str = (con->historyPos >= 0) ? con->history[con->historyPos] : "";
+            if (prev_history_pos != con->history_pos) {
+                const char* history_str = (con->history_pos >= 0) ? con->history[con->history_pos] : "";
                 data->DeleteChars(0, data->BufTextLen);
                 data->InsertChars(0, history_str);
             }
@@ -114,30 +114,30 @@ int onConsoleInputCommandCallback(ImGuiInputTextCallbackData* data) {
 }
 
 void ConsoleWindow::onDraw() {
-    unsigned filterMask = 0;
+    uint32_t filter_mask = 0;
     char tmpBuffer[64];
     for (int i = 0; i < 5; ++i) {
-        auto& info = infos[i];
+        auto* info = &infos[i];
         unsigned count = 0;
         for (int j = (int)messages_cur - (int)MIN(messages_num, 1024); j != messages_cur; ++j) {
             auto msg = messages[(j < 0 ? (j + 1024) : j) % 1024];
-            if (msg.verbosity == info.verbosity) {
+            if (msg.verbosity == info->verbosity) {
                 ++count;
             }
         }
-        info.count = count;
-        snprintf(tmpBuffer, sizeof tmpBuffer, "%s %u###console_verbosity_%i", info.icon, count, i);
-        ImGui::PushStyleColor(ImGuiCol_Button, info.show ? 0x44FF7722 : 0x0);
-        ImGui::PushStyleColor(ImGuiCol_Text, info.show ? info.iconColor : 0x3FFFFFFF);
+        info->count = count;
+        snprintf(tmpBuffer, sizeof tmpBuffer, "%s %u###console_verbosity_%i", info->icon, count, i);
+        ImGui::PushStyleColor(ImGuiCol_Button, info->show ? 0x44FF7722 : 0x0);
+        ImGui::PushStyleColor(ImGuiCol_Text, info->show ? info->iconColor : 0x3FFFFFFF);
         if (ImGui::Button(tmpBuffer)) {
-            info.show = !info.show;
+            info->show = !info->show;
         }
         ImGui::PopStyleColor(2);
         if (ImGui::IsItemHovered()) {
-            ImGui::SetTooltip("Toggle %s Verbosity", info.name);
+            ImGui::SetTooltip("Toggle %s Verbosity", info->name);
         }
-        if (info.show) {
-            filterMask |= 1 << i;
+        if (info->show) {
+            filter_mask |= 1 << i;
         }
         ImGui::SameLine(0, 1);
     }
@@ -162,11 +162,11 @@ void ConsoleWindow::onDraw() {
 
     ImGui::TextUnformatted(ICON_FA_SEARCH);
     ImGui::SameLine();
-    textFilter.Draw("##logs_filter", 100.0f);
-    if (textFilter.IsActive()) {
+    text_filter.Draw("##logs_filter", 100.0f);
+    if (text_filter.IsActive()) {
         ImGui::SameLine(0, 0);
         if (ImGui::ToolbarButton(ICON_FA_TIMES_CIRCLE, false, "Clear Filter")) {
-            textFilter.Clear();
+            text_filter.Clear();
         }
     }
 
@@ -176,10 +176,10 @@ void ConsoleWindow::onDraw() {
     for (int j = (int)messages_cur - (int)MIN(messages_num, 1024); j != messages_cur; ++j) {
         auto msg = messages[(j < 0 ? (j + 1024) : j) % 1024];
         const auto* text = msg.text;
-        if (textFilter.IsActive() && !textFilter.PassFilter(text)) {
+        if (text_filter.IsActive() && !text_filter.PassFilter(text)) {
             continue;
         }
-        if (!!((1 << (int) msg.verbosity) & filterMask) && textFilter.PassFilter(text)) {
+        if (!!((1 << (int) msg.verbosity) & filter_mask) && text_filter.PassFilter(text)) {
             ImGui::PushStyleColor(ImGuiCol_Text, msg.iconColor);
             ImGui::PushID(&msg);
             if (ImGui::Selectable(msg.icon)) {
@@ -315,7 +315,7 @@ void ConsoleWindow::execute(const char* cmd) {
 
     // Insert into history. First find match and delete it so it can be pushed to the back.
     // This isn't trying to be smart or optimal.
-    historyPos = -1;
+    history_pos = -1;
     for (int i = static_cast<int>(history.size()) - 1; i >= 0; --i) {
         if (strcasecmp(history[i], cmd) == 0) {
             free(history[i]);

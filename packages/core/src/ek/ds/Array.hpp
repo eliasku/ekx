@@ -116,7 +116,7 @@ public:
     void reset() {
         if (buffer) {
             reduce_size(0);
-            arr_reset(&buffer);
+            arr_reset(buffer);
         }
     }
 
@@ -187,7 +187,7 @@ public:
         ek_buf_set_size(&newBuffer, ElementSize, sz, capacity);
         constructMove((T*) newBuffer, (T*) buffer, sz);
 
-        arr_reset(&buffer);
+        arr_reset(buffer);
         buffer = newBuffer;
     }
 

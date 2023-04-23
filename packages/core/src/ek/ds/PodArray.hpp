@@ -46,7 +46,7 @@ public:
     }
 
     void reset() {
-        arr_reset((void**) &buffer);
+        arr_reset(buffer);
     }
 
     [[nodiscard]]

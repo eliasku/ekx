@@ -41,7 +41,7 @@ bool arr_empty(const void* ptr) {
     return !ptr || !arr_size(ptr);
 }
 
-void arr_reset(void** ptr) {
+void arr_reset_(void** ptr) {
     if (*ptr) {
         // destroy buffer content
         ek_buf_header_t* hdr = ek_buf_header(*ptr);
@@ -53,7 +53,7 @@ void arr_reset(void** ptr) {
 void ek_buf_set_capacity(void** ptr, uint32_t newCapacity, uint32_t elementSize) {
     // delete case
     if (newCapacity == 0) {
-        arr_reset(ptr);
+        arr_reset_(ptr);
         return;
     }
     ek_buf_header_t* prevHeader = *ptr ? ek_buf_header(*ptr) : 0;
@@ -141,7 +141,7 @@ void arr_grow(void** arr, uint32_t capacity, uint32_t element_size) {
     ek_buf_set_size(&new_buffer, element_size, sz, capacity);
     memcpy(new_buffer, *arr, sz * element_size);
 
-    arr_reset(arr);
+    arr_reset_(arr);
     *arr = new_buffer;
 }
 

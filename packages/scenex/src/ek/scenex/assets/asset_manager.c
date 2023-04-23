@@ -1,4 +1,5 @@
 #include "asset_manager.h"
+#include "asset.h"
 
 #include <ek/log.h>
 #include <ek/assert.h>
@@ -11,6 +12,7 @@ void assets_init(void) {
     asset_manager.base_path = "assets";
     asset_manager.scale_factor = 1;
     asset_manager.scale_uid = 1;
+    init_asset_types();
 }
 
 static uint8_t get_scale_uid(float scale) {
@@ -26,23 +28,23 @@ static uint8_t get_scale_uid(float scale) {
 
 void assets_load_all(void) {
     arr_for (asset, asset_manager.assets) {
-        load_asset(*asset);
+        (*asset)->type->load(*asset);
     }
 }
 
 void assets_unload_all(void) {
     arr_for (asset, asset_manager.assets) {
-        unload_asset(*asset);
+        (*asset)->type->unload(*asset);
     }
 }
 
 void assets_clear(void) {
     assets_unload_all();
-
     arr_for (asset, asset_manager.assets) {
-        delete_asset(*asset);
+        // NOTE: no dtor
+        free(*asset);
     }
-    arr_reset((void**)&asset_manager.assets);
+    arr_reset(asset_manager.assets);
 }
 
 void assets_set_scale_factor(float scale) {
@@ -61,9 +63,9 @@ void assets_add(asset_ptr asset) {
     arr_push(asset_manager.assets, asset);
 }
 
-bool assets_is_all_loaded() {
-    arr_for (asset, asset_manager.assets) {
-        if (get_asset_state(*asset) != ASSET_STATE_READY) {
+bool assets_is_all_loaded(void) {
+    arr_for (p_asset, asset_manager.assets) {
+        if ((*p_asset)->state != ASSET_STATE_READY) {
             return false;
         }
     }

@@ -18,7 +18,7 @@ static void Trail2D_ctor(component_handle_t i) {
 
 static void Trail2D_dtor(component_handle_t i) {
     trail2d_t* r = &((trail2d_t*) Trail2D.data[0])[i];
-    arr_reset((void**) &r->nodes.data);
+    arr_reset(r->nodes.data);
 }
 
 void setup_trail2d(void) {

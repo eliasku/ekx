@@ -396,7 +396,7 @@ void font_init_ttf(font_t* font, float dpiScale_, float fontSize, string_hash_t 
 }
 
 void font_destroy(font_t* font) {
-    arr_reset((void**) &font->map.entries);
+    arr_reset(font->map.entries);
     if (font->fontType == FONT_TYPE_TTF) {
         ttf_unload(font);
     }
@@ -434,7 +434,7 @@ void ttf_loadFromMemory(font_t* font, ek_local_res* lr) {
 
 void ttf_unload(font_t* font) {
     if (font->loaded_) {
-        arr_reset((void**) &font->glyphs);
+        arr_reset(font->glyphs);
         ek_local_res_close(&font->source);
         font->loaded_ = false;
     }

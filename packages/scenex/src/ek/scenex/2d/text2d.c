@@ -18,7 +18,7 @@ static void Text2D_ctor(component_handle_t i) {
 
 static void Text2D_dtor(component_handle_t i) {
     void* str_obj = ((text2d_t*) Text2D.data[0])[i].str_obj;
-    arr_reset(&str_obj);
+    arr_reset(str_obj);
 }
 
 void Text2D_setup(void) {

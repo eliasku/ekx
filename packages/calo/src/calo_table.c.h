@@ -31,13 +31,8 @@ uint32_t add_data(vla_table_t* table, const void* data, uint32_t length) {
     }
     resize_alloc(&table->lengths, table->count);
     resize_alloc(&table->offsets, table->count);
-//    resize_alloc(&table->hash_index, table->count);
     table->lengths[index] = length;
     table->offsets[index] = offset;
-//    table->hash_index[index] = (data_hash_index_t) {
-//            .index = index,
-//            .hash = 0
-//    };
 
     if (length) {
         table->size += length;
@@ -71,7 +66,7 @@ void free_table(vla_table_t* table) {
         free(table->lengths);
         free(table->data);
     }
-    *table = (vla_table_t) {};
+    *table = (vla_table_t) {0};
 }
 
 #undef resize_alloc

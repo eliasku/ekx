@@ -45,12 +45,6 @@ void assets_root_pack_load(const char* filepath);
 void assets_root_pack_poll(void);
 float assets_root_pack_progress(void);
 
-void load_asset(asset_ptr asset);
-void unload_asset(asset_ptr asset);
-void delete_asset(asset_ptr asset);
-asset_state_t get_asset_state(asset_ptr asset);
-
-
 #ifdef __cplusplus
 }
 #endif

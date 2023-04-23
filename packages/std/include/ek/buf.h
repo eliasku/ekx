@@ -26,7 +26,7 @@ bool arr_full(const void* ptr);
 
 bool arr_empty(const void* ptr);
 
-void arr_reset(void** ptr);
+void arr_reset_(void** ptr);
 
 #define arr_reinit(arr, size) ek_buf_set_size((void**)&(arr), sizeof (arr)[0], size, size)
 
@@ -73,6 +73,7 @@ void arr_erase_(void* arr, const void* it, uint32_t element_size, uint32_t count
  */
 void* arr_add_(void** p_arr, uint32_t element_size);
 
+#define arr_reset(arr) arr_reset_((void**)&(arr))
 #define arr_push_(p_arr, T, el) (*((T*)arr_add_((void**)(p_arr), sizeof(T))) = (el))
 #define arr_push(arr, el) ((__typeof__ (arr))arr_add_((void**)&(arr), sizeof (arr)[0]))[0] = (el)
 #define arr_resize(arr, cnt) (arr_resize_((void**)&(arr), sizeof (arr)[0], (cnt)))

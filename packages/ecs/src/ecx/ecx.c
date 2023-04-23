@@ -55,7 +55,7 @@ void ecx_shutdown(void) {
         }
 #pragma nounroll
         for (uint32_t j = 0; j < type->data_num; ++j) {
-            arr_reset(&type->data[j]);
+            arr_reset(type->data[j]);
         }
         if (type->on_shutdown) {
             type->on_shutdown();
