@@ -1,17 +1,17 @@
 #include "node_events.h"
+#include <ek/buf.h>
+#include <ek/assert.h>
 #include "node.h"
 
 ecx_component_type NodeEvents;
 
 static void NodeEvents_ctor(component_handle_t i) {
-    node_events_t* p = ((node_events_t*) NodeEvents.data[0]) + i;
-    new(p)node_events_();
+    ((node_events_t*) NodeEvents.data[0])[i] = (node_events_t) {0};
 }
 
 static void NodeEvents_dtor(component_handle_t i) {
     node_events_t* p = ((node_events_t*) NodeEvents.data[0]) + i;
-    p->~node_events_();
-    //memset(p, 0, sizeof(node_events_t));
+    arr_reset(p->callbacks);
 }
 
 void setup_node_events(void) {
@@ -22,12 +22,16 @@ void setup_node_events(void) {
     NodeEvents.dtor = NodeEvents_dtor;
 }
 
-void add_node_event_listener(entity_t e, string_hash_t event_type, void(* callback)(const node_event_t* event)) {
-    add_node_events(e)->signal.add(event_type, callback);
+void add_node_event_listener(entity_t e, string_hash_t event_type, void(*callback)(const node_event_t* event)) {
+    node_events_t* d = add_node_events(e);
+    node_event_callback_t cb = (node_event_callback_t) {callback, event_type, false};
+    arr_push(d->callbacks, cb);
 }
 
 void add_node_event_listener_once(entity_t e, string_hash_t event_type, void(* callback)(const node_event_t* event)) {
-    add_node_events(e)->signal.once(event_type, callback);
+    node_events_t* d = add_node_events(e);
+    node_event_callback_t cb = (node_event_callback_t) {callback, event_type, true};
+    arr_push(d->callbacks, cb);
 }
 
 node_event_t node_event(string_hash_t event_type, entity_t e) {
@@ -43,10 +47,21 @@ node_event_t node_event(string_hash_t event_type, entity_t e) {
 bool emit_node_event(entity_t e, const node_event_t* event) {
     EK_ASSERT(is_entity(e));
     node_events_t* eh = get_node_events(e);
-    if (eh) {
+    if (eh && eh->callbacks) {
         node_event_t* mutable_event = (node_event_t*) event;
         mutable_event->receiver = e;
-        eh->signal.emit_(event->type, event);
+        string_hash_t type = event->type;
+        for (uint32_t i = 0; i < arr_size(eh->callbacks); ) {
+            node_event_callback_t* callback = eh->callbacks + i;
+            if (!callback->type || callback->type == type) {
+                callback->callback(mutable_event);
+                if (callback->once) {
+                    arr_erase(eh->callbacks, callback);
+                    continue;
+                }
+            }
+            ++i;
+        }
         return true;
     }
     return false;

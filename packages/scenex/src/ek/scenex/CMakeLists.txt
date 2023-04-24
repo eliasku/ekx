@@ -10,7 +10,7 @@ target_sources(${PROJECT_NAME} PUBLIC
         base/node.c
         base/interactive.c
         base/node_events.h
-        base/node_events.cpp
+        base/node_events.c
         base/tween.h
         base/destroy_timer.h
 

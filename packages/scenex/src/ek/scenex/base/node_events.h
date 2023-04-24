@@ -2,14 +2,7 @@
 #define SCENEX_NODE_EVENTS_H
 
 #include <ecx/ecx.h>
-
-#ifdef __cplusplus
-
-#include <utility>
-#include <ek/util/Signal.hpp>
-#include <ecx/ecx.hpp>
-
-#endif
+#include <ek/hash.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,7 +25,15 @@ typedef struct {
     bool processed;
 } node_event_t;
 
-typedef struct node_events_ node_events_t;
+typedef struct {
+    void(*callback)(const node_event_t*);
+    string_hash_t type;
+    bool once;
+} node_event_callback_t;
+
+typedef struct {
+    node_event_callback_t* callbacks;
+} node_events_t;
 
 node_event_t node_event(string_hash_t event_type, entity_t e);
 
@@ -58,14 +59,6 @@ void notify_parents(entity_t e, string_hash_t event_type);
 
 #ifdef __cplusplus
 }
-#endif
-
-#ifdef __cplusplus
-
-struct node_events_ {
-    ek::Signal<const node_event_t*> signal{};
-};
-
 #endif
 
 #endif // SCENEX_NODE_EVENTS_H

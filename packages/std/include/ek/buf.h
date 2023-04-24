@@ -62,7 +62,7 @@ void* arr_search(void* arr, uint32_t element_size, const void* el);
 void arr_pop(void* arr);
 
 void arr_erase_(void* arr, const void* it, uint32_t element_size, uint32_t count);
-#define arr_erase(arr, ptr) arr_erase_(arr, it, sizeof *(arr), 1)
+#define arr_erase(arr, ptr) arr_erase_(arr, ptr, sizeof *(arr), 1)
 #define arr_erase_at(arr, index) arr_erase_(arr, (arr) + (index), sizeof *(arr), 1)
 
 /**
