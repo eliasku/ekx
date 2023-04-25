@@ -22,7 +22,7 @@ void ek_app_cancel_quit(void) {
 }
 
 void ek_app__init(void) {
-    memset(&ek_app, 0, sizeof(ek_app_context));
+    //memset(&ek_app, 0, sizeof(ek_app_context));
     ek_app.viewport.width = 1.0f;
     ek_app.viewport.height = 1.0f;
     ek_app.viewport.scale = 1.0f;

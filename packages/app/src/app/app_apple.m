@@ -21,9 +21,9 @@ AppDelegate* ek_app_delegate = NULL;
 #ifndef EK_NO_MAIN
 
 int main(int argc, char* argv[]) {
+    ek_app__init();
     ek_app.argc = argc;
     ek_app.argv = argv;
-    ek_app__init();
 
     NSString* language = [NSLocale preferredLanguages][0];
     if (language != nil) {

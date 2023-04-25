@@ -129,7 +129,6 @@ static void handleQuitRequest() {
     [self.application setActivationPolicy:NSApplicationActivationPolicyRegular];
 
     initScanCodeTableApple();
-    ek_app__init();
     ek_app_main();
     if (ek_app.state & EK_APP_STATE_EXIT_PENDING) {
         exit(ek_app.exit_code);

@@ -86,7 +86,7 @@ void uitest_start(void) {
     log_info("UI test start");
 
     if (test_lang.str[0]) {
-        log_info("UI test set lang: %s", test_lang);
+        log_info("UI test set lang: %s", test_lang.str);
         set_language(test_lang);
     }
 
