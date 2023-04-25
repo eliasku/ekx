@@ -103,19 +103,19 @@ static void on_interstitial_ad_end(void) {
     }
 }
 
-void Ads::gameOver(std::function<void()> callback) {
+void Ads::gameOver(void(*callback)(void)) {
     if (removed) {
         if (callback) {
             callback();
         }
     } else {
-        on_game_over_passed = std::move(callback);
+        on_game_over_passed = callback;
         admob_wrapper_show_interstitial(on_interstitial_ad_end);
     }
 }
 
-void Ads::showRewardVideo(std::function<void(bool)> callback) {
-    on_rewarded = std::move(callback);
+void Ads::showRewardVideo(void(*callback)(bool)) {
+    on_rewarded = callback;
     admob_wrapper_show_rewarded_ad(on_rewarded_ad_end);
 }
 

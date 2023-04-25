@@ -5,6 +5,7 @@ import {execute} from "../utils.js";
 import {buildAssetPackAsync} from "../assets.js";
 import {build as buildCMake} from "../../cmake/mod.js";
 import {ensureDirSync} from "../../utils/utils.js";
+import {copyFileSync} from "fs";
 
 const exportDir = "export/uitest";
 
@@ -55,9 +56,15 @@ const displays: { [key: string]: DisplayInfo } = {
 
 async function build() {
     await buildCMake({
-        workingDir: path.join(exportDir, "build"),
+        buildDir: path.join(exportDir, "build"),
         definitions: {
-            EK_UITEST: "ON"
+            EK_UITEST: "ON",
+            EKX_BUILD_DEV_TOOLS: "OFF",
+            EKX_BUILD_TESTS: "OFF",
+            EKX_BUILD_COVERAGE: "OFF",
+            EKX_BUILD_EXTERNAL_TESTS: "OFF",
+            EKX_INCLUDE_EXAMPLES: "OFF",
+            EKX_INCLUDE_PLUGINS: "ON",
         }
     });
 }
@@ -66,7 +73,10 @@ function doScreenshots(ctx: Project): Promise<any> {
     const bin = path.join(exportDir, ctx.name);
     const jobs = [];
     const screenshotsDir = path.join(exportDir, "screenshots");
-    fs.rmSync(screenshotsDir, {recursive: true});
+    try {
+        fs.rmSync(screenshotsDir, {recursive: true});
+    }
+    catch {}
 
     for (const sim of Object.keys(displays)) {
         const display = displays[sim];
@@ -98,7 +108,7 @@ function doScreenshots(ctx: Project): Promise<any> {
 export async function screenshots(ctx: Project): Promise<any> {
     await Promise.all([
         buildAssetPackAsync(ctx, path.join(exportDir, "assets"), true),
-        build()
+        build(),
     ]);
     await doScreenshots(ctx);
 }

@@ -19,12 +19,12 @@ typedef struct {
     void (* run)(void);
 } test_reg_t;
 
-static test_reg_t tests[64];
-static uint32_t tests_num;
+test_reg_t tests[64];
+uint32_t tests_num;
 
-static const char* test_to_run;
-static const char* test_screenshots_dir;
-static lang_name_t test_lang;
+const char* test_to_run;
+const char* test_screenshots_dir;
+lang_name_t test_lang;
 
 static void set_simulator_display_settings(vec2_t size, vec4_t insets, bool relative, vec2_t applicationBaseSize) {
     if (relative) {
@@ -83,7 +83,10 @@ void uitest_click_entity(entity_t e) {
 }
 
 void uitest_start(void) {
+    log_info("UI test start");
+
     if (test_lang.str[0]) {
+        log_info("UI test set lang: %s", test_lang);
         set_language(test_lang);
     }
 
@@ -104,11 +107,14 @@ void uitest_start(void) {
 }
 
 void uitest(const char* name, void(* run)(void)) {
+    log_info("add UI test %s", name);
     tests[tests_num++] = (test_reg_t) {name, run};
 }
 
 void uitest_setup(void) {
+    log_info("UI test setup");
     test_to_run = find_argument_value("--uitest", "");
+    log_info("UI test to run %s", test_to_run);
     test_lang.str[0] = 0;
     strncat(test_lang.str, find_argument_value("--lang", ""), (sizeof test_lang.str) - 1);
     {

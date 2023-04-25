@@ -24,14 +24,14 @@ struct Ads {
     void purchaseRemoveAds() const;
 
     // TODO: rename, try start commercial break
-    void gameOver(std::function<void()> callback);
+    void gameOver(void(*callback)(void));
 
-    void showRewardVideo(std::function<void(bool)> callback);
+    void showRewardVideo(void(*callback)(bool));
 
     Signal<> on_removed{};
     Signal<> on_product_loaded{};
-    std::function<void()> on_game_over_passed{};
-    std::function<void(bool)> on_rewarded{};
+    void(*on_game_over_passed)(void) = nullptr;
+    void(*on_rewarded)(bool) = nullptr;
 
     void cheat_RemoveAds();
 

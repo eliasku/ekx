@@ -332,7 +332,6 @@ static void game_app_event(const ek_app_event event) {
 // Game app activation
 
 static void launcher_on_ready(void) {
-    UITEST_SETUP;
 }
 
 static void launcher_on_frame(void) {
@@ -360,6 +359,7 @@ static void launcher_on_frame(void) {
                 break;
             case 3:
                 ++init_step;
+                UITEST_SETUP;
                 game_app_pre_load();
                 break;
             case 4:

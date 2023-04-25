@@ -16,7 +16,7 @@ void uitest_screenshot(const char* name);
 void uitest_done();
 void uitest_fail();
 void uitest_click_entity(entity_t e);
-#define uitest_click(...) uitest_click_entity(find_by_path(game_app_state.root, __VA_ARGS__))
+#define uitest_click(...) uitest_click_entity(find_by_path(game_app_state.root, __VA_ARGS__, 0))
 
 void uitest(const char* name, void(*run)(void));
 void uitest_setup(void);
