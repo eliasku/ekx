@@ -13,6 +13,7 @@
 #include <ek/rr.c>
 #include <ek/hash/murmur.c>
 #include <ek/hash/hsp.c>
+#include <ek/sigslot.c>
 
 #ifdef __EMSCRIPTEN__
 #include <ek/sparse_array.c>

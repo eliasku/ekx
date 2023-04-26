@@ -9,7 +9,7 @@
 
 #if defined(__ANDROID__)
 
-#include "billing_android.cpp.h"
+#include "billing_android.c.h"
 
 #elif TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 

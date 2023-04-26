@@ -143,6 +143,7 @@ void clip(float* dest, uint32_t size) {
 
 
 auph_source_reader_func auph_select_source_reader(auph_sample_format format, uint32_t channels, bool interpolate) {
+    UNUSED(interpolate);
     if (format == AUPH_SAMPLE_FORMAT_F32) {
         if (channels == 2) {
             return auph_mix_samples_f32_2;

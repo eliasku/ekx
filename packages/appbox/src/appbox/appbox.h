@@ -3,7 +3,7 @@
 
 #include <ecx/ecx.h>
 #include <ek/admob.h>
-#include "Ads.hpp"
+#include "ads.h"
 
 #ifdef __cplusplus
 extern "C" {

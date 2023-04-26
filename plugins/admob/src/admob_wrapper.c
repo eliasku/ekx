@@ -22,6 +22,7 @@
 struct admob_wrapper g_admob_wrapper;
 
 static void admob_wrapper_rewarded_ad_end(void* userdata) {
+    UNUSED(userdata);
     if (g_admob_wrapper.rewarded_ad_active) {
         log_info("rewarded ad end");
         auph_mute_pop();
@@ -34,6 +35,7 @@ static void admob_wrapper_rewarded_ad_end(void* userdata) {
 }
 
 static void admob_wrapper_interstitial_end(void* userdata) {
+    UNUSED(userdata);
     if (g_admob_wrapper.interstitial_active) {
         log_info("interstitial end");
         auph_mute_pop();
@@ -104,6 +106,7 @@ void admob_wrapper_show_rewarded_ad(void(* callback)(bool)) {
 }
 
 void admob_wrapper_setup(bool simulation) {
+    UNUSED(simulation);
     g_admob_wrapper.supported = ek_admob_supported();
 #if EK_ADMOB_SIMULATOR
     g_admob_wrapper.simulated = simulation;

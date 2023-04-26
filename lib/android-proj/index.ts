@@ -33,15 +33,15 @@ export class AndroidProjGen {
     };
 
     gradleProperties = new Properties({
-        "org.gradle.jvmargs": "-Xmx2048m -Dfile.encoding=UTF-8",
-        //"org.gradle.parallel":true,
+        "org.gradle.jvmargs": "-Xmx4096m -Dfile.encoding=UTF-8 -XX:+UseParallelGC",
         "android.useAndroidX": true,
-        //"android.enableJetifier": true
+        "android.defaults.buildfeatures.buildconfig": true,
     });
 
     async prepare() {
         try {
-            this.gradleProperties.dict["org.gradle.java.home"] = await getJavaHome(11);
+            this.gradleProperties.dict["org.gradle.java.home"] = await getJavaHome(17);
+            this.gradleProperties.dict["org.gradle.java.home"] = "/Applications/Android Studio.app/";
         } catch {
             logger.warn("cannot resolve java path");
         }
@@ -176,7 +176,7 @@ export function generateTopModule(): BuildTop {
             dependencies: [{
                 type: "classpath",
                 name: "com.android.tools.build:gradle",
-                version: "7.4.2"
+                version: "8.0.0"
             }]
         },
         allprojects: {

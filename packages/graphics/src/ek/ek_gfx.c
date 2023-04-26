@@ -22,9 +22,9 @@ static void ek_gfx_log_backend() {
             "SG_BACKEND_DUMMY",
             0
     };
-    const int backend = (int) sg_query_backend();
+    const int backend = sg_query_backend();
     EK_ASSERT(backend >= 0);
-    EK_ASSERT(backend < (sizeof(backend_strings) / sizeof(backend_strings[0])));
+    EK_ASSERT(backend < (int)(sizeof(backend_strings) / sizeof(backend_strings[0])));
     log_info("sg backend: %s", backend_strings[backend]);
 #endif
 }

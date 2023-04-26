@@ -199,6 +199,7 @@ static void on_popup_back_button(const node_event_t* event) {
 }
 
 static void on_popup_down_outside(const node_event_t* event) {
+    UNUSED(event);
     if (g_popup_manager.active_num) {
         interaction_system_send_back_button();
     }

@@ -64,14 +64,14 @@ export async function setup(project: Project) {
             // Check Release Notes for updates: https://firebase.google.com/support/release-notes/android
             android_buildScriptDependency: [
                 `classpath 'com.google.gms:google-services:4.3.15'`,
-                `classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.4'`
+                `classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.5'`
             ],
             android_gradleApplyPlugin: ['com.google.gms.google-services', 'com.google.firebase.crashlytics'],
             android_gradleConfigRelease: `firebaseCrashlytics {
                 nativeSymbolUploadEnabled true
             }`,
             android_dependency: [
-                `implementation platform('com.google.firebase:firebase-bom:31.4.0')`,
+                `implementation platform('com.google.firebase:firebase-bom:31.5.0')`,
                 `implementation 'com.google.firebase:firebase-crashlytics-ndk'`,
                 `implementation 'com.google.firebase:firebase-analytics'`
             ]

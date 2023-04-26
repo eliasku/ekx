@@ -1,7 +1,7 @@
 target_sources(${PROJECT_NAME} PUBLIC
-        appbox/Ads.hpp
-        appbox/Ads.cpp
-        appbox/AppBox.cpp
+        appbox/ads.h
+        appbox/ads.c
+        appbox/appbox.c
         appbox/appbox.h
         )
 

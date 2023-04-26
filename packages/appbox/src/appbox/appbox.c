@@ -1,5 +1,6 @@
 #include "appbox.h"
 
+#include "ads.h"
 #include <ek/app.h>
 #include <ek/scenex/base/node.h>
 #include <ek/scenex/2d/text2d.h>
@@ -9,7 +10,7 @@
 #include <ekx/app/audio_manager.h>
 #include <ek/game_services.h>
 #include <ekx/app/localization.h>
-#include "Ads.hpp"
+#include <ek/print.h>
 #include <ek/scenex/base/node_events.h>
 #include <ek/local_storage.h>
 
@@ -73,15 +74,59 @@ void appbox_on_game_start(void) {
     ads_on_game_start();
 }
 
-void set_state_on_off(entity_t e, bool enabled) {
-    auto on = find(e, H("state_on"));
-    auto off = find(e, H("state_off"));
+static void set_state_on_off(entity_t e, bool enabled) {
+    entity_t on = find(e, H("state_on"));
+    entity_t off = find(e, H("state_off"));
     set_visible(on, enabled);
     set_visible(off, !enabled);
 }
 
+static void appbox_on_crash(const node_event_t* event) {
+    UNUSED(event);
+    // force crash
+    volatile uint8_t* invalid_ptr = (uint8_t*) NULL;
+    *invalid_ptr = 0;
+}
+
+static void appbox_on_privacy_policy(const node_event_t* event) {
+    UNUSED(event);
+    ek_app_open_url(g_appbox.config.privacy_policy_url);
+}
+
+static void appbox_on_vibro(const node_event_t* event) {
+    set_state_on_off(event->source, audio_toggle_pref(AUDIO_PREF_VIBRO));
+    if (g_audio.prefs & AUDIO_PREF_VIBRO) {
+        vibrate(50);
+    }
+}
+
+static void appbox_on_sound(const node_event_t* event) {
+    set_state_on_off(event->source, audio_toggle_pref(AUDIO_PREF_SOUND));
+}
+
+static void appbox_on_music(const node_event_t* event) {
+    set_state_on_off(event->source, audio_toggle_pref(AUDIO_PREF_MUSIC));
+}
+
+static void appbox_on_restore_purchases(const node_event_t* event) {
+    UNUSED(event);
+    billing_get_purchases();
+}
+
+static void appbox_on_remove_ads(const node_event_t* event) {
+    UNUSED(event);
+    ads_purchase_remove_ads();
+}
+
+static void appbox_on_ads_removed(signal_slot_t* slot, void* event) {
+    UNUSED(event);
+    entity_t btn = entity_id(slot->context.u64);
+    if (is_entity(btn)) {
+        set_visible(btn, false);
+    }
+}
+
 void appbox_init_default_controls(entity_t e) {
-    using namespace ek;
     {
         // VERSION
         entity_t e_version = find(e, H("version"));
@@ -90,11 +135,7 @@ void appbox_init_default_controls(entity_t e) {
             set_text_f(e_version, "%s #%s_d", g_appbox.config.version_name, g_appbox.config.version_code);
             add_interactive(e_version);
             add_button(e_version);
-            add_node_event_listener(e_version, BUTTON_EVENT_CLICK, +[](const node_event_t*) {
-                // force crash
-                volatile uint8_t* invalid_ptr = (uint8_t*)NULL;
-                *invalid_ptr = 0;
-            });
+            add_node_event_listener(e_version, BUTTON_EVENT_CLICK, appbox_on_crash);
 #else
             set_text_f(e_version, "%s #%s", g_appbox.config.version_name, g_appbox.config.version_code);
 #endif
@@ -106,9 +147,7 @@ void appbox_init_default_controls(entity_t e) {
         if (e_pp.id) {
             add_interactive(e_pp);
             add_button(e_pp);
-            add_node_event_listener(e_pp, BUTTON_EVENT_CLICK, +[](const node_event_t*) {
-                ek_app_open_url(g_appbox.config.privacy_policy_url);
-            });
+            add_node_event_listener(e_pp, BUTTON_EVENT_CLICK, appbox_on_privacy_policy);
         }
     }
 
@@ -116,26 +155,20 @@ void appbox_init_default_controls(entity_t e) {
     {
         entity_t btn = find(e, H("remove_ads"));
         if (btn.id) {
-            if (g_ads->removed) {
+            if (g_ads.removed) {
                 set_visible(btn, false);
             } else {
-                g_ads->on_removed << [btn] {
-                    if (is_entity(btn)) {
-                        set_visible(btn, false);
-                    }
-                };
-                add_node_event_listener(btn, BUTTON_EVENT_CLICK, +[](const node_event_t*) {
-                    g_ads->purchaseRemoveAds();
-                });
+                signal_slot_t* slot = sig_connect(&g_ads.on_removed, appbox_on_ads_removed, 0);
+                slot->context.u64 = btn.id;
+                slot->once = true;
+                add_node_event_listener(btn, BUTTON_EVENT_CLICK, appbox_on_remove_ads);
             }
         }
     }
     {
         entity_t btn = find(e, H("restore_purchases"));
         if (btn.id) {
-            add_node_event_listener(btn, BUTTON_EVENT_CLICK, +[](const node_event_t*) {
-                billing_get_purchases();
-            });
+            add_node_event_listener(btn, BUTTON_EVENT_CLICK, appbox_on_restore_purchases);
         }
     }
 
@@ -144,30 +177,21 @@ void appbox_init_default_controls(entity_t e) {
         {
             entity_t btn = find(e, H("sound"));
             if (btn.id) {
-                add_node_event_listener(btn, BUTTON_EVENT_CLICK, +[](const node_event_t* event) {
-                    set_state_on_off(event->source, audio_toggle_pref(AUDIO_PREF_SOUND));
-                });
+                add_node_event_listener(btn, BUTTON_EVENT_CLICK, appbox_on_sound);
                 set_state_on_off(btn, g_audio.prefs & AUDIO_PREF_SOUND);
             }
         }
         {
             entity_t btn = find(e, H("music"));
             if (btn.id) {
-                add_node_event_listener(btn, BUTTON_EVENT_CLICK, [](const node_event_t* event) {
-                    set_state_on_off(event->source, audio_toggle_pref(AUDIO_PREF_MUSIC));
-                });
+                add_node_event_listener(btn, BUTTON_EVENT_CLICK, appbox_on_music);
                 set_state_on_off(btn, g_audio.prefs & AUDIO_PREF_MUSIC);
             }
         }
         {
             entity_t btn = find(e, H("vibro"));
             if (btn.id) {
-                add_node_event_listener(btn, BUTTON_EVENT_CLICK, [](const node_event_t* event) {
-                    set_state_on_off(event->source, audio_toggle_pref(AUDIO_PREF_VIBRO));
-                    if (g_audio.prefs & AUDIO_PREF_VIBRO) {
-                        vibrate(50);
-                    }
-                });
+                add_node_event_listener(btn, BUTTON_EVENT_CLICK, appbox_on_vibro);
                 set_state_on_off(btn, g_audio.prefs & AUDIO_PREF_VIBRO);
             }
         }
@@ -177,10 +201,9 @@ void appbox_init_default_controls(entity_t e) {
 }
 
 void appbox_share_with_app_link(const char* text) {
-    ek::String msg = text;
-    msg += " ";
-    msg += g_appbox.config.app_link_url;
-    ek_app_share(msg.c_str());
+    char buf[1024];
+    ek_snprintf(buf, sizeof buf, "%s %s", text, g_appbox.config.app_link_url);
+    ek_app_share(buf);
 }
 
 void appbox_rate_us(void) {
@@ -213,7 +236,8 @@ void appbox_rate_us(void) {
 //    }
 //}
 
-void appbox_init_download_app_buttons(entity_t) {
+void appbox_init_download_app_buttons(entity_t e) {
+    UNUSED(e);
 //    auto banner = sg_create("gfx", "cross_banner");
 //    setName(banner, "banner");
 //    layout_wrapper{banner}.aligned(0.5f, 0.0f, 1.0f, 0.0f);
@@ -224,19 +248,21 @@ void appbox_init_download_app_buttons(entity_t) {
 //    append(e, banner);
 }
 
+static void appbox_on_language_button(const node_event_t* event) {
+    UNUSED(event);
+    uint32_t index = s_localization.lang_index;
+    uint32_t num = s_localization.lang_num;
+    // check if languages are available
+    if (index < num && num != 0 &&
+        set_language_index((index + 1) % num)) {
+        const char* lang_name = s_localization.languages[s_localization.lang_index].name.str;
+        ek_ls_set_s("selected_lang", lang_name);
+    }
+}
+
 void appbox_init_language_button(entity_t e) {
-    using namespace ek;
     entity_t btn = find(e, H("language"));
     if (btn.id) {
-        add_node_event_listener(btn, BUTTON_EVENT_CLICK, [](const node_event_t*) {
-            uint32_t index = s_localization.lang_index;
-            uint32_t num = s_localization.lang_num;
-            // check if languages are available
-            if (index < num && num != 0 &&
-                set_language_index((index + 1) % num)) {
-                const char* lang_name = s_localization.languages[s_localization.lang_index].name.str;
-                ek_ls_set_s("selected_lang", lang_name);
-            }
-        });
+        add_node_event_listener(btn, BUTTON_EVENT_CLICK, appbox_on_language_button);
     }
 }

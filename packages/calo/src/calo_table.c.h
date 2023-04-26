@@ -14,12 +14,12 @@ uint32_t find_data_(const vla_table_t* table, const void* data, uint32_t size) {
             return i;
         }
     }
-    return ~0;
+    return ~0u;
 }
 
 uint32_t add_data(vla_table_t* table, const void* data, uint32_t length) {
     uint32_t found = find_data_(table, data, length);
-    if (found != ~0) {
+    if (found != ~0u) {
         return found;
     }
 

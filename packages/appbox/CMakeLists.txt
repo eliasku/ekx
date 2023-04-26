@@ -13,11 +13,7 @@ target_link_libraries(${PROJECT_NAME}
         PUBLIC plugin-game-services
         )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-        C_STANDARD 11
-        CXX_STANDARD 17
-        CXX_STANDARD_REQUIRED YES
-        CXX_EXTENSIONS NO)
+set_target_properties(${PROJECT_NAME} PROPERTIES C_STANDARD 11)
 
 if (NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC"))
     set(EK_COMPILE_WARNINGS

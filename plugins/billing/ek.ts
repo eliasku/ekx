@@ -6,14 +6,14 @@ export function setup(project: Project) {
         cpp: "src",
         android: {
             android_java: "java",
-            android_dependency: `implementation 'com.android.billingclient:billing:5.1.0'`
+            android_dependency: `implementation 'com.android.billingclient:billing:5.2.0'`
         },
         ios: {
             xcode_capability: "com.apple.InAppPurchase",
             xcode_framework: "StoreKit",
             cpp_flags: {
                 files: [
-                    "src/billing.cpp"
+                    "src/billing.c"
                 ],
                 flags: "-x objective-c++"
             }
