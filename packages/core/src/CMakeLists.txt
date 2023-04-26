@@ -5,9 +5,6 @@ project(core)
 add_library(${PROJECT_NAME} STATIC
         ek/core_dbg.c
 
-        ek/util/Signal.hpp
-
-        ek/ds/FixedArray.hpp
         ek/ds/Array.hpp
         ek/ds/Hash.hpp
         )

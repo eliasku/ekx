@@ -15,6 +15,7 @@ add_executable(${PROJECT_NAME}
         rnd_test.c
         string_test.c
         hash_test.c
+        sigslot_test.c
         )
 
 add_test(NAME ${PROJECT_NAME} COMMAND ${NODE_JS_EXECUTABLE} $<TARGET_FILE:${PROJECT_NAME}>)

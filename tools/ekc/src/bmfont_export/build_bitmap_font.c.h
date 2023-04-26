@@ -348,7 +348,8 @@ font_t build_bitmap_font(const bitmap_font_build_options_t* decl, image_set_t* d
         glyph_t* glyphs = result.glyphs;
         arr_for(glyph, glyphs) {
             uint32_t* codepoints_ = glyph->codepoints;
-            arr_for(code, codepoints_) {
+            arr_for(p_code, codepoints_) {
+                const uint32_t code = *p_code;
                 const uint32_t upper = (uint32_t) toupper((int)code);
                 const uint32_t lower = (uint32_t) tolower((int)code);
                 if (lower != upper) {

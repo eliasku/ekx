@@ -102,7 +102,7 @@ void ads_show_reward_video(void(* callback)(bool)) {
     admob_wrapper_show_rewarded_ad(on_rewarded_ad_end);
 }
 
-void ads_cheat_remove_ads() {
+void ads_cheat_remove_ads(void) {
     ads_on_remove_ads_purchased();
 }
 

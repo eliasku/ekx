@@ -1,6 +1,3 @@
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "modernize-deprecated-headers"
-
 #include "node.h"
 
 #include <ek/assert.h>
@@ -412,4 +409,3 @@ void set_touchable(entity_t e, bool v) {
     node->flags = v ? (node->flags & ~NODE_UNTOUCHABLE) : (node->flags | NODE_UNTOUCHABLE);
 }
 
-#pragma clang diagnostic pop

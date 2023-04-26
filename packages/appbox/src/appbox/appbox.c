@@ -15,7 +15,7 @@
 #include <ek/local_storage.h>
 
 appbox_config_t appbox_config_default(void) {
-    appbox_config_t config = {};
+    appbox_config_t config = {0};
     config.version_name = "1.0.0";
     config.version_code = "";
     config.privacy_policy_url = "https://eliasku-games.web.app/privacy-policy";
@@ -50,11 +50,8 @@ void appbox_setup(appbox_config_t config) {
 
     // initialize translations
     // TODO: wtf
-    lang_name_t lang = {};
-    lang_name_t default_lang = {};
-    default_lang.str[0] = 'e';
-    default_lang.str[1] = 'n';
-    default_lang.str[2] = 0;
+    lang_name_t lang = {{0}};
+    lang_name_t default_lang = {{'e','n',0}};
     int n = ek_ls_get_s("selected_lang", lang.str, sizeof(lang_name_t));
     EK_ASSERT(sizeof(lang_name_t) <= sizeof(ek_app.lang));
     if (n < 2) {
@@ -62,7 +59,7 @@ void appbox_setup(appbox_config_t config) {
     }
     // trim to 2-wide code
     lang.str[2] = 0;
-    if (lang.str[0] == 0) {
+    if (!lang.str[0]) {
         lang = default_lang;
     }
     if (!set_language(lang)) {
@@ -81,12 +78,14 @@ static void set_state_on_off(entity_t e, bool enabled) {
     set_visible(off, !enabled);
 }
 
+#ifndef NDEBUG
 static void appbox_on_crash(const node_event_t* event) {
     UNUSED(event);
     // force crash
     volatile uint8_t* invalid_ptr = (uint8_t*) NULL;
     *invalid_ptr = 0;
 }
+#endif
 
 static void appbox_on_privacy_policy(const node_event_t* event) {
     UNUSED(event);

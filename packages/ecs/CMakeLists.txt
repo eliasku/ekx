@@ -33,7 +33,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE
         )
 
 target_link_libraries(${PROJECT_NAME}
-        PUBLIC core
+        PUBLIC std
         )
 
 if (EKX_BUILD_TESTS)

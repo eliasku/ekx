@@ -623,10 +623,10 @@ int export_bitmap_font(const char* config_path) {
     log_info("Export Bitmap Font binary: %s", output_font);
 
     // calculate codepoint map size
-    uint32_t dictSize = 0;
+    uint32_t dict_size = 0;
     uint32_t glyphs_num = arr_size(fontData.glyphs);
     for (uint32_t i = 0; i < glyphs_num; ++i) {
-        dictSize += arr_size(fontData.glyphs[i].codepoints);
+        dict_size += arr_size(fontData.glyphs[i].codepoints);
     }
 
     bmfont_t font = {0};

@@ -130,7 +130,7 @@ void update_trail2d(void) {
         entity_idx_t ei = Trail2D.handle_to_entity[i];
         component_handle_t wti = get_component_handle_by_index(&Transform2D, ei);
         const mat3x2_t m = ((world_transform2d_t*) get_component_data(&Transform2D, wti, 1))->matrix;
-        update_trail2d_mat(&trails[i], m);
+        update_trail2d_mat(trails + i, m);
     }
 }
 
@@ -174,9 +174,9 @@ static void trail_renderer2d_draw(entity_t e) {
     ek_vertex2d* ptr = canvas.vertex_it;
 
     // we could generate vertices right into destination buffer :)
-    for (int i = 0; i < columns; ++i) {
+    for (uint32_t i = 0; i < columns; ++i) {
         const vec2_t p = node_array[node_idx].position;
-        vec2_t perp = {};
+        vec2_t perp;
         if (i > 0/* node_idx > begin */) {
             perp = normalize_vec2(sub_vec2(node_array[node_idx - 1].position, p));
             if (i + 1 < columns) {
@@ -184,6 +184,9 @@ static void trail_renderer2d_draw(entity_t e) {
             }
         } else if (i + 1 < columns) {
             perp = normalize_vec2(sub_vec2(p, node_array[node_idx + 1].position));
+        }
+        else {
+            perp = vec2(0, 0);
         }
         perp = perp_vec2(perp);
 
@@ -213,8 +216,10 @@ static void trail_renderer2d_draw(entity_t e) {
 
     {
         uint16_t v = canvas.vertex_base;
+        uint16_t v_end = v + quads * 2;
+        EK_ASSERT(v_end >= v);
         uint16_t* indices = canvas.index_it;
-        for (int i = 0; i < quads; ++i) {
+        while (v != v_end) {
             *(indices++) = v;
             *(indices++) = v + 2;
             *(indices++) = v + 3;
