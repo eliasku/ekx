@@ -41,7 +41,6 @@ export class AndroidProjGen {
     async prepare() {
         try {
             this.gradleProperties.dict["org.gradle.java.home"] = await getJavaHome(17);
-            this.gradleProperties.dict["org.gradle.java.home"] = "/Applications/Android Studio.app/";
         } catch {
             logger.warn("cannot resolve java path");
         }
