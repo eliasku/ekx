@@ -26,10 +26,10 @@ typedef struct camera_shaker {
 extern "C" {
 #endif
 
-void camera_shaker_init(void);
+void setup_camera_shaker(void);
 void camera_shaker_start(entity_t e, float v);
 void camera_shaker_set(entity_t e);
-void camera_shaker_update(void);
+void update_camera_shakers(void);
 
 #ifdef __cplusplus
 }

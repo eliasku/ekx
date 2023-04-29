@@ -2,37 +2,42 @@
 #include "sprite.h"
 #include "ek/canvas.h"
 
-ecx_component_type Bounds2D;
-ecx_component_type Display2D;
-ecx_component_type Quad2D;
-ecx_component_type Sprite2D;
-ecx_component_type NinePatch2D;
-ecx_component_type Arc2D;
+ECX_DEFINE_TYPE(bounds2d_t);
+ECX_DEFINE_TYPE(display2d_t);
+ECX_DEFINE_TYPE(quad2d_t);
+ECX_DEFINE_TYPE(sprite2d_t);
+ECX_DEFINE_TYPE(ninepatch2d_t);
+ECX_DEFINE_TYPE(arc2d_t);
 
-static void Bounds2D_ctor(component_handle_t handle) {
+static
+void bounds2d_ctor(component_handle_t handle) {
     ((bounds2d_t*) Bounds2D.data[0])[handle] = (bounds2d_t) {
             rect_01(),
             0,
     };
 }
 
-static void Display2D_ctor(component_handle_t handle) {
+static
+void display2d_ctor(component_handle_t handle) {
     ((display2d_t*) Display2D.data[0])[handle] = (display2d_t) {0};
 }
 
-static void Sprite2D_ctor(component_handle_t handle) {
+static
+void sprite2d_ctor(component_handle_t handle) {
     sprite2d_t o = (sprite2d_t) {0};
     o.hit_pixels = true;
     ((sprite2d_t*) Sprite2D.data[0])[handle] = o;
 }
 
-static void NinePatch2D_ctor(component_handle_t i) {
+static
+void ninepatch2d_ctor(component_handle_t i) {
     ninepatch2d_t o = (ninepatch2d_t) {0};
     o.hit_pixels = true;
     ((ninepatch2d_t*) NinePatch2D.data[0])[i] = o;
 }
 
-static void Arc2D_ctor(component_handle_t i) {
+static
+void arc2d_ctor(component_handle_t i) {
     arc2d_t o = (arc2d_t) {0};
     o.radius = 10.0f;
     o.line_width = 10.0f;
@@ -42,34 +47,22 @@ static void Arc2D_ctor(component_handle_t i) {
     ((arc2d_t*) Arc2D.data[0])[i] = o;
 }
 
-void Display2D_setup(void) {
-    init_component_type(&Bounds2D, (ecx_component_type_decl) {
-            "Bounds2D", 4, 1, {sizeof(bounds2d_t)}
-    });
-    Bounds2D.ctor = Bounds2D_ctor;
+void setup_display2d(void) {
+    ECX_TYPE(bounds2d_t, 4);
+    Bounds2D.ctor = bounds2d_ctor;
 
-    init_component_type(&Display2D, (ecx_component_type_decl) {
-            "Display2D", 256, 1, {sizeof(display2d_t)}
-    });
-    Display2D.ctor = Display2D_ctor;
+    ECX_TYPE(display2d_t, 256);
+    Display2D.ctor = display2d_ctor;
 
-    init_component_type(&Quad2D, (ecx_component_type_decl) {
-            "Quad2D", 32, 1, {sizeof(quad2d_t)}
-    });
-    init_component_type(&Sprite2D, (ecx_component_type_decl) {
-            "Sprite2D", 32, 1, {sizeof(sprite2d_t)}
-    });
-    Sprite2D.ctor = Sprite2D_ctor;
+    ECX_TYPE(quad2d_t, 32);
+    ECX_TYPE(sprite2d_t, 32);
+    Sprite2D.ctor = sprite2d_ctor;
 
-    init_component_type(&NinePatch2D, (ecx_component_type_decl) {
-            "NinePatch2D", 32, 1, {sizeof(ninepatch2d_t)}
-    });
-    NinePatch2D.ctor = NinePatch2D_ctor;
+    ECX_TYPE(ninepatch2d_t, 32);
+    NinePatch2D.ctor = ninepatch2d_ctor;
 
-    init_component_type(&Arc2D, (ecx_component_type_decl) {
-            "Arc2D", 4, 1, {sizeof(arc2d_t)}
-    });
-    Arc2D.ctor = Arc2D_ctor;
+    ECX_TYPE(arc2d_t, 4);
+    Arc2D.ctor = arc2d_ctor;
 }
 
 rect_t get_world_rect(const bounds2d_t* bounds, mat3x2_t world_matrix) {

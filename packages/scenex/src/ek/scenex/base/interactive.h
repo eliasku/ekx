@@ -44,7 +44,7 @@ void setup_interactive(void);
 interactive_t* add_interactive(entity_t e);
 interactive_t* get_interactive(entity_t e);
 void interactive_handle(interactive_t* interactive, entity_t e, string_hash_t type);
-void interactive_clear_all_events(void);
+void clear_all_interactive_events(void);
 
 #ifdef __cplusplus
 };

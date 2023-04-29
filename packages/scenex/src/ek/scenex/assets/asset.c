@@ -108,7 +108,7 @@ typedef struct {
 typedef struct {
     asset_t base;
     const char* name;
-    string_hash_t name_hash;
+    R(static_mesh_t) res;
 } model_asset_t;
 
 typedef struct {
@@ -140,51 +140,52 @@ static asset_t* alloc_asset(struct asset_type_* type) {
 #define VAR_NEW_ASSET(T) T##_t * asset = (T##_t *)alloc_asset(&(T));
 
 asset_t* unpack_asset(calo_reader_t* r, string_hash_t type) {
+    asset_t* result = NULL;
     if (type == H("audio")) {
         VAR_NEW_ASSET(audio_asset);
         asset->res = R_AUDIO(read_u32(r));
-        asset->path = read_stream_string(r);
         asset->flags = read_u32(r);
-        return &asset->base;
+        asset->path = read_stream_string(r);
+        result = &asset->base;
     } else if (type == H("scene")) {
         VAR_NEW_ASSET(scene_asset);
         asset->res = R_SG(read_u32(r));
         asset->path = read_stream_string(r);
-        return &asset->base;
+        result = &asset->base;
     } else if (type == H("bmfont")) {
         VAR_NEW_ASSET(bmfont_asset);
         asset->res = R_FONT(read_u32(r));
         asset->path = read_stream_string(r);
-        return &asset->base;
+        result = &asset->base;
     } else if (type == H("ttf")) {
         VAR_NEW_ASSET(ttf_asset);
         asset->res = R_FONT(read_u32(r));
         asset->path = read_stream_string(r);
         asset->glyph_cache = read_u32(r);
         asset->base_font_size = read_f32(r);
-        return &asset->base;
+        result = &asset->base;
     } else if (type == H("atlas")) {
         VAR_NEW_ASSET(atlas_asset);
         asset->name = read_stream_string(r);
-        asset->res = R_ATLAS(H(asset->name));
+        asset->res = R_ATLAS(read_u32(r));
         asset->format_mask = read_u32(r);
-        return &asset->base;
+        result = &asset->base;
     } else if (type == H("dynamic_atlas")) {
         VAR_NEW_ASSET(dynamic_atlas_asset);
         asset->res = R_DYNAMIC_ATLAS(read_u32(r));
         asset->flags = read_u32(r);
-        return &asset->base;
+        result = &asset->base;
     } else if (type == H("model")) {
         VAR_NEW_ASSET(model_asset);
         asset->name = read_stream_string(r);
-        asset->name_hash = H(asset->name);
-        return &asset->base;
+        asset->res = R_MESH3D(read_u32(r));
+        result = &asset->base;
     } else if (type == H("texture")) {
         VAR_NEW_ASSET(image_asset);
         asset->res = R_IMAGE(read_u32(r));
         asset->data = read_stream_image_data(r);
         asset->base.weight = (float) arr_size(asset->data.images);
-        return &asset->base;
+        result = &asset->base;
     } else if (type == H("strings")) {
         VAR_NEW_ASSET(strings_asset);
         asset->name = read_stream_string(r);
@@ -200,15 +201,15 @@ asset_t* unpack_asset(calo_reader_t* r, string_hash_t type) {
             asset->loaders[i].asset = &asset->base;
         }
         asset->base.weight = (float) langs_num;
-        return &asset->base;
+        result = &asset->base;
     } else if (type == H("pack")) {
         VAR_NEW_ASSET(pack_asset);
         asset->name = read_stream_string(r);
-        return &asset->base;
+        result = &asset->base;
     } else {
         log_error("asset: unknown `type` name hash");
     }
-    return NULL;
+    return result;
 }
 
 static void pack_on_list_loaded(ek_local_res* lr) {
@@ -299,7 +300,7 @@ static void pack_poll(asset_t* base) {
     if (!is_time_budget_allow_start_next_job(timer)) {
         uint64_t since = timer;
         double elapsed = ek_ticks_to_sec(ek_ticks(&since));
-        log_info("Assets loading jobs spend %d ms", (int) (elapsed * 1000));
+        log_debug("Assets loading jobs spend %d ms", (int) (elapsed * 1000));
     }
 
     pack->assets_loaded = loaded_assets_num;
@@ -660,7 +661,7 @@ static void model_on_file_loaded(ek_local_res* lr) {
         reader.p = lr->buffer;
         read_calo(&reader);
         model3d_t model = read_stream_model3d(&reader);
-        RES_NAME_RESOLVE(res_mesh3d, this_->name_hash) = static_mesh(model);
+        REF_RESOLVE(res_mesh3d, this_->res) = static_mesh(model);
         ek_local_res_close(lr);
     } else {
         log_error("MODEL resource not found: %s", this_->name);
@@ -678,8 +679,8 @@ static void model_do_load(asset_t* base) {
 
 static void model_do_unload(asset_t* base) {
     model_asset_t* asset = (model_asset_t*) base;
-    static_mesh_t* pp = &RES_NAME_RESOLVE(res_mesh3d, asset->name_hash);
-    static_mesh_destroy(pp);
+    static_mesh_t* mesh = &REF_RESOLVE(res_mesh3d, asset->res);
+    static_mesh_destroy(mesh);
 }
 
 void init_asset_types(void) {

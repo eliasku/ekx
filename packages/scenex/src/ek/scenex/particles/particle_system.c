@@ -4,41 +4,38 @@
 #include <ek/scenex/2d/display2d.h>
 #include <ek/scenex/2d/transform2d.h>
 
-ecx_component_type ParticleEmitter2D;
-ecx_component_type ParticleLayer2D;
-ecx_component_type ParticleRenderer2D;
+ECX_DEFINE_TYPE(particle_emitter2d_t);
+ECX_DEFINE_TYPE(particle_layer2d_t);
+ECX_DEFINE_TYPE(particle_renderer2d_t);
 
-void ParticleEmitter2D_ctor(component_handle_t i) {
+static
+void particle_emitter2d_ctor(component_handle_t i) {
     particle_emitter2d_t r = INIT_ZERO;
     r.data = emitter_data();
     r.enabled = true;
     ((particle_emitter2d_t*) ParticleEmitter2D.data[0])[i] = r;
 }
 
-void ParticleLayer2D_ctor(component_handle_t i) {
+static
+void particle_layer2d_ctor(component_handle_t i) {
     ((particle_layer2d_t*) ParticleLayer2D.data[0])[i] = (particle_layer2d_t) {0};
 }
 
-void ParticleLayer2D_dtor(component_handle_t i) {
+static
+void particle_layer2d_dtor(component_handle_t i) {
     particle_layer2d_t* l = ((particle_layer2d_t*) ParticleLayer2D.data[0]) + i;
     arr_reset(l->particles);
 }
 
 void setup_particle2d(void) {
-    init_component_type(&ParticleEmitter2D, (ecx_component_type_decl) {
-            "ParticleEmitter2D", 8, 1, {sizeof(particle_emitter2d_t)}
-    });
-    ParticleEmitter2D.ctor = ParticleEmitter2D_ctor;
+    ECX_TYPE(particle_emitter2d_t, 8);
+    ParticleEmitter2D.ctor = particle_emitter2d_ctor;
 
-    init_component_type(&ParticleLayer2D, (ecx_component_type_decl) {
-            "ParticleLayer2D", 8, 1, {sizeof(particle_layer2d_t)}
-    });
-    ParticleLayer2D.ctor = ParticleLayer2D_ctor;
-    ParticleLayer2D.dtor = ParticleLayer2D_dtor;
+    ECX_TYPE(particle_layer2d_t, 8);
+    ParticleLayer2D.ctor = particle_layer2d_ctor;
+    ParticleLayer2D.dtor = particle_layer2d_dtor;
 
-    init_component_type(&ParticleRenderer2D, (ecx_component_type_decl) {
-            "ParticleRenderer2D", 8, 1, {sizeof(particle_renderer2d_t)}
-    });
+    ECX_TYPE(particle_renderer2d_t, 8);
 }
 
 particle_layer2d_t* find_particle_layer(entity_t e) {

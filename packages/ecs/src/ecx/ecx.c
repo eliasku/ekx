@@ -153,7 +153,7 @@ void destroy_entity(entity_t entity) {
 // internal function:
 // - valid entity_index
 // - component is not set
-component_handle_t _create_component(ecx_component_type* type, entity_idx_t entity_idx) {
+component_handle_t ecx_create_component(ecx_component_type* type, entity_idx_t entity_idx) {
     EK_ASSERT(type && type->lock_counter == 0);
     EK_ASSERT_R2(get_component_handle_by_index(type, entity_idx) == 0);
 
@@ -345,7 +345,7 @@ void* add_component(ecx_component_type* type, entity_t entity) {
 #endif
     component_handle_t handle = get_component_handle_by_index(type, entity.idx);
     if (LIKELY(!handle)) {
-        handle = _create_component(type, entity.idx);
+        handle = ecx_create_component(type, entity.idx);
     }
     return get_component_data(type, handle, 0);
 }
@@ -356,6 +356,6 @@ static int compare_ecs_types_(const void* a, const void* b) {
     return (int) size1 - (int) size2;
 }
 
-void _sort_component_type_table(ecx_component_type** types_table, uint32_t count) {
+void ecx_sort_component_type_table(ecx_component_type** types_table, uint32_t count) {
     qsort(types_table, count, sizeof(ecx_component_type*), compare_ecs_types_);
 }

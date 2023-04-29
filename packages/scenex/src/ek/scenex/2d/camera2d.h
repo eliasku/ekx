@@ -60,10 +60,12 @@ extern const camera2d_t* current_rendering_camera;
 extern entity_t active_cameras[CAMERA2D_ACTIVE_QUEUE_MAX];
 extern uint32_t active_cameras_num;
 
-extern ecx_component_type Camera2D;
-void Camera2D_setup(void);
-#define get_camera2d(e) ((camera2d_t*)get_component(&Camera2D, e))
-#define add_camera2d(e) ((camera2d_t*)add_component(&Camera2D, e))
+extern ECX_DEFINE_TYPE(camera2d_t);
+#define Camera2D ECX_ID(camera2d_t)
+
+void setup_camera2d(void);
+#define get_camera2d(e) ECX_GET(camera2d_t,e)
+#define add_camera2d(e) ECX_ADD(camera2d_t,e)
 
 #ifdef __cplusplus
 }

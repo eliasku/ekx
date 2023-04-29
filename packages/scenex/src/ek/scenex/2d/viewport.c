@@ -2,7 +2,7 @@
 #include "layout_rect.h"
 #include <ekx/app/game_display.h>
 
-ecx_component_type Viewport;
+ECX_DEFINE_TYPE(viewport_t);
 
 static viewport_scale_options_t viewport_scale_options(void) {
     return (viewport_scale_options_t) {
@@ -25,18 +25,16 @@ static viewport_scale_output_t viewport_scale_output(void) {
     };
 }
 
-static void Viewport_ctor(component_handle_t i) {
+static void viewport_ctor(component_handle_t i) {
     ((viewport_t*) Viewport.data[0])[i] = (viewport_t) {
             viewport_scale_options(),
             viewport_scale_output(),
     };
 }
 
-void Viewport_setup(void) {
-    init_component_type(&Viewport, (ecx_component_type_decl) {
-            "Viewport", 4, 1, {sizeof(viewport_t)}
-    });
-    Viewport.ctor = Viewport_ctor;
+void setup_viewport(void) {
+    ECX_TYPE(viewport_t, 4);
+    Viewport.ctor = viewport_ctor;
 }
 
 static void do_scale(const viewport_scale_input_t* input, const viewport_scale_options_t* options,

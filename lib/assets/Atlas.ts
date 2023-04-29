@@ -77,6 +77,7 @@ ${this.inputs.join("\n")}
     writeInfo(w: Writer) {
         write_stream_u32(w, H("atlas"));
         write_stream_string(w, this.desc.name);
+        write_stream_u32(w, H(this.desc.name));
         // variants
         let formatMask = 1;
         if (this.desc.webp) {

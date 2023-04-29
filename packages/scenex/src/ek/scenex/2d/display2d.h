@@ -80,32 +80,34 @@ typedef struct {
     R(sprite_t) sprite;
 } arc2d_t;
 
-extern ecx_component_type Bounds2D;
-extern ecx_component_type Display2D;
-extern ecx_component_type Quad2D;
-extern ecx_component_type Sprite2D;
-extern ecx_component_type NinePatch2D;
-extern ecx_component_type Arc2D;
+extern ECX_DEFINE_TYPE(bounds2d_t);
+extern ECX_DEFINE_TYPE(display2d_t);
+extern ECX_DEFINE_TYPE(quad2d_t);
+extern ECX_DEFINE_TYPE(sprite2d_t);
+extern ECX_DEFINE_TYPE(ninepatch2d_t);
+extern ECX_DEFINE_TYPE(arc2d_t);
 
-void Display2D_setup(void);
+#define Bounds2D ECX_ID(bounds2d_t)
+#define Display2D ECX_ID(display2d_t)
+#define Quad2D ECX_ID(quad2d_t)
+#define Sprite2D ECX_ID(sprite2d_t)
+#define NinePatch2D ECX_ID(ninepatch2d_t)
+#define Arc2D ECX_ID(arc2d_t)
 
-#define get_bounds2d(e) ((bounds2d_t*)get_component(&Bounds2D, e))
-#define add_bounds2d(e) ((bounds2d_t*)add_component(&Bounds2D, e))
+void setup_display2d(void);
 
-#define get_display2d(e) ((display2d_t*)get_component(&Display2D, e))
-#define add_display2d(e) ((display2d_t*)add_component(&Display2D, e))
-
-#define get_quad2d(e) ((quad2d_t*)get_component(&Quad2D, e))
-#define add_quad2d(e) ((quad2d_t*)add_component(&Quad2D, e))
-
-#define get_sprite2d(e) ((sprite2d_t*)get_component(&Sprite2D, e))
-#define add_sprite2d(e) ((sprite2d_t*)add_component(&Sprite2D, e))
-
-#define get_ninepatch2d(e) ((ninepatch2d_t*)get_component(&NinePatch2D, e))
-#define add_ninepatch2d(e) ((ninepatch2d_t*)add_component(&NinePatch2D, e))
-
-#define get_arc2d(e) ((arc2d_t*)get_component(&Arc2D, e))
-#define add_arc2d(e) ((arc2d_t*)add_component(&Arc2D, e))
+#define get_bounds2d(e) ECX_GET(bounds2d_t,e)
+#define add_bounds2d(e) ECX_ADD(bounds2d_t,e)
+#define get_display2d(e) ECX_GET(display2d_t,e)
+#define add_display2d(e) ECX_ADD(display2d_t,e)
+#define get_quad2d(e) ECX_GET(quad2d_t,e)
+#define add_quad2d(e) ECX_ADD(quad2d_t,e)
+#define get_sprite2d(e) ECX_GET(sprite2d_t,e)
+#define add_sprite2d(e) ECX_ADD(sprite2d_t,e)
+#define get_ninepatch2d(e) ECX_GET(ninepatch2d_t,e)
+#define add_ninepatch2d(e) ECX_ADD(ninepatch2d_t,e)
+#define get_arc2d(e) ECX_GET(arc2d_t,e)
+#define add_arc2d(e) ECX_ADD(arc2d_t,e)
 
 quad2d_t* quad2d_setup(entity_t e);
 

@@ -4,10 +4,10 @@
 #include <ek/buf.h>
 #include <ek/scenex/base/node.h>
 
-ecx_component_type MovieClip;
-ecx_component_type MovieClipTarget;
+ECX_DEFINE_TYPE(movieclip_t);
+ECX_DEFINE_TYPE(movieclip_target_t);
 
-static void MovieClip_ctor(component_handle_t i) {
+static void movieclip_ctor(component_handle_t i) {
     ((movieclip_t*) MovieClip.data[0])[i] = (movieclip_t) {
             .data = NULL,
             .time = 0.0f,
@@ -17,20 +17,10 @@ static void MovieClip_ctor(component_handle_t i) {
     };
 }
 
-void MovieClip_setup(void) {
-    {
-        const ecx_component_type_decl decl = (ecx_component_type_decl) {
-                "MovieClip", 16, 1, {sizeof(movieclip_t)}
-        };
-        init_component_type(&MovieClip, decl);
-        MovieClip.ctor = MovieClip_ctor;
-    }
-    {
-        const ecx_component_type_decl decl = (ecx_component_type_decl) {
-                "MovieClipTarget", 16, 1, {sizeof(movieclip_target_index_t)}
-        };
-        init_component_type(&MovieClipTarget, decl);
-    }
+void setup_movieclip(void) {
+    ECX_TYPE(movieclip_target_t, 16);
+    ECX_TYPE(movieclip_t, 16);
+    MovieClip.ctor = movieclip_ctor;
 }
 
 static void trunc_time(movieclip_t* mc) {
@@ -48,18 +38,6 @@ static void trunc_time(movieclip_t* mc) {
 static float ease(float x, const sg_easing_t* data);
 
 static void apply_frame(entity_t e, movieclip_t* mc);
-
-void MovieClip_update(void) {
-    for (uint32_t i = 1; i < MovieClip.size; ++i) {
-        movieclip_t* mc = (movieclip_t*) MovieClip.data[0] + i;
-        const float dt = g_time_layers[mc->timer].dt;
-        if (mc->playing) {
-            mc->time += dt * mc->fps;
-            trunc_time(mc);
-            apply_frame(get_entity(&MovieClip, i), mc);
-        }
-    }
-}
 
 static int find_keyframe(const sg_movie_frame_t* frames, float t) {
     const uint32_t end = arr_size(frames);
@@ -181,7 +159,7 @@ static void apply_frame(entity_t e, movieclip_t* mc) {
     entity_t it = get_first_child(e);
     const int total_targets = (int) arr_size(data->layers);
     while (it.id) {
-        const movieclip_target_index_t* ti = get_movieclip_target(it);
+        const movieclip_target_t* ti = get_movieclip_target(it);
         if (ti) {
             const int idx = ti->key;
             if (idx < total_targets) {
@@ -343,4 +321,16 @@ static float ease(float x, const sg_easing_t* data) {
         y = e * t + (1.0f - e) * x;
     }
     return y;
+}
+
+void update_movieclips(void) {
+    for (uint32_t i = 1; i < MovieClip.size; ++i) {
+        movieclip_t* mc = (movieclip_t*) MovieClip.data[0] + i;
+        const float dt = g_time_layers[mc->timer].dt;
+        if (mc->playing) {
+            mc->time += dt * mc->fps;
+            trunc_time(mc);
+            apply_frame(get_entity(&MovieClip, i), mc);
+        }
+    }
 }

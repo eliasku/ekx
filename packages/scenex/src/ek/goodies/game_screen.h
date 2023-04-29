@@ -58,7 +58,7 @@ entity_t game_screen_find(string_hash_t name);
 
 void game_screen_change(string_hash_t name);
 
-void game_screen_update(void);
+void update_game_screens(void);
 
 void init_game_screen(entity_t e, string_hash_t name);
 

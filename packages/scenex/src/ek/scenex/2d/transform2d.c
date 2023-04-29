@@ -11,17 +11,17 @@ static transform2d_t transform2d_identity(void) {
 }
 
 
-ecx_component_type Transform2D;
-static void Transform2D_ctor(component_handle_t i) {
-    ((transform2d_t*)Transform2D.data[0])[i] = transform2d_identity();
-    ((world_transform2d_t*)Transform2D.data[1])[i] = world_transform2d_identity();
+ECX_DEFINE_TYPE(transform2d_t);
+#define Transform2D ECX_ID(transform2d_t)
+
+static void transform2d_ctor(component_handle_t i) {
+    ((transform2d_t*)ECX_ID(transform2d_t).data[0])[i] = transform2d_identity();
+    ((world_transform2d_t*)ECX_ID(transform2d_t).data[1])[i] = world_transform2d_identity();
 }
 
-void Transform2D_setup(void) {
-    init_component_type(&Transform2D, (ecx_component_type_decl){
-            "Transform2D", 512, 2, {sizeof(transform2d_t), sizeof(world_transform2d_t)}
-    });
-    Transform2D.ctor = Transform2D_ctor;
+void setup_transform2d(void) {
+    ECX_TYPE_2(transform2d_t, world_transform2d_t, 512);
+    Transform2D.ctor = transform2d_ctor;
 }
 
 vec2_t transform_up(entity_t it, entity_t top, vec2_t pos) {
@@ -104,7 +104,7 @@ void update_world_transform_2d(entity_t root) {
     uint32_t end = out_size;
     transform2d_t* l_data = (transform2d_t*) Transform2D.data[0];
     world_transform2d_t* w_data = (world_transform2d_t*) Transform2D.data[1];
-    node_t* node_data = (node_t*) Node.data[0];
+    node_t* node_data = (node_t*) ECX_ID(node_t).data[0];
     component_handle_t handle = get_component_handle(&Transform2D, root);
     /// copy transforms for all roots
     w_data[handle].matrix = l_data[handle].matrix;
@@ -117,7 +117,7 @@ void update_world_transform_2d(entity_t root) {
             const component_handle_t parent_transform_handle = get_component_handle(&Transform2D, parent);
             const world_transform2d_t tp = w_data[parent_transform_handle];
 
-            entity_t it = node_data[get_component_handle(&Node, parent)].child_first;
+            entity_t it = node_data[get_component_handle(&ECX_ID(node_t), parent)].child_first;
             while (it.id) {
                 const component_handle_t it_handle = get_component_handle(&Transform2D, it);
                 world_transform2d_t* tw = &w_data[it_handle];
@@ -128,7 +128,7 @@ void update_world_transform_2d(entity_t root) {
                 EK_ASSERT(out_size + 1 < TRANSFORM_UPDATE_QUEUE_MAX_SIZE);
                 out[out_size++] = it;
 
-                it = node_data[get_component_handle(&Node, it)].sibling_next;
+                it = node_data[get_component_handle(&ECX_ID(node_t), it)].sibling_next;
             }
         }
         begin = end;

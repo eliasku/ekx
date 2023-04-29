@@ -3,20 +3,19 @@
 #include <ek/scenex/2d/transform2d.h>
 #include <ek/math.h>
 
-ecx_component_type simple_animator_comp;
+ECX_DEFINE_TYPE(simple_animator_t);
+#define SimpleAnimator ECX_ID(simple_animator_t)
 
-void simple_animator_init(void) {
-    init_component_type(&simple_animator_comp, (ecx_component_type_decl) {
-            "simple_animator", 4, 1, {sizeof(simple_animator_t)}
-    });
+void setup_simple_animator(void) {
+    ECX_TYPE(simple_animator_t, 4);
 }
 
-void simple_animator_update(float dt) {
-    EK_ASSERT(simple_animator_comp.index);
-    for (uint32_t i = 1; i < simple_animator_comp.size; ++i) {
-        entity_idx_t ei = simple_animator_comp.handle_to_entity[i];
+void update_simple_animators(float dt) {
+    EK_ASSERT(SimpleAnimator.index);
+    for (uint32_t i = 1; i < SimpleAnimator.size; ++i) {
+        entity_idx_t ei = SimpleAnimator.handle_to_entity[i];
         entity_t e = entity_at(ei);
-        simple_animator_t* s = ((simple_animator_t*) simple_animator_comp.data[0]) + i;
+        simple_animator_t* s = ((simple_animator_t*) SimpleAnimator.data[0]) + i;
         s->rotation += dt * s->rotation_speed;
         s->hue += dt * s->hue_speed;
         set_rotation(e, s->rotation);
@@ -28,9 +27,9 @@ void simple_animator_update(float dt) {
     }
 }
 
-simple_animator_t* simple_animator_add(entity_t e) {
-    EK_ASSERT(simple_animator_comp.index);
-    simple_animator_t* s = (simple_animator_t*) add_component(&simple_animator_comp, e);
+simple_animator_t* add_simple_animator(entity_t e) {
+    EK_ASSERT(SimpleAnimator.index);
+    simple_animator_t* s = (simple_animator_t*) add_component(&SimpleAnimator, e);
     *s = (simple_animator_t) {
             0.0f,
             1.0f,

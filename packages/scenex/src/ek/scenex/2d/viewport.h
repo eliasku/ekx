@@ -44,10 +44,12 @@ typedef struct {
 
 void Viewport_update(const game_display_info* display0);
 
-extern ecx_component_type Viewport;
-void Viewport_setup(void);
-#define get_viewport(e) ((viewport_t*)get_component(&Viewport, e))
-#define add_viewport(e) ((viewport_t*)add_component(&Viewport, e))
+#define Viewport ECX_ID(viewport_t)
+
+extern ECX_DEFINE_TYPE(viewport_t);
+void setup_viewport(void);
+#define get_viewport(e) ECX_GET(viewport_t,e)
+#define add_viewport(e) ECX_ADD(viewport_t,e)
 
 #ifdef __cplusplus
 }

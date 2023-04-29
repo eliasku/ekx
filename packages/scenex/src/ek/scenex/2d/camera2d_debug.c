@@ -54,7 +54,7 @@ static void debug_draw_hit_target(camera2d_t* camera) {
         return;
     }
     mat3x2_t matrix = mat3x2_identity();
-    transform2d_t* worldTransform = (transform2d_t*) find_component_in_parent(&Transform2D, target, 0);
+    transform2d_t* worldTransform = (transform2d_t*) find_component_in_parent(&ECX_ID(transform2d_t), target, 0);
     if (worldTransform) {
         matrix = worldTransform->matrix;
     }

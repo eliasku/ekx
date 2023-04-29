@@ -15,20 +15,23 @@ typedef struct {
     float fps;
     time_layer_t timer;
     bool playing;
-}  movieclip_t;
+} movieclip_t;
 
 typedef struct {
     int32_t key;
-} movieclip_target_index_t;
+} movieclip_target_t;
 
-extern ecx_component_type MovieClip;
-extern ecx_component_type MovieClipTarget;
-void MovieClip_setup(void);
-void MovieClip_update(void);
-#define get_movieclip(e) ((movieclip_t*)get_component(&MovieClip, e))
-#define add_movieclip(e) ((movieclip_t*)add_component(&MovieClip, e))
-#define set_movieclip_target(e, index_key) (((movieclip_target_index_t*)add_component(&MovieClipTarget, (e)))->key = (index_key))
-#define get_movieclip_target(e) ((movieclip_target_index_t*)get_component(&MovieClipTarget, e))
+#define MovieClip ECX_ID(movieclip_t)
+#define get_movieclip(e) ECX_GET(movieclip_t,e)
+#define add_movieclip(e) ECX_ADD(movieclip_t,e)
+#define set_movieclip_target(e, index_key) (ECX_ADD(movieclip_target_t,e)->key = (index_key))
+#define get_movieclip_target(e) ECX_GET(movieclip_target_t,e)
+extern ECX_DEFINE_TYPE(movieclip_t);
+extern ECX_DEFINE_TYPE(movieclip_target_t);
+
+void setup_movieclip(void);
+
+void update_movieclips(void);
 
 void goto_and_stop(entity_t e, float frame);
 

@@ -1,6 +1,23 @@
 #include <ek/hash.h>
 #include <ek/assert.h>
 
+uint64_t hash_fnv64(const char* str, uint64_t hash) {
+    while (*str) {
+        hash ^= (uint64_t) *(str++);
+        hash += (hash << 1) + (hash << 4) + (hash << 5) +
+                (hash << 7) + (hash << 8) + (hash << 40);
+    }
+    return hash;
+}
+
+uint32_t hash_fnv32(const char* str, uint32_t hash) {
+    while (*str) {
+        hash ^= (uint32_t) *(str++);
+        hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+    }
+    return hash;
+}
+
 /**
  * in general this huge string table used for checking hash collisions in runtime.
  * also it provides ability to get C-string by Hash value for tooling and debugging.
@@ -40,7 +57,9 @@ void hsp_insert(string_hash_t hash_val, uint16_t id) {
     hsp.half_hashes[id] = hash_val >> 16u;
 }
 
-string_hash_t hsp_hash_debug(const char* str) {
+string_hash_t hsp_hash_debug(const char* str, bool literal) {
+    // NOTE: literal could be used for additional tracking of `H` macro usage
+    UNUSED(literal);
     uint32_t hv = hsp_hash(str);
     uint16_t id = hsp_find(hv);
     if (id) {

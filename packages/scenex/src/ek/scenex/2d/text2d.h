@@ -74,10 +74,13 @@ rect_t text2d_get_bounds(entity_t e);
 
 bool text2d_hit_test(entity_t e, vec2_t lp);
 
-extern ecx_component_type Text2D;
-void Text2D_setup(void);
-#define get_text2d(e) ((text2d_t*)get_component(&Text2D, e))
-#define add_text2d(e) ((text2d_t*)add_component(&Text2D, e))
+extern ECX_DEFINE_TYPE(text2d_t);
+
+#define Text2D ECX_ID(text2d_t)
+
+void setup_text2d(void);
+#define get_text2d(e) ECX_GET(text2d_t,e)
+#define add_text2d(e) ECX_ADD(text2d_t,e)
 
 #ifdef __cplusplus
 }

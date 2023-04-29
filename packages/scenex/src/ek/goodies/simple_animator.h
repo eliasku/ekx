@@ -17,11 +17,11 @@ typedef struct simple_animator {
     color_t base_color;
 } simple_animator_t;
 
-void simple_animator_init(void);
+void setup_simple_animator(void);
 
-void simple_animator_update(float dt);
+void update_simple_animators(float dt);
 
-simple_animator_t* simple_animator_add(entity_t e);
+simple_animator_t* add_simple_animator(entity_t e);
 
 #ifdef __cplusplus
 }

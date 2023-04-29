@@ -12,16 +12,17 @@
 
 button_skin_t button_skin_default;
 
-ecx_component_type Button;
+ECX_DEFINE_TYPE(button_t);
+#define Button ECX_ID(button_t)
 
-static void Button_ctor(component_handle_t handle) {
+static
+void button_ctor(component_handle_t handle) {
     ((button_t*) Button.data[0])[handle] = button();
 }
 
-void Button_setup(void) {
-    const ecx_component_type_decl decl = (ecx_component_type_decl) {"Button", 16, 1, {sizeof(button_t)}};
-    init_component_type(&Button, decl);
-    Button.ctor = Button_ctor;
+void setup_button(void) {
+    ECX_TYPE( button_t, 16);
+    Button.ctor = button_ctor;
 
     button_skin_default = (button_skin_t) {
             .sfx_over = H("sfx/btn_over"),
@@ -133,7 +134,7 @@ update_button_events(interactive_t* interactive, button_t* button, entity_t e, e
     button->pushed = interactive->pushed;
 }
 
-void Button_update(void) {
+void update_buttons(void) {
     entity_t tap_events[64];
     uint32_t tap_events_num = 0;
     for (uint32_t i = 1; i < Button.size; ++i) {

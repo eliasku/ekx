@@ -24,19 +24,19 @@ void scene_pre_update(entity_t root, float dt) {
     update_interaction_system();
     update_time_layers(dt);
     update_audio_manager();
-    game_screen_update();
+    update_game_screens();
 
-    LayoutRect_update();
-    tween_update();
-    camera_shaker_update();
+    update_layout_rect();
+    update_tweens();
+    update_camera_shakers();
 
-    bubble_text_update();
+    update_bubble_texts();
     update_popup_manager();
 
-    Button_update();
-    MovieClip_update();
+    update_buttons();
+    update_movieclips();
 
-    updater_update();
+    process_updaters();
 }
 
 void scene_post_update(entity_t root) {
@@ -46,7 +46,7 @@ void scene_post_update(entity_t root) {
     update_emitters();
     update_particles();
     update_camera2d_queue();
-    interactive_clear_all_events();
+    clear_all_interactive_events();
 }
 
 void scene_render(entity_t root) {

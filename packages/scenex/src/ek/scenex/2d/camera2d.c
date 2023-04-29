@@ -25,21 +25,16 @@ camera2d_t camera2d_default(void) {
     return cam;
 }
 
-ecx_component_type Camera2D;
+ECX_DEFINE_TYPE(camera2d_t);
 
-static void Camera2D_ctor(component_handle_t handle) {
+static
+void camera2d_ctor(component_handle_t handle) {
     ((camera2d_t*) Camera2D.data[0])[handle] = camera2d_default();
 }
 
-void Camera2D_setup(void) {
-    const ecx_component_type_decl decl = (ecx_component_type_decl) {
-            "Camera2D",
-            4,
-            1,
-            {sizeof(camera2d_t)}
-    };
-    init_component_type(&Camera2D, decl);
-    Camera2D.ctor = Camera2D_ctor;
+void setup_camera2d(void) {
+    ECX_TYPE(camera2d_t, 4);
+    Camera2D.ctor = camera2d_ctor;
 }
 
 entity_t main_camera;
@@ -110,12 +105,12 @@ void render_camera2d_queue(void) {
         current_rendering_camera = camera;
 
         sg_push_debug_group("Camera");
-        canvas_begin_ex(camera->screenRect, camera->worldToScreenMatrix, (sg_image){0}, (sg_image){0});
+        canvas_begin_ex(camera->screenRect, camera->worldToScreenMatrix, (sg_image) {0}, (sg_image) {0});
         sg_apply_viewportf(camera->screenRect.x, camera->screenRect.y, camera->screenRect.w, camera->screenRect.h,
                            true);
         if (camera->clearColorEnabled) {
             canvas_push_program(res_shader.data[R_SHADER_SOLID_COLOR]);
-            canvas.color[0] = (color2_t){{color_vec4(camera->clearColor), color_vec4(camera->clearColor2)}};
+            canvas.color[0] = (color2_t) {{color_vec4(camera->clearColor), color_vec4(camera->clearColor2)}};
             canvas_fill_rect(camera->worldRect, COLOR_WHITE);
             canvas.color[0] = color2_identity();
             canvas_restore_program();

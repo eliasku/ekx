@@ -17,8 +17,8 @@ typedef struct {
 } bubble_text_t;
 
 entity_t bubble_text_entity(string_hash_t font_name, vec2_t pos, float delay);
-void bubble_text_update(void);
-void bubble_text_setup(void);
+void update_bubble_texts(void);
+void setup_bubble_text(void);
 
 #ifdef __cplusplus
 }

@@ -197,9 +197,31 @@ entity_t get_entity(const ecx_component_type* type, component_handle_t handle);
 
 void init_component_type(ecx_component_type* type, ecx_component_type_decl decl);
 
-void _sort_component_type_table(ecx_component_type** types, uint32_t count);
+void ecx_sort_component_type_table(ecx_component_type** types, uint32_t count);
 
-component_handle_t _create_component(ecx_component_type* type, entity_idx_t entity_idx);
+component_handle_t ecx_create_component(ecx_component_type* type, entity_idx_t entity_idx);
+
+#ifndef NDEBUG
+#define ECX_TYPE_LABEL__(Type) #Type
+#else
+#define ECX_TYPE_LABEL__(Type) ""
+#endif
+
+#define ECX_ID(Name) ecx_##Name
+#define ECX_DEFINE_TYPE(Type) ecx_component_type ECX_ID(Type)
+#define ECX_GET(T,e) ((T*)get_component(&ECX_ID(T),e))
+#define ECX_ADD(T,e) ((T*)add_component(&ECX_ID(T),e))
+#define ECX_HAS(T,e) (get_component_handle(&ECX_ID(T),e)!=0)
+#define ECX_DEL(T,e) remove_component(&ECX_ID(T),e)
+
+#define ECX_TYPE_DECL_0(Type,Cap) ((ecx_component_type_decl){ECX_TYPE_LABEL__(Type),(Cap),0,{0}})
+#define ECX_TYPE_DECL_1(Type,Cap,Data1) ((ecx_component_type_decl){ECX_TYPE_LABEL__(Type),(Cap),1,{sizeof(Data1)}})
+#define ECX_TYPE_DECL_2(Type,Cap,Data1,Data2) ((ecx_component_type_decl){ECX_TYPE_LABEL__(Type),(Cap),2,{sizeof(Data1),sizeof(Data2)}})
+
+#define ECX_TYPE_0(T,InitialCount) init_component_type(&ECX_ID(T),ECX_TYPE_DECL_0(T,InitialCount))
+#define ECX_TYPE_1(T,InitialCount) init_component_type(&ECX_ID(T),ECX_TYPE_DECL_1(T,InitialCount,T))
+#define ECX_TYPE_2(T,T2,InitialCount) init_component_type(&ECX_ID(T),ECX_TYPE_DECL_2(T,InitialCount,T,T2))
+#define ECX_TYPE(T,InitialCount) ECX_TYPE_1(T,InitialCount)
 
 #ifdef __cplusplus
 }

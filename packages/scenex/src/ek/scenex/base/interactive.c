@@ -1,29 +1,29 @@
 #include "interactive.h"
 #include "node_events.h"
 
-ecx_component_type interactive_type;
+ECX_DEFINE_TYPE(interactive_t);
+
+#define Interactive ECX_ID(interactive_t)
 
 void setup_interactive(void) {
-    init_component_type(&interactive_type, (ecx_component_type_decl) {
-            "interactive", 8, 1, {sizeof(interactive_t)}
-    });
+    ECX_TYPE(interactive_t, 8);
 }
 
 interactive_t* add_interactive(entity_t e) {
-    EK_ASSERT(interactive_type.index);
-    interactive_t* c = (interactive_t*) add_component(&interactive_type, e);
+    EK_ASSERT(Interactive.index);
+    interactive_t* c = (interactive_t*) add_component(&Interactive, e);
     *c = (interactive_t) {0};
     c->bubble = true;
     return c;
 }
 
 interactive_t* get_interactive(entity_t e) {
-    return (interactive_t*) get_component(&interactive_type, e);
+    return (interactive_t*) get_component(&Interactive, e);
 }
 
-void interactive_clear_all_events(void) {
-    for (uint32_t i = 1; i < interactive_type.size; ++i) {
-        interactive_t* s = (interactive_t*) interactive_type.data[0] + i;
+void clear_all_interactive_events(void) {
+    for (uint32_t i = 1; i < Interactive.size; ++i) {
+        interactive_t* s = (interactive_t*) Interactive.data[0] + i;
         s->ev_out = false;
         s->ev_over = false;
         s->ev_down = false;

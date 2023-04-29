@@ -2,21 +2,17 @@
 #include "destroy_timer.h"
 #include <ek/math.h>
 
-ecx_component_type Tween;
+ECX_DEFINE_TYPE(tween_t);
+#define Tween ECX_ID(tween_t)
 
-static void Tween_ctor(component_handle_t handle) {
-    ((tween_t*) Tween.data[0])[handle] = (tween_t) {0};
+static
+void tween_ctor(component_handle_t i) {
+    ((tween_t*) Tween.data[0])[i] = (tween_t) {0};
 }
 
-void Tween_setup(void) {
-    const ecx_component_type_decl decl = (ecx_component_type_decl) {
-            "Tween",
-            8,
-            1,
-            {sizeof(tween_t)}
-    };
-    init_component_type(&Tween, decl);
-    Tween.ctor = Tween_ctor;
+void setup_tween(void) {
+    ECX_TYPE(tween_t, 8);
+    Tween.ctor = tween_ctor;
 }
 
 void handle_end(entity_t e, tween_t* tween) {
@@ -41,7 +37,7 @@ void update_frame(entity_t e, tween_t* tween) {
     }
 }
 
-void tween_update(void) {
+void update_tweens(void) {
     for (uint32_t i = Tween.size - 1; i > 0; --i) {
         const entity_t e = get_entity(&Tween, i);
         tween_t* tween = (tween_t*) get_component_data(&Tween, i, 0);

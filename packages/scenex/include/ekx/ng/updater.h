@@ -8,22 +8,20 @@
 extern "C" {
 #endif
 
-typedef struct updater_state updater_state;
-
 typedef void (* updater_callback_t)(entity_t e, time_layer_t time_layer);
 
-struct updater_state {
+typedef struct {
     time_layer_t time_layer;
     updater_callback_t callback;
-};
+} updater_t;
 
-void updater_init(void);
+void setup_updater(void);
 
-void updater_set(entity_t e, updater_callback_t callback);
+void process_updaters(void);
 
-void updater_update(void);
+void set_updater(entity_t e, updater_callback_t callback);
 
-void updater_remove(entity_t e);
+#define del_updater(e) remove_component(&ECX_ID(updater_t),e);
 
 #ifdef __cplusplus
 }

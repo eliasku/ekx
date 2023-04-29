@@ -35,6 +35,8 @@ export class ModelAsset extends Asset {
 
     writeInfo(w: Writer) {
         write_stream_u32(w, H(ModelAsset.typeName));
-        write_stream_string(w, this.desc.name!);
+        const name = this.desc.name!;
+        write_stream_string(w, name);
+        write_stream_u32(w, H(name));
     }
 }

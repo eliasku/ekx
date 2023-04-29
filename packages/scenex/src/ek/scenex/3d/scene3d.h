@@ -118,12 +118,17 @@ typedef struct {
 
 void update_world_transform3d(void);
 
-extern ecx_component_type Camera3D;
-extern ecx_component_type Light3D;
-extern ecx_component_type MeshRenderer;
-extern ecx_component_type Transform3D;
+extern ECX_DEFINE_TYPE(camera3d_t);
+extern ECX_DEFINE_TYPE(light3d_t);
+extern ECX_DEFINE_TYPE(mesh_renderer_t);
+extern ECX_DEFINE_TYPE(transform3d_t);
 
-void scene3d_setup(void);
+#define Camera3D ECX_ID(camera3d_t)
+#define Light3D ECX_ID(light3d_t)
+#define MeshRenderer ECX_ID(mesh_renderer_t)
+#define Transform3D ECX_ID(transform3d_t)
+
+void setup_scene3d(void);
 
 #define get_transform3d(e) ((transform3d_t*)get_component(&Transform3D, e))
 #define add_transform3d(e) ((transform3d_t*)add_component(&Transform3D, e))

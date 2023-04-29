@@ -82,7 +82,7 @@ public:
             uint32_t i = 0;
             ((table_[i] = type<Cn>(), ++i), ...);
         }
-        _sort_component_type_table(table_, components_num);
+        ecx_sort_component_type_table(table_, components_num);
 #ifndef NDEBUG
         {
             uint32_t i = 0;

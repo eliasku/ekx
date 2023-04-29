@@ -38,10 +38,10 @@ typedef struct {
 node_event_t node_event(string_hash_t event_type, entity_t e);
 
 /*** events functions ***/
-extern ecx_component_type NodeEvents;
+extern ECX_DEFINE_TYPE(node_events_t);
 void setup_node_events(void);
-#define get_node_events(e) ((node_events_t*)get_component(&NodeEvents, e))
-#define add_node_events(e) ((node_events_t*)add_component(&NodeEvents, e))
+#define get_node_events(e) ECX_GET(node_events_t,e)
+#define add_node_events(e) ECX_ADD(node_events_t,e)
 
 bool emit_node_event(entity_t e, const node_event_t* event);
 void add_node_event_listener(entity_t e, string_hash_t event_type, void(* callback)(const node_event_t* event));

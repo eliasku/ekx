@@ -5,10 +5,14 @@
 #include <ek/canvas.h>
 #include <ek/scenex/2d/sprite.h>
 
-ecx_component_type Trail2D;
-ecx_component_type TrailRenderer2D;
+ECX_DEFINE_TYPE(trail2d_t);
+ECX_DEFINE_TYPE(trail_renderer2d_t);
 
-static void Trail2D_ctor(component_handle_t i) {
+#define Trail2D ECX_ID(trail2d_t)
+#define TrailRenderer2D ECX_ID(trail_renderer2d_t)
+
+static
+void trail2d_ctor(component_handle_t i) {
     trail2d_t r = INIT_ZERO;
     r.drain_speed = 2;
     r.segment_distance_max = 10;
@@ -16,17 +20,17 @@ static void Trail2D_ctor(component_handle_t i) {
     ((trail2d_t*) Trail2D.data[0])[i] = r;
 }
 
-static void Trail2D_dtor(component_handle_t i) {
+static
+void trail2d_dtor(component_handle_t i) {
     trail2d_t* r = &((trail2d_t*) Trail2D.data[0])[i];
     arr_reset(r->nodes.data);
 }
 
 void setup_trail2d(void) {
-    init_component_type(&Trail2D, (ecx_component_type_decl) {"Trail2D", 16, 1, {sizeof(trail2d_t)}});
-    init_component_type(&TrailRenderer2D,
-                        (ecx_component_type_decl) {"TrailRenderer2D", 16, 1, {sizeof(trail_renderer2d_t)}});
-    Trail2D.ctor = Trail2D_ctor;
-    Trail2D.dtor = Trail2D_dtor;
+    ECX_TYPE(trail2d_t, 4);
+    ECX_TYPE(trail_renderer2d_t, 4);
+    Trail2D.ctor = trail2d_ctor;
+    Trail2D.dtor = trail2d_dtor;
 }
 
 static void deq_move(trail2d_deque_t* deq) {
@@ -57,7 +61,7 @@ static void deq_push(trail2d_deque_t* deq, trail2d_node_t el) {
     }
 }
 
-static  uint32_t deq_size(const trail2d_deque_t* deq) {
+static uint32_t deq_size(const trail2d_deque_t* deq) {
     return deq->end - deq->first;
 }
 
@@ -97,7 +101,7 @@ static void update_trail2d_position(trail2d_t* trail, vec2_t new_position) {
     }
 
     if (deq_size(&trail->nodes) > 0) {
-        trail2d_node_t * n = deq_back(&trail->nodes);
+        trail2d_node_t* n = deq_back(&trail->nodes);
         n->position = new_position;
         n->scale = trail->scale;
     } else {
@@ -112,7 +116,7 @@ static void update_trail2d_mat(trail2d_t* trail, const mat3x2_t m) {
     update_trail2d_position(trail, vec2_transform(trail->offset, m));
 
     for (uint32_t i = trail->nodes.first; i < trail->nodes.end; ++i) {
-        trail2d_node_t * node = trail->nodes.data + i;
+        trail2d_node_t* node = trail->nodes.data + i;
         node->energy -= dt * trail->drain_speed;
         if (node->energy <= 0) {
             node->energy = 0;
@@ -128,8 +132,8 @@ void update_trail2d(void) {
     const uint32_t count = Trail2D.size;
     for (uint32_t i = 1; i < count; ++i) {
         entity_idx_t ei = Trail2D.handle_to_entity[i];
-        component_handle_t wti = get_component_handle_by_index(&Transform2D, ei);
-        const mat3x2_t m = ((world_transform2d_t*) get_component_data(&Transform2D, wti, 1))->matrix;
+        component_handle_t wti = get_component_handle_by_index(&ECX_ID(transform2d_t), ei);
+        const mat3x2_t m = ((world_transform2d_t*) get_component_data(&ECX_ID(transform2d_t), wti, 1))->matrix;
         update_trail2d_mat(trails + i, m);
     }
 }
@@ -137,7 +141,7 @@ void update_trail2d(void) {
 static void trail_renderer2d_draw(entity_t e) {
     trail_renderer2d_t* comp = get_trail_renderer2d(e);
     trail2d_t* trail = get_trail2d(comp->target);
-    trail2d_node_t * node_array = trail->nodes.data;
+    trail2d_node_t* node_array = trail->nodes.data;
 
     const uint32_t columns = deq_size(&trail->nodes);
     if (columns < 2) {
@@ -180,12 +184,12 @@ static void trail_renderer2d_draw(entity_t e) {
         if (i > 0/* node_idx > begin */) {
             perp = normalize_vec2(sub_vec2(node_array[node_idx - 1].position, p));
             if (i + 1 < columns) {
-                perp = normalize_vec2(lerp_vec2(perp, normalize_vec2(sub_vec2(p, node_array[node_idx + 1].position)), 0.5f));
+                perp = normalize_vec2(
+                        lerp_vec2(perp, normalize_vec2(sub_vec2(p, node_array[node_idx + 1].position)), 0.5f));
             }
         } else if (i + 1 < columns) {
             perp = normalize_vec2(sub_vec2(p, node_array[node_idx + 1].position));
-        }
-        else {
+        } else {
             perp = vec2(0, 0);
         }
         perp = perp_vec2(perp);

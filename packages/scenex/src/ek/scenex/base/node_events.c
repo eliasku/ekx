@@ -3,7 +3,9 @@
 #include <ek/assert.h>
 #include "node.h"
 
-ecx_component_type NodeEvents;
+ECX_DEFINE_TYPE(node_events_t);
+
+#define NodeEvents ECX_ID(node_events_t)
 
 static void NodeEvents_ctor(component_handle_t i) {
     ((node_events_t*) NodeEvents.data[0])[i] = (node_events_t) {0};
@@ -15,14 +17,12 @@ static void NodeEvents_dtor(component_handle_t i) {
 }
 
 void setup_node_events(void) {
-    init_component_type(&NodeEvents, (ecx_component_type_decl) {
-            "NodeEvents", 8, 1, {sizeof(node_events_t)}
-    });
+    ECX_TYPE(node_events_t, 8);
     NodeEvents.ctor = NodeEvents_ctor;
     NodeEvents.dtor = NodeEvents_dtor;
 }
 
-void add_node_event_listener(entity_t e, string_hash_t event_type, void(*callback)(const node_event_t* event)) {
+void add_node_event_listener(entity_t e, string_hash_t event_type, void(* callback)(const node_event_t* event)) {
     node_events_t* d = add_node_events(e);
     node_event_callback_t cb = (node_event_callback_t) {callback, event_type, false};
     arr_push(d->callbacks, cb);
@@ -51,7 +51,7 @@ bool emit_node_event(entity_t e, const node_event_t* event) {
         node_event_t* mutable_event = (node_event_t*) event;
         mutable_event->receiver = e;
         string_hash_t type = event->type;
-        for (uint32_t i = 0; i < arr_size(eh->callbacks); ) {
+        for (uint32_t i = 0; i < arr_size(eh->callbacks);) {
             node_event_callback_t* callback = eh->callbacks + i;
             if (!callback->type || callback->type == type) {
                 callback->callback(mutable_event);

@@ -14,3 +14,4 @@
 #include "base/tween.c.h"
 
 #include "3d/scene3d.c.h"
+#include "3d/render_system.c.h"

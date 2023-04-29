@@ -3,23 +3,17 @@
 #include <ek/assert.h>
 #include <stdarg.h>
 
-#define has_node(e) (get_component_handle(&Node, e) != 0)
+#define has_node(e) ECX_HAS(node_t,e)
 
-ecx_component_type Node;
+ECX_DEFINE_TYPE(node_t);
 
-static void Node_ctor(component_handle_t handle) {
-    ((node_t*) Node.data[0])[handle] = (node_t){0};
+static void node_ctor(component_handle_t i) {
+    ((node_t*) ECX_ID(node_t).data[0])[i] = (node_t) {0};
 }
 
-void setup_Node(void) {
-    const ecx_component_type_decl decl = (ecx_component_type_decl) {
-            "Node",
-            512,
-            1,
-            {sizeof(node_t)}
-    };
-    init_component_type(&Node, decl);
-    Node.ctor = Node_ctor;
+void setup_node(void) {
+    ECX_TYPE(node_t, 512);
+    ECX_ID(node_t).ctor = node_ctor;
 }
 
 entity_t get_first_child(entity_t e) {
@@ -348,7 +342,7 @@ uint32_t find_many(entity_t* out, const entity_t e, ...) {
 }
 
 entity_t get_parent(entity_t e) {
-    return ((node_t*) get_component_or_default(&Node, e))->parent;
+    return ((node_t*) get_component_or_default(&ECX_ID(node_t), e))->parent;
 }
 
 void foreach_child(entity_t e, void(* callback)(entity_t child)) {
@@ -382,11 +376,11 @@ void* find_component_in_parent(ecx_component_type* type, entity_t e, uint32_t da
 }
 
 void set_tag(entity_t e, string_hash_t tag) {
-    ((node_t*) add_component(&Node, e))->tag = tag;
+    ((node_t*) add_component(&ECX_ID(node_t), e))->tag = tag;
 }
 
 string_hash_t get_tag(entity_t e) {
-    return ((node_t*) get_component_or_default(&Node, e))->tag;
+    return ((node_t*) get_component_or_default(&ECX_ID(node_t), e))->tag;
 }
 
 bool is_visible(entity_t e) {

@@ -79,9 +79,9 @@ SUITE(hash) {
         //String of 256 characters.
         //Make sure you don't store string lengths in a char, and overflow at 255 bytes (as OpenBSD's canonical BCrypt implementation did)
         CHECK_EQ(hash_murmur3_32_s(
-                         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                         0x9747b28c),
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                0x9747b28c),
                  0x37405BDC);
 
         CHECK_EQ(hash_murmur3_32_s("abc", 0), 0xB3DD93FA);
@@ -100,6 +100,11 @@ SUITE(hash) {
         H("3");
         H("3");
         H("4");
+
+        static const char* const_str = "STATIC_STRING";
+        string_hash_t h1 = H(const_str);
+        string_hash_t h2 = H("STATIC_STRING");
+        REQUIRE_EQ(h1, h2);
 
 #ifndef NDEBUG
         CHECK_EQ(hsp_get(H("1")), "1");

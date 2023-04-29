@@ -1,17 +1,16 @@
 #include "scene3d.h"
-#include <ecx/ecx.h>
 #include <ek/gfx.h>
 #include <ek/buf.h>
-#include <ek/scenex/base/node.h>
-#include "render_system.c.h"
 
-ecx_component_type MeshRenderer;
-ecx_component_type Transform3D;
-ecx_component_type Camera3D;
-ecx_component_type Light3D;
+ECX_DEFINE_TYPE(camera3d_t);
+ECX_DEFINE_TYPE(light3d_t);
+ECX_DEFINE_TYPE(mesh_renderer_t);
+ECX_DEFINE_TYPE(transform3d_t);
+
 scene3d_render_system_t scene3d_render_system;
 
-static void Transform3D_ctor(component_handle_t handle) {
+static
+void transform3d_ctor(component_handle_t handle) {
     ((transform3d_t*) Transform3D.data[0])[handle] = (transform3d_t) {
             .local = mat4_identity(),
             .world = mat4_identity(),
@@ -21,7 +20,8 @@ static void Transform3D_ctor(component_handle_t handle) {
     };
 }
 
-static void MeshRenderer_ctor(component_handle_t handle) {
+static
+void mesh_renderer_ctor(component_handle_t handle) {
     ((mesh_renderer_t*) MeshRenderer.data[0])[handle] = (mesh_renderer_t) {
             .mesh_ptr = NULL,
             .mesh = 0,
@@ -31,45 +31,13 @@ static void MeshRenderer_ctor(component_handle_t handle) {
     };
 }
 
-void scene3d_setup(void) {
-    {
-        const ecx_component_type_decl decl = (ecx_component_type_decl) {
-                "MeshRenderer",
-                16,
-                1,
-                {sizeof(mesh_renderer_t)}
-        };
-        init_component_type(&MeshRenderer, decl);
-        MeshRenderer.ctor = MeshRenderer_ctor;
-    }
-    {
-        const ecx_component_type_decl decl = (ecx_component_type_decl) {
-                "Transform3D",
-                64,
-                1,
-                {sizeof(transform3d_t)}
-        };
-        init_component_type(&Transform3D, decl);
-        Transform3D.ctor = Transform3D_ctor;
-    }
-    {
-        const ecx_component_type_decl decl = (ecx_component_type_decl) {
-                "Camera3D",
-                4,
-                1,
-                {sizeof(camera3d_t)}
-        };
-        init_component_type(&Camera3D, decl);
-    }
-    {
-        const ecx_component_type_decl decl = (ecx_component_type_decl) {
-                "Light3D",
-                8,
-                1,
-                {sizeof(light3d_t)}
-        };
-        init_component_type(&Light3D, decl);
-    }
+void setup_scene3d(void) {
+    ECX_TYPE(mesh_renderer_t, 16);
+    MeshRenderer.ctor = mesh_renderer_ctor;
+    ECX_TYPE(transform3d_t, 64);
+    Transform3D.ctor = transform3d_ctor;
+    ECX_TYPE(camera3d_t, 4);
+    ECX_TYPE(light3d_t, 8);
     setup_res_material3d();
     setup_res_mesh3d();
 

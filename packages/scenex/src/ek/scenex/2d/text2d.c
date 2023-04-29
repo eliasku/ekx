@@ -10,23 +10,21 @@
 
 ecx_component_type Text2D;
 
-static void Text2D_ctor(component_handle_t i) {
+static void text2d_ctor(component_handle_t i) {
     text2d_t txt = {0};
     txt.format = text_format(H("mini"), 16.0f);
     ((text2d_t*) Text2D.data[0])[i] = txt;
 }
 
-static void Text2D_dtor(component_handle_t i) {
+static void text2d_dtor(component_handle_t i) {
     void* str_obj = ((text2d_t*) Text2D.data[0])[i].str_obj;
     arr_reset(str_obj);
 }
 
-void Text2D_setup(void) {
-    init_component_type(&Text2D, (ecx_component_type_decl) {
-            "Text2D", 16, 1, {sizeof(text2d_t)}
-    });
-    Text2D.ctor = Text2D_ctor;
-    Text2D.dtor = Text2D_dtor;
+void setup_text2d(void) {
+    ECX_TYPE(text2d_t, 16);
+    Text2D.ctor = text2d_ctor;
+    Text2D.dtor = text2d_dtor;
 }
 
 static float find_text_scale(vec2_t textSize, rect_t rc) {

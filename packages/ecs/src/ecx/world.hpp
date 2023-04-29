@@ -1,8 +1,7 @@
 #pragma once
 
+#include "ecx.h"
 #include <ek/assert.h>
-#include <ek/sparse_array.h>
-#include "ecx_fwd.hpp"
 
 // for `std::is_empty`
 #include <type_traits>
@@ -30,13 +29,13 @@ public:
         if constexpr((Mode & 2) != 0) type.dtor = destruct;
     }
 
-    static void construct(component_handle_t handle) {
-        T* ptr = ((T*) type.data[0]) + handle;
+    static void construct(component_handle_t i) {
+        T* ptr = ((T*) type.data[0]) + i;
         new(ptr)T();
     }
 
-    static void destruct(component_handle_t handle) {
-        T* ptr = ((T*) type.data[0]) + handle;
+    static void destruct(component_handle_t i) {
+        T* ptr = ((T*) type.data[0]) + i;
         ptr->~T();
     }
 };
@@ -74,11 +73,6 @@ inline C* get(entity_t e) {
 }
 
 template<typename C>
-inline C* try_get(entity_t e) {
-    return (C*) get_component(type<C>(), e);
-}
-
-template<typename C>
 inline bool remove(entity_t e) {
     return remove_component(type<C>(), e);
 }
@@ -93,12 +87,6 @@ inline entity_t create() {
     entity_t e = create_entity();
     add<Cn...>(e);
     return e;
-}
-
-template<typename C>
-inline bool has_type() {
-    // if component is registered, non-zero type index will be assigned (component_type_id)
-    return type<C>()->index != 0;
 }
 
 }

@@ -53,18 +53,22 @@ particle_layer2d_t* find_particle_layer(entity_t e);
 
 particle_t* produce_particle(particle_layer2d_t* to_layer, const particle_decl_t* decl);
 
-extern ecx_component_type ParticleEmitter2D;
-extern ecx_component_type ParticleLayer2D;
-extern ecx_component_type ParticleRenderer2D;
+#define ParticleEmitter2D ECX_ID(particle_emitter2d_t)
+#define ParticleLayer2D ECX_ID(particle_layer2d_t)
+#define ParticleRenderer2D ECX_ID(particle_renderer2d_t)
+
+extern ECX_DEFINE_TYPE(particle_emitter2d_t);
+extern ECX_DEFINE_TYPE(particle_layer2d_t);
+extern ECX_DEFINE_TYPE(particle_renderer2d_t);
 
 void setup_particle2d(void);
 
-#define get_particle_emitter2d(e) ((particle_emitter2d_t *)get_component(&ParticleEmitter2D, e))
-#define add_particle_emitter2d(e) ((particle_emitter2d_t*)add_component(&ParticleEmitter2D, e))
-#define get_particle_layer2d(e) ((particle_layer2d_t *)get_component(&ParticleLayer2D, e))
-#define add_particle_layer2d(e) ((particle_layer2d_t*)add_component(&ParticleLayer2D, e))
-#define get_particle_renderer2d(e) ((particle_renderer2d_t *)get_component(&ParticleRenderer2D, e))
-#define add_particle_renderer2d(e) ((particle_renderer2d_t*)add_component(&ParticleRenderer2D, e))
+#define get_particle_emitter2d(e) ECX_GET(particle_emitter2d_t,e)
+#define add_particle_emitter2d(e) ECX_ADD(particle_emitter2d_t,e)
+#define get_particle_layer2d(e) ECX_GET(particle_layer2d_t,e)
+#define add_particle_layer2d(e) ECX_ADD(particle_layer2d_t,e)
+#define get_particle_renderer2d(e) ECX_GET(particle_renderer2d_t,e)
+#define add_particle_renderer2d(e) ECX_ADD(particle_renderer2d_t,e)
 
 #ifdef __cplusplus
 }

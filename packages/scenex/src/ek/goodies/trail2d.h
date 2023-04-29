@@ -45,18 +45,17 @@ typedef struct {
     R(sprite_t) sprite;
 } trail_renderer2d_t;
 
-extern ecx_component_type Trail2D;
-extern ecx_component_type TrailRenderer2D;
-
 void setup_trail2d(void);
 
-#define get_trail_renderer2d(e) ((trail_renderer2d_t*)get_component(&TrailRenderer2D, e))
+extern ECX_DEFINE_TYPE(trail2d_t);
+extern ECX_DEFINE_TYPE(trail_renderer2d_t);
 
-trail_renderer2d_t*
-add_trail_renderer2d(entity_t e, entity_t target);
+#define get_trail_renderer2d(e) ECX_GET(trail_renderer2d_t,e)
 
-#define get_trail2d(e) ((trail2d_t*)get_component(&Trail2D, e))
-#define add_trail2d(e) ((trail2d_t*)add_component(&Trail2D, e))
+trail_renderer2d_t* add_trail_renderer2d(entity_t e, entity_t target);
+
+#define get_trail2d(e) ECX_GET(trail2d_t,e)
+#define add_trail2d(e) ECX_ADD(trail2d_t,e)
 
 #ifdef __cplusplus
 }

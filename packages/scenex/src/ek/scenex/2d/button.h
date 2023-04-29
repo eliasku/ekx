@@ -42,12 +42,12 @@ typedef struct {
     bool pushed;
 } button_t;
 
-extern ecx_component_type Button;
+extern ECX_DEFINE_TYPE(button_t);
 button_t button(void);
-void Button_setup(void);
-void Button_update(void);
-#define get_button(e) ((button_t*)get_component(&Button, e))
-#define add_button(e) ((button_t*)add_component(&Button, e))
+void setup_button(void);
+void update_buttons(void);
+#define get_button(e) ECX_GET(button_t,e)
+#define add_button(e) ECX_ADD(button_t,e)
 
 #ifdef __cplusplus
 }

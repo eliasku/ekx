@@ -23,14 +23,14 @@ typedef struct {
     bool destroy_entity;
 } tween_t;
 
-void tween_update(void);
+void update_tweens(void);
 tween_t* tween_reset(entity_t e);
 
-extern ecx_component_type Tween;
-void Tween_setup(void);
-#define get_tween(e) ((tween_t*)get_component(&Tween, e))
-#define add_tween(e) ((tween_t*)add_component(&Tween, e))
-#define del_tween(e) (remove_component(&Tween, e))
+extern ECX_DEFINE_TYPE(tween_t);
+void setup_tween(void);
+#define get_tween(e) ECX_GET(tween_t,e)
+#define add_tween(e) ECX_ADD(tween_t,e)
+#define del_tween(e) ECX_DEL(tween_t,e)
 
 #ifdef __cplusplus
 };

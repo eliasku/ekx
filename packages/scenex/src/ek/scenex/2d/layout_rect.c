@@ -3,20 +3,19 @@
 #include <ek/scenex/base/node.h>
 
 rect_t LayoutRect_design_canvas_rect;
-ecx_component_type LayoutRect;
+ECX_DEFINE_TYPE(layout_rect_t);
+#define LayoutRect ECX_ID(layout_rect_t)
 
-static void LayoutRect_ctor(component_handle_t i) {
+static void layout_rect_ctor(component_handle_t i) {
     ((layout_rect_t*) LayoutRect.data[0])[i] = (layout_rect_t) {
             .doSafeInsets = true,
     };
 }
 
-void LayoutRect_setup(void) {
+void setup_layout_rect(void) {
     LayoutRect_design_canvas_rect = rect_01();
-    init_component_type(&LayoutRect, (ecx_component_type_decl) {
-            "LayoutRect", 32, 1, {sizeof(layout_rect_t)}
-    });
-    LayoutRect.ctor = LayoutRect_ctor;
+    ECX_TYPE(layout_rect_t, 32);
+    LayoutRect.ctor = layout_rect_ctor;
 }
 
 rect_t find_parent_layout_rect(entity_t e, bool safe) {
@@ -81,7 +80,7 @@ static void update_layout(entity_t e) {
     }
 }
 
-void LayoutRect_update(void) {
+void update_layout_rect(void) {
     for (uint32_t i = 1; i < LayoutRect.size; ++i) {
         entity_t e = get_entity(&LayoutRect, i);
         update_layout(e);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecx_fwd.hpp"
+#include "ecx.h"
 #include "world.hpp"
 #include "view_forward.hpp"
 #include "view_backward.hpp"
@@ -48,9 +48,7 @@ inline auto view_backward() {
 
 #ifndef ECX_COMPONENT
 
-#define ECX_COMPONENT(C) ecs::ComponentType<C>::setup(4, #C)
-#define ECX_COMPONENT_RESERVE(C, cap) ecs::ComponentType<C>::setup((cap), #C)
-
+#define ECX_COMPONENT(C) ecs::ComponentType<C>::setup(4, ECX_TYPE_LABEL__(C))
 #define ECX_COMP_TYPE_CXX(C) template<> class ecs::ComponentType<C> final : public ecs::GenericComponent<C, 3> {};
 
 #endif // !ECX_COMPONENT

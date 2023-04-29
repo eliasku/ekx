@@ -6,7 +6,8 @@
 void ek_texture_loader_set_path(ek_texture_loader_path* dst, const char* src) {
     EK_ASSERT(dst != 0);
     EK_ASSERT(src != 0);
-    strncpy(dst->path, src, EK_TEXTURE_LOADER_PATH_MAX);
+    dst->path[0] = 0;
+    strncat(dst->path, src, EK_TEXTURE_LOADER_PATH_MAX);
 }
 
 void ek_texture_loader_init(ek_texture_loader* loader) {

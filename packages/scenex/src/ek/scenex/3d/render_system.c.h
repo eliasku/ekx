@@ -437,7 +437,7 @@ static void render_system_render(float width, float height) {
     sg_apply_scissor_rect(0, 0, wi, hi, true);
     sg_apply_viewport(0, 0, wi, hi, true);
 
-    static float fc_ = 1.0;
+    static float fc_ = 1.0f;
     fc_ += 1.0f;
     const float time = (float) ek_time_now();
 

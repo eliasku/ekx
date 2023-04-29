@@ -9,7 +9,7 @@ export function H(str: string): StringHash32 {
     // while we use ASCII for identifiers, we are OK. Then it's better to synchronize string encoding between native ad JS env
     for (let i = 0; i < str.length; ++i) {
         hash ^= str.charCodeAt(i);
-        hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24)
+        hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
     }
     return hash;
 }

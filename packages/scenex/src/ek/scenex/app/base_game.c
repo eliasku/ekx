@@ -53,25 +53,25 @@
 
 static void setup_scene_x(void) {
     //// basic scene
-    setup_Node();
-    Transform2D_setup();
-    Display2D_setup();
-    Text2D_setup();
-    Camera2D_setup();
-    MovieClip_setup();
+    setup_node();
+    setup_transform2d();
+    setup_display2d();
+    setup_text2d();
+    setup_camera2d();
+    setup_movieclip();
 
-    LayoutRect_setup();
-    Viewport_setup();
-    Button_setup();
+    setup_layout_rect();
+    setup_viewport();
+    setup_button();
     setup_interactive();
     setup_node_events();
 
-    Tween_setup();
-    camera_shaker_init();
-    bubble_text_setup();
+    setup_tween();
+    setup_camera_shaker();
+    setup_bubble_text();
     setup_trail2d();
     setup_particle2d();
-    updater_init();
+    setup_updater();
 }
 
 game_app_state_t game_app_state;

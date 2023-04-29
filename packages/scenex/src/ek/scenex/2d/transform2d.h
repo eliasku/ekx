@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 // 32 bytes
-typedef struct {
+typedef struct world_transform2d_ {
     mat3x2_t matrix; // 4 * 6 = 24
     color2_t color; // 2 * 4 = 8
 } world_transform2d_t;
@@ -34,12 +34,12 @@ typedef struct {
     vec2_t cached_skew;
 } transform2d_t;
 
-extern ecx_component_type Transform2D;
-void Transform2D_setup(void);
-#define get_transform2d(e) ((transform2d_t*)get_component(&Transform2D, e))
-#define add_transform2d(e) ((transform2d_t*)add_component(&Transform2D, e))
+extern ECX_DEFINE_TYPE(transform2d_t);
+void setup_transform2d(void);
+#define get_transform2d(e) ECX_GET(transform2d_t,e)
+#define add_transform2d(e) ECX_ADD(transform2d_t,e)
 
-#define get_world_transform2d(e) ((world_transform2d_t*)get_component_n(&Transform2D, e, 1))
+#define get_world_transform2d(e) ((world_transform2d_t*)get_component_n(&ECX_ID(transform2d_t), e, 1))
 
 void transform2d_set_matrix(transform2d_t* t, mat3x2_t m);
 void transform2d_set_position_with_pivot(transform2d_t* t, vec2_t position, vec2_t pivot);

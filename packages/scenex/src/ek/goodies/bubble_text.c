@@ -12,18 +12,19 @@
 #include <ekx/app/time_layers.h>
 #include <ek/math.h>
 
-ecx_component_type BubbleText;
-void bubble_text_setup(void) {
-    init_component_type(&BubbleText, (ecx_component_type_decl) {
-            "BubbleText", 8, 1, {sizeof(bubble_text_t)}
-    });
+ECX_DEFINE_TYPE(bubble_text_t);
+
+#define BubbleText ECX_ID(bubble_text_t)
+
+void setup_bubble_text(void) {
+    ECX_TYPE(bubble_text_t, 8);
 }
 
 inline static float ease_back5(float t) {
     return ease_back(t, 5);
 }
 
-void bubble_text_update(void) {
+void update_bubble_texts(void) {
     float dt = g_time_layers[TIME_LAYER_HUD].dt;
     const float time_max = 2.0f;
     const float delta_y = -100.0f;

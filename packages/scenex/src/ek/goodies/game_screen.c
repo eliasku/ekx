@@ -181,7 +181,7 @@ void game_screen_change(string_hash_t name) {
     //analytics::screen(name.c_str());
 }
 
-void game_screen_update(void) {
+void update_game_screens(void) {
     if (!game_screen_manager.transition.active) {
         return;
     }

@@ -58,7 +58,7 @@ inline void guiComponentPanel(const char* name, C* data, Func fn) {
 
 template<typename C, typename Func>
 inline void guiComponentPanel(entity_t entity, const char* name, Func fn) {
-    C* data = ecs::try_get<C>(entity);
+    C* data = ecs::get<C>(entity);
     if (data) {
         guiComponentPanel(name, data, fn);
     }

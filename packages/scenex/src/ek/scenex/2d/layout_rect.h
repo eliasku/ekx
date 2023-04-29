@@ -39,11 +39,11 @@ void LayoutRect_hard_x(entity_t e, float x);
 void LayoutRect_hard_y(entity_t e, float y);
 
 extern rect_t LayoutRect_design_canvas_rect;
-extern ecx_component_type LayoutRect;
-void LayoutRect_setup(void);
-void LayoutRect_update(void);
-#define get_layout_rect(e) ((layout_rect_t*)get_component(&LayoutRect, e))
-#define add_layout_rect(e) ((layout_rect_t*)add_component(&LayoutRect, e))
+extern ECX_DEFINE_TYPE(layout_rect_t);
+void setup_layout_rect(void);
+void update_layout_rect(void);
+#define get_layout_rect(e) ECX_GET(layout_rect_t,e)
+#define add_layout_rect(e) ECX_ADD(layout_rect_t,e)
 
 #ifdef __cplusplus
 }
