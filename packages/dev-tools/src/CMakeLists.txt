@@ -5,8 +5,8 @@ add_library(${PROJECT_NAME} STATIC
         ek/editor/gui/EditorGUI.cpp
         ek/editor/gui/Widgets_impl.hpp
 
-        ek/editor/imgui/ImGuiIntegration.hpp
-        ek/editor/imgui/ImGuiIntegration.cpp
+        ek/editor/imgui/ekimgui.h
+        ek/editor/imgui/ekimgui.cpp
         ek/editor/imgui/imgui.hpp
 
         ek/editor/Editor.cpp
@@ -23,6 +23,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_include_directories(${PROJECT_NAME} PUBLIC .)
 target_compile_definitions(${PROJECT_NAME} PUBLIC
         EK_DEV_TOOLS
+        EK_DEV_TOOLS_DEBUG
         )
 
 if(NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC"))

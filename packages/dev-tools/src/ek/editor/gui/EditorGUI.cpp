@@ -3,7 +3,6 @@
 #include <ek/scenex/app/base_game.h>
 #include <ek/editor/imgui/imgui.hpp>
 #include <ekx/app/input_state.h>
-#include "FontIconsPreview.hpp"
 
 // private impls:
 #include "StatsWindow_impl.hpp"
@@ -15,18 +14,29 @@
 #include "ConsoleWindow_impl.hpp"
 #include "ResourcesWindow_impl.hpp"
 #include "Widgets_impl.hpp"
-#include "test_window.hpp"
 
-namespace ek {
+#ifdef EK_DEV_TOOLS_DEBUG
 
-void Editor::drawGUI() {
+#include "../helpers/test_window.hpp"
+#include "../helpers/font_icons_preview.hpp"
+
+#endif
+
+#ifdef EK_DEV_TOOLS_DEBUG
+bool plot_demo_f;
+bool gui_demo_f;
+bool gui_metrics_f;
+bool gui_debug_log_f;
+bool gui_stack_tool_f;
+bool gui_about_f;
+bool font_icons_preview_f;
+bool test_window_f;
+#endif
+
+void editor_draw_gui(void) {
     // TODO: 2d/3d root
-    hierarchy.root = game_app_state.root;
+    g_editor.hierarchy.root = game_app_state.root;
 
-    static bool fontIconsWindow = false;
-    static bool imGuiDemoWindow = false;
-    static bool testWindow = false;
-    auto& settings = *g_editor_config;
     bool resetLayout = false;
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
@@ -34,10 +44,6 @@ void Editor::drawGUI() {
         }
 
         if (ImGui::BeginMenu("Debug")) {
-            settings.dirty |= ImGui::MenuItem("Reload Assets on Scale", nullptr,
-                                              &settings.notifyAssetsOnScaleFactorChanged);
-            ///
-            ImGui::Separator();
             ImGui::MenuItem("Emulate Touch Input", nullptr, &g_input_state.emulate_touch);
             ///
             ImGui::Separator();
@@ -46,34 +52,40 @@ void Editor::drawGUI() {
                               game_app_state.display.info.userInsetsAbsolute.data);
             ImGui::Text("User Insets Relative");
             ImGui::SliderFloat4("##userInsetsRelative",
-                                game_app_state.display.info.userInsetsRelative.data, 0.0f,1.0f);
+                                game_app_state.display.info.userInsetsRelative.data, 0.0f, 1.0f);
 
             ImGui::Separator();
 
             if (ImGui::BeginMenu(ICON_FA_FEATHER_ALT " Sokol")) {
-                auto& sokol_gfx_gui_state = gui_.sokol_gfx_gui_state;
-                ImGui::MenuItem("Capabilities", 0, &sokol_gfx_gui_state.caps.open);
-                ImGui::MenuItem("Buffers", 0, &sokol_gfx_gui_state.buffers.open);
-                ImGui::MenuItem("Images", 0, &sokol_gfx_gui_state.images.open);
-                ImGui::MenuItem("Shaders", 0, &sokol_gfx_gui_state.shaders.open);
-                ImGui::MenuItem("Pipelines", 0, &sokol_gfx_gui_state.pipelines.open);
-                ImGui::MenuItem("Passes", 0, &sokol_gfx_gui_state.passes.open);
-                ImGui::MenuItem("Calls", 0, &sokol_gfx_gui_state.capture.open);
+                ImGui::MenuItem("Capabilities", NULL, &sokol_gfx_gui_state.caps.open);
+                ImGui::MenuItem("Buffers", NULL, &sokol_gfx_gui_state.buffers.open);
+                ImGui::MenuItem("Images", NULL, &sokol_gfx_gui_state.images.open);
+                ImGui::MenuItem("Shaders", NULL, &sokol_gfx_gui_state.shaders.open);
+                ImGui::MenuItem("Pipelines", NULL, &sokol_gfx_gui_state.pipelines.open);
+                ImGui::MenuItem("Passes", NULL, &sokol_gfx_gui_state.passes.open);
+                ImGui::MenuItem("Calls", NULL, &sokol_gfx_gui_state.capture.open);
                 ImGui::EndMenu();
             }
 
-            if (ImGui::BeginMenu("ImGui")) {
-                ImGui::MenuItem("Demo", nullptr, &imGuiDemoWindow);
-                ImGui::MenuItem("Editor Font Icons", nullptr, &fontIconsWindow);
+#ifdef EK_DEV_TOOLS_DEBUG
+            if (ImGui::BeginMenu(ICON_FA_ICE_CREAM " Dear ImGui")) {
+                ImGui::MenuItem("Gui Demo", NULL, &gui_demo_f);
+                ImGui::MenuItem("Plot Demo", NULL, &plot_demo_f);
+                ImGui::MenuItem("Metrics", NULL, &gui_metrics_f);
+                ImGui::MenuItem("Debug Log", NULL, &gui_debug_log_f);
+                ImGui::MenuItem("Stack Tool", NULL, &gui_stack_tool_f);
+                ImGui::MenuItem("About", NULL, &gui_about_f);
                 ImGui::EndMenu();
             }
-            ImGui::MenuItem("Functions", nullptr, &testWindow);
+            ImGui::MenuItem("Font Icons", NULL, &font_icons_preview_f);
+            ImGui::MenuItem("Test", NULL, &test_window_f);
+#endif
 
             ImGui::EndMenu();
         }
 
         if (ImGui::BeginMenu("Window")) {
-            for (auto* wnd : windows) {
+            for (auto* wnd: g_editor.windows) {
                 wnd->mainMenu();
             }
             if (ImGui::MenuItem("Reset Layout")) {
@@ -83,28 +95,27 @@ void Editor::drawGUI() {
         }
 
         if (ImGui::BeginMenu("Help")) {
-
             ImGui::EndMenu();
         }
         ImGui::SameLine((ImGui::GetWindowContentRegionMax().x / 2.0f) -
                         (1.5f * (ImGui::GetFontSize() + ImGui::GetStyle().ItemSpacing.x)));
 
-        if (ImGui::Button(game.paused ? ICON_FA_PLAY : ICON_FA_PAUSE)) {
-            game.paused = !game.paused;
-            game.dirty = true;
+        if (ImGui::Button(g_editor.game.paused ? ICON_FA_PLAY : ICON_FA_PAUSE)) {
+            g_editor.game.paused = !g_editor.game.paused;
+            g_editor.game.dirty = true;
         }
         ImGui::SameLine();
         ImGui::SetNextItemWidth(100.0f);
-        game.dirty |= ImGui::SliderFloat(ICON_FA_CLOCK, &game.timeScale, 0.0f, 3.0f, "%.3f", 1.0f);
+        g_editor.game.dirty |= ImGui::SliderFloat(ICON_FA_CLOCK, &g_editor.game.timeScale, 0.0f, 3.0f, "%.3f", 1.0f);
         ImGui::SameLine();
-        game.dirty |= ImGui::Checkbox(ICON_FA_STOPWATCH, &game.profiler);
+        g_editor.game.dirty |= ImGui::Checkbox(ICON_FA_STOPWATCH, &g_editor.game.profiler);
 
-        s_profile_metrics.enabled = game.profiler;
-        g_time_layers[TIME_LAYER_ROOT].scale = game.paused ? 0.0f : game.timeScale;
+        s_profile_metrics.enabled = g_editor.game.profiler;
+        g_time_layers[TIME_LAYER_ROOT].scale = g_editor.game.paused ? 0.0f : g_editor.game.timeScale;
 
         ImGui::EndMainMenuBar();
     }
-    auto dockSpaceId = ImGui::DockSpaceOverViewport();
+    ImGuiID dockSpaceId = ImGui::DockSpaceOverViewport();
     if (resetLayout) {
         ImGui::DockBuilderRemoveNode(dockSpaceId);
         ImGui::DockBuilderAddNode(dockSpaceId);
@@ -139,16 +150,23 @@ void Editor::drawGUI() {
         ImGui::DockBuilderDockWindow("###ConsoleWindow", DockingBottomLeftChild);
     }
 
-    for (auto* wnd : windows) {
+    for (auto* wnd: g_editor.windows) {
         wnd->show();
     }
 
-    hierarchy.validateSelection();
-    inspector.list = hierarchy.selection;
+    g_editor.hierarchy.validateSelection();
+    g_editor.inspector.list = g_editor.hierarchy.selection;
 
-    if (imGuiDemoWindow) ImGui::ShowDemoWindow(&imGuiDemoWindow);
-    if (fontIconsWindow) showFontIconsPreview(&fontIconsWindow);
-    if (testWindow) showTestWindow(&testWindow);
+#ifdef EK_DEV_TOOLS_DEBUG
+    if (gui_demo_f) ImGui::ShowDemoWindow(&gui_demo_f);
+    if (gui_metrics_f) ImGui::ShowMetricsWindow(&gui_metrics_f);
+    if (gui_debug_log_f) ImGui::ShowDebugLogWindow(&gui_debug_log_f);
+    if (gui_stack_tool_f) ImGui::ShowStackToolWindow(&gui_stack_tool_f);
+    if (gui_about_f) ImGui::ShowAboutWindow(&gui_about_f);
+    if (plot_demo_f) ImPlot::ShowDemoWindow(&plot_demo_f);
+
+    if (font_icons_preview_f) font_icons_preview(&font_icons_preview_f);
+    if (test_window_f) test_window(&test_window_f);
+#endif // EK_DEV_TOOLS_SLIM
 }
 
-}

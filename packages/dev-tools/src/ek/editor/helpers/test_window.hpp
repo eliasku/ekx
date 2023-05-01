@@ -1,7 +1,5 @@
 #pragma once
 
-namespace ek {
-
 struct gain_bias_params_t {
     float bias = 0.5f;
     bool gain = true;
@@ -23,7 +21,7 @@ static float graph_back(void* data, int idx) {
     return ease_back(t, params->overshoot);
 }
 
-void plog_linear() {
+void plot_linear() {
     static float x_data[100 + 1];
     static float y_data[100 + 1];
     for (int i = 0; i <= 100; ++i) {
@@ -34,7 +32,8 @@ void plog_linear() {
     }
 }
 
-void drawTestsWindow() {
+static
+void draw_test_window() {
     {
         static gain_bias_params_t gain_bias{};
         ImGui::DragFloat("Bias", &gain_bias.bias, 0.01f, 0.01f, 0.99f);
@@ -46,7 +45,7 @@ void drawTestsWindow() {
         }
         if (ImPlot::BeginPlot("Gain Bias", ImVec2(300, 300))) {
             ImPlot::SetupAxes("x", "f(x)");
-            plog_linear();
+            plot_linear();
             {
                 float x_data[100 + 1];
                 float y_data[100 + 1];
@@ -71,7 +70,6 @@ void drawTestsWindow() {
         }
     }
 
-
 //    if (ImPlot::BeginPlot("Back Overshoot", ImVec2(300, 300))) {
 //        ImPlot::SetupAxes("x", "f(x)");
 ////        plog_linear();
@@ -80,11 +78,10 @@ void drawTestsWindow() {
 //    }
 }
 
-void showTestWindow(bool* opened) {
+void test_window(bool* opened) {
     if (ImGui::Begin("Tests Window###TestWindow", opened)) {
-        drawTestsWindow();
+        draw_test_window();
     }
     ImGui::End();
 }
 
-}

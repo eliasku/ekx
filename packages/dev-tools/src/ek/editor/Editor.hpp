@@ -1,6 +1,6 @@
 #pragma once
 
-#include "imgui/ImGuiIntegration.hpp"
+#include "imgui/ekimgui.h"
 #include "gui/HierarchyWindow.hpp"
 #include "gui/InspectorWindow.hpp"
 #include "gui/StatsWindow.hpp"
@@ -10,48 +10,26 @@
 #include "gui/ConsoleWindow.hpp"
 #include "gui/ResourcesWindow.hpp"
 
-namespace ek {
-
-struct EditorSettings {
-    int auto_save_counter = 0;
-
-    bool notifyAssetsOnScaleFactorChanged = true;
-    bool showEditor = true;
-    int width = 0;
-    int height = 0;
-    bool dirty = false;
-
-    void save() const;
-
-    void load();
+struct EditorConfig {
+    int dirty;
+    int width;
+    int height;
+    bool hidden;
 };
 
 struct Editor {
-    Editor();
-
-    ~Editor();
-
-    void drawGUI();
-
-    HierarchyWindow hierarchy{};
-    InspectorWindow inspector{};
-    GameWindow game{};
-    StatsWindow stats{};
-    MemoryProfiler memory{};
-    SceneWindow scene{};
-    ConsoleWindow console{};
-    ResourcesWindow resources{};
-    PodArray<EditorWindow*> windows{};
-
-    ImGuiIntegration gui_;
-
-    void load();
-    void save();
-
-    static void invalidateSettings();
+    ek::HierarchyWindow hierarchy{};
+    ek::InspectorWindow inspector{};
+    ek::GameWindow game{};
+    ek::StatsWindow stats{};
+    ek::MemoryProfiler memory{};
+    ek::SceneWindow scene{};
+    ek::ConsoleWindow console{};
+    ek::ResourcesWindow resources{};
+    ek::PodArray<ek::EditorWindow*> windows{};
+    EditorConfig config{};
 };
 
-}
+void editor_draw_gui(void);
 
-extern ek::EditorSettings* g_editor_config;
-extern ek::Editor* g_editor;
+extern Editor g_editor;

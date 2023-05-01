@@ -171,8 +171,8 @@ void SceneWindow::onDraw() {
         entity_t target = hitTest(root, wp);
         hoverTarget = target;
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            g_editor->hierarchy.select(target);
-            g_editor->hierarchy.focus(target);
+            g_editor.hierarchy.select(target);
+            g_editor.hierarchy.focus(target);
         }
     }
 }
@@ -256,7 +256,7 @@ void SceneWindow::drawSceneNodeBounds(entity_t e) {
             m = mat3x2_mul(view.view2.matrix, transform->matrix);
         }
         rect_t b = disp->get_bounds ? disp->get_bounds(e) : rect_wh(0,0);
-        if (g_editor->hierarchy.isSelectedInHierarchy(e)) {
+        if (g_editor.hierarchy.isSelectedInHierarchy(e)) {
             drawBox2(b, m, COLOR_WHITE, COLOR_BLACK, true, ARGB(0x77FFFFFF));
         }
         if (hoverTarget.id == e.id) {
@@ -388,7 +388,7 @@ void SceneWindow::drawToolbar() {
 }
 
 void SceneWindow::manipulateObject2D() {
-    auto& selection = g_editor->hierarchy.selection;
+    auto& selection = g_editor.hierarchy.selection;
     if (selection.size() > 0 && is_entity(entity_id(selection[0]))) {
         entity_t sel = entity_id(selection[0]);
         auto worldMatrix2D = get_world_transform2d(sel)->matrix;
@@ -423,7 +423,7 @@ void SceneWindow::manipulateObject2D() {
 }
 
 void SceneWindow::manipulateObject3D() {
-    auto& selection = g_editor->hierarchy.selection;
+    auto& selection = g_editor.hierarchy.selection;
     if (selection.size() > 0 && is_entity(entity_id(selection[0]))) {
         entity_t sel = entity_id(selection[0]);
         auto worldMatrix2D = get_world_transform2d(sel)->matrix;

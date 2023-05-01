@@ -3,34 +3,32 @@
 #include <fonts/IconsMaterialDesign.h>
 #include <fonts/IconsFontAwesome5.h>
 
-namespace ek {
+ImGuiTextFilter font_icons_preview_filter;
 
-static ImGuiTextFilter PreviewFontIconsFilter{};
+void show_icons_md(void);
 
-void showIconsMD();
+void show_icons_fa(void);
 
-void showIconsFA();
-
-void showFontIconsPreview(bool* opened) {
+void font_icons_preview(bool* opened) {
     if (ImGui::Begin("Preview Font Icons###FontIconsPreview", opened)) {
-        PreviewFontIconsFilter.Draw();
-        showIconsFA();
+        font_icons_preview_filter.Draw();
+        show_icons_fa();
     }
     ImGui::End();
 }
 
-void drawPreviewIconButton(const char* title) {
-    if(PreviewFontIconsFilter.IsActive()) {
-        if(!PreviewFontIconsFilter.PassFilter(title)) {
+void button_preview_icon(const char* title) {
+    if(font_icons_preview_filter.IsActive()) {
+        if(!font_icons_preview_filter.PassFilter(title)) {
             return;
         }
     }
     ImGui::Button(title);
 }
 
-#define ICONS_PREVIEW_ICON_BUTTON(s) drawPreviewIconButton(s " " #s)
+#define ICONS_PREVIEW_ICON_BUTTON(s) button_preview_icon(s " " #s)
 
-void showIconsFA() {
+void show_icons_fa(void) {
     ICONS_PREVIEW_ICON_BUTTON(ICON_FA_AD);
     ICONS_PREVIEW_ICON_BUTTON(ICON_FA_ADDRESS_BOOK);
     ICONS_PREVIEW_ICON_BUTTON(ICON_FA_ADDRESS_CARD);
@@ -1035,7 +1033,7 @@ void showIconsFA() {
     ICONS_PREVIEW_ICON_BUTTON(ICON_FA_YIN_YANG);
 }
 
-void showIconsMD() {
+void show_icons_md(void) {
     ICONS_PREVIEW_ICON_BUTTON(ICON_MD_3D_ROTATION);
     ICONS_PREVIEW_ICON_BUTTON(ICON_MD_AC_UNIT);
     ICONS_PREVIEW_ICON_BUTTON(ICON_MD_ACCESS_ALARM);
@@ -1968,4 +1966,4 @@ void showIconsMD() {
     ICONS_PREVIEW_ICON_BUTTON(ICON_MD_ZOOM_OUT);
     ICONS_PREVIEW_ICON_BUTTON(ICON_MD_ZOOM_OUT_MAP);
 }
-}
+
