@@ -3,12 +3,12 @@
 //#define STB_IMAGE_WRITE_IMPLEMENTATION
 //#endif
 
-#include <stb/stb_image_write.h>
 #include <ek/buf.h>
+#include <ek/hash.h>
 #include <ek/log.h>
 #include <ek/print.h>
-#include <ek/hash.h>
 #include <gen_sg.h>
+#include <stb/stb_image_write.h>
 
 #include "bmfont_export.h"
 #include "bmfont_export/build_bitmap_font.c.h"
@@ -87,7 +87,7 @@ rect_t combine_bounds(const rect_t a, const rect_t b) {
 }
 
 bitmap_filter_t bitmap_filter(void) {
-    bitmap_filter_t filter = (bitmap_filter_t) {
+    bitmap_filter_t filter = (bitmap_filter_t){
             .type = BITMAP_FILTER_NONE,
             .blurX = 0.0f,
             .blurY = 0.0f,
@@ -114,10 +114,10 @@ bitmap_filter_t bitmap_filter(void) {
 
 void parse_bitmap_filter(FILE* f, bitmap_filter_t* filter) {
     fscanf(f, "%u\n", &filter->type);
-    fscanf(f, "%f\n", &filter->top); // 0
+    fscanf(f, "%f\n", &filter->top);    // 0
     fscanf(f, "%f\n", &filter->bottom); // 100
     fscanf(f, "%f\n", &filter->distance);
-    fscanf(f, "%u\n", &filter->quality); // 1
+    fscanf(f, "%u\n", &filter->quality);  // 1
     fscanf(f, "%f\n", &filter->strength); // 1
     fscanf(f, "%f\n", &filter->angle);
     fscanf(f, "%f\n", &filter->blurX);
@@ -155,7 +155,7 @@ void parse_bitmap_font_build_options(FILE* f, bitmap_font_build_options_t* optio
         uint32_t from;
         uint32_t to;
         fscanf(f, "%u %u\n", &from, &to);
-        options->ranges[options->ranges_num++] = (codepoint_pair_t) {from, to};
+        options->ranges[options->ranges_num++] = (codepoint_pair_t){from, to};
     }
 
     for (uint32_t i = 0; i < filters_num; ++i) {
@@ -181,14 +181,13 @@ bitmap_filter_t bitmap_filter_scale(const bitmap_filter_t filter, float scale) {
 
 ivec2_t round_blur_radius(float rx, float ry) {
     return ivec2(
-            MAX(0, MIN(256, (int) rx - 1)),
-            MAX(0, MIN(256, (int) ry - 1))
-    );
+            MAX(0, MIN(256, (int)rx - 1)),
+            MAX(0, MIN(256, (int)ry - 1)));
 }
 
 void extend_blur_rect(rect_t* rect, const float blurX, const float blurY, int pass) {
     ivec2_t radius = round_blur_radius(blurX, blurY);
-// Distination pixels can "move" more left, as these left pixels can take extra from the right
+    // Distination pixels can "move" more left, as these left pixels can take extra from the right
     int extra_x1 = radius.x / 2;
     int extra_x0 = radius.x - extra_x1;
     int extra_y1 = radius.y / 2;
@@ -204,10 +203,10 @@ void extend_blur_rect(rect_t* rect, const float blurX, const float blurY, int pa
         extra_y1 = tmp;
     }
 
-    rect->x -= (float) extra_x0;
-    rect->y -= (float) extra_y0;
-    rect->w += (float) radius.x;
-    rect->h += (float) radius.y;
+    rect->x -= (float)extra_x0;
+    rect->y -= (float)extra_y0;
+    rect->w += (float)radius.x;
+    rect->h += (float)radius.y;
 }
 
 rect_t extend_blur_rect_filter(const rect_t rect, const bitmap_filter_t* filter) {
@@ -228,8 +227,7 @@ rect_t extend_filter_rect(const rect_t rect, const bitmap_filter_t* filter) {
             r2.x += offset.x;
             r2.y += offset.y;
             res = combine_bounds(res, r2);
-        }
-            break;
+        } break;
         default:
             break;
     }
@@ -241,7 +239,7 @@ rect_t extend_filter_rect(const rect_t rect, const bitmap_filter_t* filter) {
 
 uint32_t convert_strength(float value) {
     const float m = value * 256.0f;
-    const uint32_t strength = (uint32_t) MAX(m, 0);
+    const uint32_t strength = (uint32_t)MAX(m, 0);
     return MIN(strength, 0x10000u);
 }
 
@@ -253,12 +251,12 @@ void apply_color(bitmap_t surf, vec4_t color) {
     for (int y = 0u; y < surf.h; ++y) {
         color_t* r = bitmap_row(surf, y);
         for (int x = 0u; x < surf.w; ++x) {
-            const uint32_t a = ((uint32_t) r->a) * 258u;
+            const uint32_t a = ((uint32_t)r->a) * 258u;
             if (a != 0u) {
-                r->r = (uint8_t) ((a * pma_rgba.r) >> 16u);
-                r->g = (uint8_t) ((a * pma_rgba.g) >> 16u);
-                r->b = (uint8_t) ((a * pma_rgba.b) >> 16u);
-                r->a = (uint8_t) ((a * pma_rgba.a) >> 16u);
+                r->r = (uint8_t)((a * pma_rgba.r) >> 16u);
+                r->g = (uint8_t)((a * pma_rgba.g) >> 16u);
+                r->b = (uint8_t)((a * pma_rgba.b) >> 16u);
+                r->a = (uint8_t)((a * pma_rgba.a) >> 16u);
             }
             ++r;
         }
@@ -282,11 +280,11 @@ void apply_strength(bitmap_t surf, uint32_t strength) {
             const uint8_t a0 = r[x].a;
             if (a0 != 0) {
                 const uint8_t a1 = lut[a0];
-                const float k = (float) (a1) / (float) (a0);
+                const float k = (float)(a1) / (float)(a0);
                 r[x].a = a1;
-                r[x].r = (uint8_t) ((float) r[x].r * k);
-                r[x].g = (uint8_t) ((float) r[x].g * k);
-                r[x].b = (uint8_t) ((float) r[x].b * k);
+                r[x].r = (uint8_t)((float)r[x].r * k);
+                r[x].g = (uint8_t)((float)r[x].g * k);
+                r[x].b = (uint8_t)((float)r[x].b * k);
             }
         }
     }
@@ -331,14 +329,14 @@ void BlurRow(const color_t* inSrc, int inDS, int inSrcW, int inbitmap_filter_tLe
     for (int x = 0; x < inDestW; x++) {
         if (prev >= src_end) {
             for (; x < inDestW; x++) {
-                *(uint32_t*) dest = 0;
+                *(uint32_t*)dest = 0;
                 dest += inDD;
             }
             return;
         }
 
         if (sa == 0) {
-            *(uint32_t*) dest = 0;
+            *(uint32_t*)dest = 0;
         } else {
             dest->r = sr / inbitmap_filter_tSize;
             dest->g = sg / inbitmap_filter_tSize;
@@ -438,7 +436,7 @@ void blur(bitmap_t src, const bitmap_filter_t* filter) {
     bitmap_t chainSrc = src;
     bitmap_t chainDst = tmp;
     for (int q = 0; q < filter->quality; ++q) {
-        DoApply(chainSrc, chainDst, (ivec2_t) {0}, (ivec2_t) {0}, q, radius);
+        DoApply(chainSrc, chainDst, (ivec2_t){0}, (ivec2_t){0}, q, radius);
         // std::swap(chainDst, chainSrc);
         bitmap_t tmp2 = chainDst;
         chainDst = chainSrc;
@@ -453,7 +451,7 @@ void blur(bitmap_t src, const bitmap_filter_t* filter) {
 void gradient(bitmap_t src, const bitmap_filter_t* filter, const irect_t bounds) {
     for (int y = 0; y < src.h; ++y) {
         const float distance = filter->bottom - filter->top;
-        const float coord = (float) y + (float) bounds.y;
+        const float coord = (float)y + (float)bounds.y;
         const float t = (coord - filter->top) / distance;
         const color_t m = color_vec4(lerp_vec4(filter->color0, filter->color1, saturate(t)));
         color_t* r = bitmap_row(src, y);
@@ -476,8 +474,7 @@ void apply_bitmap_filter(bitmap_t bitmap, const bitmap_filter_t* filter, const i
             apply_color(bitmap, filter->color0);
             bitmap_blit(bitmap, tmp);
             bitmap_free(&tmp);
-        }
-            break;
+        } break;
         case BITMAP_FILTER_SHADOW: {
             bitmap_t tmp = {0};
             bitmap_alloc(&tmp, bitmap.w, bitmap.h);
@@ -485,7 +482,7 @@ void apply_bitmap_filter(bitmap_t bitmap, const bitmap_filter_t* filter, const i
             vec2_t offset = vec2_cs(to_radians(filter->angle));
             offset = scale_vec2(offset, filter->distance);
 
-            ivec2_t ioffset = (ivec2_t) {.x =(int) offset.x, .y= (int) offset.y};
+            ivec2_t ioffset = (ivec2_t){.x = (int)offset.x, .y = (int)offset.y};
             scroll(bitmap, tmp, ioffset);
             blur(tmp, filter);
             apply_strength(tmp, convert_strength(filter->strength));
@@ -493,8 +490,7 @@ void apply_bitmap_filter(bitmap_t bitmap, const bitmap_filter_t* filter, const i
             bitmap_blit(tmp, bitmap);
             bitmap_copy(bitmap, tmp);
             bitmap_free(&tmp);
-        }
-            break;
+        } break;
         default:
             break;
     }
@@ -512,11 +508,11 @@ irect_t get_filtered_rect(const irect_t rc, const bitmap_filter_t* filters, uint
     for (uint32_t i = 0; i < n; ++i) {
         res = extend_filter_rect(res, filters + i);
     }
-    const int l = (int) (floorf(res.x));
-    const int t = (int) (floorf(res.y));
-    const int r = (int) (ceilf(res.x + res.w));
-    const int b = (int) (ceilf(res.y + res.h));
-    return (irect_t) {.x = l, .y = t, .w = r - l, .h = b - t};
+    const int l = (int)(floorf(res.x));
+    const int t = (int)(floorf(res.y));
+    const int r = (int)(ceilf(res.x + res.w));
+    const int b = (int)(ceilf(res.y + res.h));
+    return (irect_t){.x = l, .y = t, .w = r - l, .h = b - t};
 }
 
 
@@ -527,8 +523,7 @@ void apply_bitmap_filters(const bitmap_filter_t* filters, uint32_t n, float scal
     bitmap_alloc(&dest, bounds.w, bounds.h);
     const ivec2_t dest_pos = ivec2(
             source->x - bounds.x,
-            source->y - bounds.y
-    );
+            source->y - bounds.y);
     bitmap_t idata = *bitmap;
     bitmap_blit_copy(&dest, dest_pos.x, dest_pos.y, &idata, 0, 0, idata.w, idata.h);
 
@@ -607,9 +602,9 @@ int export_bitmap_font(const char* config_path) {
     image_set_t images = {0};
     images.resolutions_num = options.resolutions_num;
     for (uint32_t i = 0; i < options.resolutions_num; ++i) {
-        images.resolutions[i] = (resolution_t) {
-                .index = i, .scale = options.resolutions[i]
-        };
+        images.resolutions[i] = (resolution_t){
+                .index = i,
+                .scale = options.resolutions[i]};
     }
     fclose(f);
 
@@ -622,19 +617,18 @@ int export_bitmap_font(const char* config_path) {
 
     log_info("Export Bitmap Font binary: %s", output_font);
 
-    // calculate codepoint map size
-    uint32_t dict_size = 0;
-    uint32_t glyphs_num = arr_size(fontData.glyphs);
-    for (uint32_t i = 0; i < glyphs_num; ++i) {
-        dict_size += arr_size(fontData.glyphs[i].codepoints);
-    }
+    // calculate codepoint map size before?
+    // uint32_t dict_size = 0;
+    // uint32_t glyphs_num = arr_size(fontData.glyphs);
+    // for (uint32_t i = 0; i < glyphs_num; ++i) {
+    //     dict_size += arr_size(fontData.glyphs[i].codepoints);
+    // }
 
     bmfont_t font = {0};
     font.header.base_font_size = fontData.fontSize;
     font.header.line_height_multiplier = fontData.lineHeight;
     font.header.ascender = fontData.ascender;
     font.header.descender = fontData.descender;
-
 
     // codepoints map
     uint32_t glyph_i = 0;
