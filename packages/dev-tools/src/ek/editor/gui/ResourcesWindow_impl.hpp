@@ -10,8 +10,6 @@
 #include <ek/scenex/2d/dynamic_atlas.h>
 #include <ek/scenex/scene_factory.h>
 
-namespace ek {
-
 /// assets
 
 void draw_sprite_info(void* asset) {
@@ -170,6 +168,4 @@ void ResourcesWindow::onDraw() {
 
         ImGui::EndTabBar();
     }
-}
-
 }

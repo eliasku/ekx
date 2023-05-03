@@ -10,8 +10,6 @@
 #include <ek/editor/imgui/imgui.hpp>
 #include <ekx/app/profiler.h>
 
-namespace ek {
-
 static float getterProfilerTrackValue(void* data, int idx) {
     struct profiler_track* track = (struct profiler_track*) data;
     return track->hist[(track->hist_i + idx) % PROFILE_TRACK_CAPACITY];
@@ -45,6 +43,4 @@ void StatsWindow::onDraw() {
         ImGui::Text(track->titleFormat, track->name, (int) track->value);
         ImGui::PopID();
     }
-}
-
 }

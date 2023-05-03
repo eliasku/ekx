@@ -3,8 +3,6 @@
 #include "SceneWindow.hpp"
 #include <ImGuizmo/ImGuizmo.h>
 
-namespace ek {
-
 // matrix 2d utility
 mat3x2_t matrix3Dto2D(const mat4_t m) {
     mat3x2_t result;
@@ -180,7 +178,7 @@ void SceneWindow::onDraw() {
 SceneWindow::SceneWindow() {
     name = "SceneWindow";
     title = ICON_FA_GLOBE " Scene###SceneWindow";
-    fullFrame = true;
+    full_frame = true;
     display.simulated = true;
     display.info.size = {120, 120};
     display.info.window = {120, 120};
@@ -455,6 +453,4 @@ void SceneWindow::manipulateObject3D() {
 //        const auto newLocalMatrix3D = inverseParentWorldMatrix3D * worldMatrix3D;
 //        localTransform.setMatrix(matrix3Dto2D(newLocalMatrix3D));
     }
-}
-
 }

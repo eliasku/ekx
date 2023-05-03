@@ -1,33 +1,30 @@
 #pragma once
 
 #include "EditorWindow.hpp"
-#include <ek/ds/PodArray.hpp>
 #include <ek/ds/Array.hpp>
+#include <ek/ds/PodArray.hpp>
 #include <ek/log.h>
-
-namespace ek {
 
 struct ConsoleMsg {
     char text[1024];
-    log_level_t verbosity;
+    const char* icon;
     const char* file;
     int line;
+    ImU32 color;
+    log_level_t verbosity;
     uint8_t tick;
-    const char* icon;
-    ImU32 iconColor;
 };
 
 struct VerbosityFilterInfo {
-    log_level_t verbosity = LOG_LEVEL_DEBUG;
-    const char* name = "";
-    ImU32 iconColor = 0xFFFFFFFF;
-    unsigned count = 0;
-    bool show = true;
-    const char* icon = "!";
+    const char* name;
+    const char* icon;
+    ImU32 color;
+    log_level_t verbosity;
+    unsigned count;
+    bool show;
 };
 
-class ConsoleWindow : public EditorWindow {
-public:
+struct ConsoleWindow : public EditorWindow {
 
     ConsoleWindow();
 
@@ -35,28 +32,20 @@ public:
 
     void onDraw() override;
 
-    void onMessageWrite(log_msg_t msg);
-
-    void execute(const char* cmd);
-
-    void clear();
-
     ConsoleMsg messages[1024];
     uint32_t messages_num = 0;
     uint32_t messages_cur = 0;
-    PodArray<const char*> commands;
-    PodArray<const char*> candidates;
-    PodArray<char*> history;
+    ek::PodArray<const char*> commands;
+    ek::PodArray<const char*> candidates;
+    ek::PodArray<char*> history;
+    ImGuiTextFilter text_filter{};
+    VerbosityFilterInfo infos[6]{};
+
+    char input[1024]{0};
+
     // -1: new line, 0..History.Size-1 browsing history
     int history_pos = 0;
 
-    ImGuiTextFilter text_filter{};
-    bool autoScroll = true;
-    bool scrollDownRequired = false;
-
-    VerbosityFilterInfo infos[5]{};
-
-    char input[1024]{0};
+    bool auto_scroll = true;
+    bool scroll_down_required = false;
 };
-
-}

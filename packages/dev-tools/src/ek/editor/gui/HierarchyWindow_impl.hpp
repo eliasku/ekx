@@ -14,8 +14,6 @@
 #include <ek/scenex/2d/camera2d.h>
 #include <ek/scenex/3d/scene3d.h>
 
-namespace ek {
-
 entity_t HierarchyWindow::getSiblingNext(entity_t e) {
     const auto* node = get_node(e);
     return node ? node->sibling_next : NULL_ENTITY;
@@ -293,6 +291,4 @@ void HierarchyWindow::focus(entity_t e) {
 
         scrollToList.set(e.id, e);
     }
-}
-
 }

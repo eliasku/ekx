@@ -2,10 +2,8 @@
 
 #include "EditorWindow.hpp"
 
-namespace ek {
+struct MemoryProfiler : public EditorWindow {
 
-class MemoryProfiler : public EditorWindow {
-public:
     MemoryProfiler() {
         name = "MemoryProfiler";
         title = ICON_FA_MEMORY " Memory###MemoryProfiler";
@@ -15,5 +13,3 @@ public:
 
     void onDraw() override;
 };
-
-}

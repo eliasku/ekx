@@ -1,15 +1,14 @@
 #include "Editor.hpp"
 #include "editor_api.h"
 
+#include <ek/log.h>
 #include <ek/scenex/app/base_game.h>
 #include <pugixml.hpp>
-#include <ek/log.h>
 
 #define EDITOR_CONFIG_PATH "editor_config.xml"
 #define EDITOR_LAYOUT_PATH "editor_layout.xml"
 
-static
-void editor_load_layout(void) {
+static void editor_load_layout(void) {
     log_debug("load editor layout state");
     pugi::xml_document doc{};
     if (!doc.load_file(EDITOR_LAYOUT_PATH)) {
@@ -21,8 +20,7 @@ void editor_load_layout(void) {
     }
 }
 
-static
-void editor_save_layout(void) {
+static void editor_save_layout(void) {
     pugi::xml_document xml;
     auto node = xml.append_child("EditorLayoutState");
     for (auto* wnd: g_editor.windows) {
@@ -31,8 +29,7 @@ void editor_save_layout(void) {
     xml.save_file(EDITOR_LAYOUT_PATH);
 }
 
-static
-void editor_save_config(void) {
+static void editor_save_config(void) {
     pugi::xml_document xml;
 
     pugi::xml_node node = xml.append_child("editor");
@@ -44,8 +41,7 @@ void editor_save_config(void) {
     }
 }
 
-static
-void editor_load_config(void) {
+static void editor_load_config(void) {
     log_debug("loading editor settings");
     pugi::xml_document doc{};
     if (!doc.load_file(EDITOR_CONFIG_PATH)) {
@@ -58,8 +54,7 @@ void editor_load_config(void) {
     g_editor.config.height = node.attribute("height").as_int((int) ek_app.config.height);
 }
 
-static
-void invalidate_config(void) {
+static void invalidate_config(void) {
     if (g_editor.config.dirty) {
         ++g_editor.config.dirty;
         if (g_editor.config.dirty > 20) {
@@ -73,7 +68,7 @@ void editor_render_overlay(void) {
     ekimgui_end_frame();
 
     bool dirty = false;
-    for (ek::EditorWindow* wnd: g_editor.windows) {
+    for (EditorWindow* wnd: g_editor.windows) {
         dirty |= wnd->dirty;
     }
     if (dirty) {
@@ -125,8 +120,7 @@ void editor_event(ek_app_event event) {
                 g_editor.config.height = height;
                 g_editor.config.dirty |= 1;
             }
-        }
-            break;
+        } break;
         default:
             break;
     }

@@ -2,10 +2,7 @@
 
 #include "EditorWindow.hpp"
 
-namespace ek {
-
-class GameWindow : public EditorWindow {
-public:
+struct GameWindow : public EditorWindow {
 
     bool paused = false;
     float timeScale = 1.0f;
@@ -14,7 +11,7 @@ public:
     GameWindow() {
         name = "GameWindow";
         title = ICON_FA_GAMEPAD " Game###GameWindow";
-        fullFrame = true;
+        full_frame = true;
     }
 
     ~GameWindow() override = default;
@@ -23,5 +20,3 @@ public:
     void onLoad(const pugi::xml_node& xml) override;
     void onSave(pugi::xml_node& xml) override;
 };
-
-}

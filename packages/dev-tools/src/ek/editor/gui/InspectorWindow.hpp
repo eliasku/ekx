@@ -2,11 +2,8 @@
 
 #include "EditorWindow.hpp"
 
-namespace ek {
-
-class InspectorWindow : public EditorWindow {
-public:
-    PodArray<entity_id_t> list{};
+struct InspectorWindow : public EditorWindow {
+    ek::PodArray<entity_id_t> list{};
 
     InspectorWindow() {
         name = "InspectorWindow";
@@ -19,5 +16,3 @@ public:
 
     void onDraw() override;
 };
-
-}

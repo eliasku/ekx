@@ -2,10 +2,7 @@
 
 #include "EditorWindow.hpp"
 
-namespace ek {
-
-class ResourcesWindow : public EditorWindow {
-public:
+struct ResourcesWindow : public EditorWindow {
 
     ResourcesWindow() {
         name = "ResourcesWindow";
@@ -16,5 +13,3 @@ public:
 
     void onDraw() override;
 };
-
-}

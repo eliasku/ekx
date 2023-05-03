@@ -108,7 +108,6 @@ void bitmap_decode(bitmap_t* bitmap, const void* data, uint32_t size, bool pma) 
         bitmap->pixels = (color_t*) decoded;
         if (pma) {
             log_debug("decode image: premultiply alpha");
-            EK_PROFILE_SCOPE("pma");
             bitmap_premultiply(bitmap);
         }
     } else {

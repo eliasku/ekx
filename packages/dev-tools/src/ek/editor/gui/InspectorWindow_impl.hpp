@@ -16,8 +16,6 @@
 #include <ek/scenex/2d/camera2d.h>
 #include <ek/scenex/2d/viewport.h>
 
-namespace ek {
-
 inline void select_ref_asset(const char* label, rr_man_t* man, res_id* sid) {
     if (ImGui::BeginCombo(label, hsp_get(man->names[*sid]))) {
         // TODO:
@@ -391,4 +389,3 @@ void InspectorWindow::onDraw() {
     }
 }
 
-}

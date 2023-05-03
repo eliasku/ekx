@@ -2,24 +2,22 @@
 
 #include "../imgui/imgui.hpp"
 #include <pugixml.hpp>
+#include <fonts/IconsFontAwesome5.h>
 
-namespace ek {
-
-class EditorWindow {
-public:
+struct EditorWindow {
     const char* name;
     const char* title;
     bool dirty = false;
     bool opened = true;
-    bool fullFrame = false;
+    bool full_frame = false;
 
     virtual ~EditorWindow() = default;
 
     virtual void onDraw() {}
 
-    virtual void onLoad(const pugi::xml_node& xml) { (void) xml; }
+    virtual void onLoad(const pugi::xml_node& xml) { (void)xml; }
 
-    virtual void onSave(pugi::xml_node& xml) { (void) xml; }
+    virtual void onSave(pugi::xml_node& xml) { (void)xml; }
 
     void load(const pugi::xml_node& xml) {
         if (!name || !*name) return;
@@ -48,7 +46,7 @@ public:
         }
 
         int flags = 0;
-        if (fullFrame) {
+        if (full_frame) {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0.0f, 0.0f});
             flags |= ImGuiWindowFlags_NoBackground;
         }
@@ -61,7 +59,7 @@ public:
         }
         ImGui::End();
 
-        if (fullFrame) {
+        if (full_frame) {
             ImGui::PopStyleVar();
         }
     }
@@ -70,5 +68,3 @@ public:
         dirty |= ImGui::MenuItem(title, nullptr, &opened);
     }
 };
-
-}

@@ -85,15 +85,10 @@ bool ek_gfx_read_pixels(sg_image image, void* pixels) {
         newTextureWithDescriptor:
         textureDescriptor];
         if (temp_texture) {
-            id<MTLCommandBuffer> cmdbuffer = [_sg.mtl.cmd_queue
-            commandBuffer];
-            id<MTLBlitCommandEncoder> blitcmd = [cmdbuffer
-            blitCommandEncoder];
+            id<MTLCommandBuffer> cmdbuffer = [_sg.mtl.cmd_queue commandBuffer];
+            id<MTLBlitCommandEncoder> blitcmd = [cmdbuffer blitCommandEncoder];
 
-            [blitcmd
-            copyFromTexture:
-            tex
-            sourceSlice:
+            [blitcmd copyFromTexture:tex sourceSlice:
             0
             sourceLevel:
             0

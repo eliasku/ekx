@@ -30,7 +30,7 @@ typedef struct log_msg_t {
     uint16_t frame;
 } log_msg_t;
 
-typedef void (* log_callback_t)(log_msg_t msg);
+typedef void (*log_callback_t)(log_msg_t msg);
 
 void log_init(void);
 
@@ -58,27 +58,11 @@ void log_set_levels(uint16_t mask);
 
 #endif
 
-#define log_info(...)  log_print(LOG_LEVEL_INFO, EK_CURRENT_FILE, EK_CURRENT_LINE, __VA_ARGS__)
-#define log_warn(...)  log_print(LOG_LEVEL_WARN, EK_CURRENT_FILE, EK_CURRENT_LINE, __VA_ARGS__)
+#define log_info(...) log_print(LOG_LEVEL_INFO, EK_CURRENT_FILE, EK_CURRENT_LINE, __VA_ARGS__)
+#define log_warn(...) log_print(LOG_LEVEL_WARN, EK_CURRENT_FILE, EK_CURRENT_LINE, __VA_ARGS__)
 #define log_error(...) log_print(LOG_LEVEL_ERROR, EK_CURRENT_FILE, EK_CURRENT_LINE, __VA_ARGS__)
 #define log_fatal(...) log_print(LOG_LEVEL_FATAL, EK_CURRENT_FILE, EK_CURRENT_LINE, __VA_ARGS__)
 
-#ifdef EK_CONFIG_PROFILING
-//#define EK_PROFILE_SCOPE(label) ek::ScopedTimeMeter _time_meter_label{#label, EK_CURRENT_LOCATION, ek::Verbosity::Trace}
-#else
-//#define EK_PROFILE_SCOPE(label) ((void)0)
-#endif
-
-// TODO:
-//#ifdef EK_CONFIG_PROFILING
-//#define EK_PROFILE_SCOPE(label) ek::ScopedTimeMeter _time_meter_label{#label, EK_CURRENT_LOCATION, ek::Verbosity::Trace}
-//#else
-//#define EK_PROFILE_SCOPE(label) ((void)0)
-//#endif
-
-#define EK_PROFILE_SCOPE(label) ((void)0)
-
-//#ifndef NDEBUG
 #ifdef LOG_ALLOCATION
 
 inline static void ek_profile_alloc(const char* label, uint32_t size, const char* file, int line) {
@@ -88,7 +72,9 @@ inline static void ek_profile_alloc(const char* label, uint32_t size, const char
 #define EK_PROFILE_ALLOC(label, sz) ek_profile_alloc((label), (sz), EK_CURRENT_FILE, EK_CURRENT_LINE)
 
 #else
+
 #define EK_PROFILE_ALLOC(label, sz) ((void)0)
+
 #endif
 
 #endif //EK_LOG_H

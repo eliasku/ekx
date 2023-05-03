@@ -2,8 +2,6 @@
 
 #include "GameWindow.hpp"
 
-namespace ek {
-
 void GameWindow::onDraw() {
     game_display* display = &game_app_state.display;
     const ImVec2 displayPos = ImGui::GetCursorScreenPos();
@@ -45,6 +43,4 @@ void GameWindow::onSave(pugi::xml_node& xml) {
     xml.append_attribute("paused").set_value(paused);
     xml.append_attribute("timeScale").set_value(timeScale);
     xml.append_attribute("profiler").set_value(profiler);
-}
-
 }

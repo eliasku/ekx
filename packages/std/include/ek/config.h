@@ -8,7 +8,6 @@
 
 /// Log trace and debug levels even for Release build
 #ifdef EK_CONFIG_PARANOIA
-#define EK_CONFIG_PROFILING
 #define EK_CONFIG_LOG_ALL
 #define EK_CONFIG_ASSERT_ALL
 #endif

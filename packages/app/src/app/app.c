@@ -1,6 +1,6 @@
 #include "app_private.h"
-#include <ek/log.h>
 #include <ek/assert.h>
+#include <ek/log.h>
 #include <string.h>
 
 ek_app_context ek_app;
@@ -22,11 +22,9 @@ void ek_app_cancel_quit(void) {
 }
 
 void ek_app__init(void) {
-    //memset(&ek_app, 0, sizeof(ek_app_context));
     ek_app.viewport.width = 1.0f;
     ek_app.viewport.height = 1.0f;
     ek_app.viewport.scale = 1.0f;
-
     ek_app.config.title = "";
     ek_app.config.width = 960;
     ek_app.config.height = 720;
@@ -71,9 +69,8 @@ void ek_app__process_frame(void) {
     if (ek_app.on_frame) {
         if (ek_app.state & EK_APP_STATE_SIZE_CHANGED) {
             ek_app.state ^= EK_APP_STATE_SIZE_CHANGED;
-            ek_app__process_event((ek_app_event) {
-                    .type = EK_APP_EVENT_RESIZE
-            });
+            ek_app__process_event((ek_app_event){
+                    .type = EK_APP_EVENT_RESIZE});
         }
         ek_app.on_frame();
     }
@@ -104,4 +101,3 @@ void ek_app__update_viewport(ek_app_viewport viewport) {
 #else
 #include "app_null.c.h"
 #endif
-

@@ -1,5 +1,5 @@
-#include <ek/game_services.h>
 #include <ek/app_native.h>
+#include <ek/game_services.h>
 #include <ek/log.h>
 
 #if defined(__APPLE__) && (TARGET_OS_IOS || TARGET_OS_TV)

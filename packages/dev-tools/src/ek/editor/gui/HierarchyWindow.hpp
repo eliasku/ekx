@@ -15,10 +15,7 @@
 #include <ek/scenex/2d/viewport.h>
 #include <ek/scenex/2d/camera2d.h>
 
-namespace ek {
-
-class HierarchyWindow : public EditorWindow {
-public:
+struct HierarchyWindow : public EditorWindow {
     HierarchyWindow() {
         name = "HierarchyWindow";
         title = ICON_FA_SITEMAP " Hierarchy###HierarchyWindow";
@@ -26,11 +23,11 @@ public:
 
     ~HierarchyWindow() override = default;
 
-    PodArray<entity_id_t> selection{};
+    ek::PodArray<entity_id_t> selection{};
     ImGuiTextFilter filter{};
     entity_t root = NULL_ENTITY;
-    Hash<entity_t> openList{};
-    Hash<entity_t> scrollToList{};
+    ek::Hash<entity_t> openList{};
+    ek::Hash<entity_t> scrollToList{};
 
     void onDraw() override;
 
@@ -58,5 +55,3 @@ public:
     void select(entity_t e);
     void focus(entity_t e);
 };
-
-}

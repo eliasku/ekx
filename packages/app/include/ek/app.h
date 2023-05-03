@@ -1,9 +1,9 @@
 #ifndef EK_APP_H
 #define EK_APP_H
 
-#include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -136,15 +136,15 @@ typedef union ek_app_event {
 } ek_app_event;
 
 typedef struct ek_app_config {
-    const char* title; //
-    float width;// = 960;
-    float height;// = 720;
-    bool need_depth;// = false;
-    bool web_keep_canvas_aspect_ratio;// = false;
-    bool allow_high_dpi;// = true;
-    int sample_count;// = 1;
-    int swap_interval;// = 1;
-    uint32_t background_color; //0x0
+    const char* title;                 //
+    float width;                       // = 960;
+    float height;                      // = 720;
+    bool need_depth;                   // = false;
+    bool web_keep_canvas_aspect_ratio; // = false;
+    bool allow_high_dpi;               // = true;
+    int sample_count;                  // = 1;
+    int swap_interval;                 // = 1;
+    uint32_t background_color;         //0x0
 
     // for windowed systems, currently only macOS
     // in logical-pixel units
@@ -186,11 +186,11 @@ typedef enum ek_app_state_flag {
 } ek_app_state_flag;
 
 typedef struct ek_app_context {
-    void (* on_ready)(void);
+    void (*on_ready)(void);
 
-    void (* on_frame)(void);
+    void (*on_frame)(void);
 
-    void (* on_event)(const ek_app_event);
+    void (*on_event)(const ek_app_event);
 
     char** argv;
 

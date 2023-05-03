@@ -5,9 +5,6 @@
 
 #include <ek/core_dbg.h>
 
-namespace ek {
-
-
 /// canvas stats
 void draw_buffer_chain_stats(const char* name, ek_canvas_buffers* buffers) {
     for (int line = 0; line < 4; ++line) {
@@ -280,6 +277,4 @@ void MemoryProfiler::onDraw() {
         }
         ImGui::EndTabBar();
     }
-}
-
 }

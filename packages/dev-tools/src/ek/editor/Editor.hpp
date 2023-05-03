@@ -1,14 +1,14 @@
 #pragma once
 
-#include "imgui/ekimgui.h"
+#include "gui/ConsoleWindow.hpp"
+#include "gui/GameWindow.hpp"
 #include "gui/HierarchyWindow.hpp"
 #include "gui/InspectorWindow.hpp"
-#include "gui/StatsWindow.hpp"
-#include "gui/GameWindow.hpp"
 #include "gui/MemoryProfiler.hpp"
-#include "gui/SceneWindow.hpp"
-#include "gui/ConsoleWindow.hpp"
 #include "gui/ResourcesWindow.hpp"
+#include "gui/SceneWindow.hpp"
+#include "gui/StatsWindow.hpp"
+#include "imgui/ekimgui.h"
 
 struct EditorConfig {
     int dirty;
@@ -18,15 +18,15 @@ struct EditorConfig {
 };
 
 struct Editor {
-    ek::HierarchyWindow hierarchy{};
-    ek::InspectorWindow inspector{};
-    ek::GameWindow game{};
-    ek::StatsWindow stats{};
-    ek::MemoryProfiler memory{};
-    ek::SceneWindow scene{};
-    ek::ConsoleWindow console{};
-    ek::ResourcesWindow resources{};
-    ek::PodArray<ek::EditorWindow*> windows{};
+    HierarchyWindow hierarchy{};
+    InspectorWindow inspector{};
+    GameWindow game{};
+    StatsWindow stats{};
+    MemoryProfiler memory{};
+    SceneWindow scene{};
+    ConsoleWindow console{};
+    ResourcesWindow resources{};
+    ek::PodArray<EditorWindow*> windows{};
     EditorConfig config{};
 };
 

@@ -16,9 +16,7 @@ Install CCache:
 brew install --HEAD ccache
 ```
 
-CLion: CMake -> Settings, add following to profile:
-- `-DCMAKE_CXX_COMPILER_LAUNCHER=ccache`
-- `-G Ninja`
+Use `ccache` launcher as C/C++ compiler and `Ninja` as generator: `-DCMAKE_CXX_COMPILER_LAUNCHER=ccache -G Ninja`
 
 ## Words
 

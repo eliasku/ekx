@@ -1,9 +1,10 @@
 #include "ekimgui.h"
 
+#include <cmath>
+#include <ek/log.h>
+#include <fonts/IconsFontAwesome5.h>
 #include <imgui.h>
 #include <implot.h>
-#include <cmath>
-#include <fonts/IconsFontAwesome5.h>
 
 #define SOKOL_IMGUI_IMPL
 #define SOKOL_IMGUI_NO_SOKOL_APP
@@ -27,47 +28,47 @@ sg_image font_image;
 
 #define DPI_SCALE (ek_app.viewport.scale)
 
-static
-void add_font_with_icons(const char* filepath, float dpi_scale) {
+static void add_font_with_icons(const char* filepath, float dpi_scale) {
     ImGuiIO& io = ImGui::GetIO();
-    float pxSize = (13.0f * dpi_scale) * 96.0f / 72.0f;
-    float fontSizeScaled = pxSize;
+    float size_px = (13.0f * dpi_scale) * 96.0f / 72.0f;
+    float font_size = size_px;
     // MD
-    //float iconSizeScaled = pxSize * 1.1f;
+    // float icon_size = pxSize * 1.1f;
     // FA
-    float iconSizeScaled = pxSize * 0.75f;
-    float fontScale = 1.0f / dpi_scale;
+    float icon_size = size_px * 0.75f;
+    float font_scale = 1.0f / dpi_scale;
     {
-        ImFontConfig fontCfg{};
-        fontCfg.OversampleH = 1;
-        fontCfg.OversampleV = 1;
-        fontCfg.PixelSnapH = true;
-        fontCfg.FontDataOwnedByAtlas = false;
-        ImFont* font = io.Fonts->AddFontFromFileTTF(filepath, fontSizeScaled, &fontCfg);
-        font->Scale = fontScale;
+        ImFontConfig font_cfg = INIT_ZERO;
+        font_cfg.OversampleH = 1;
+        font_cfg.OversampleV = 1;
+        font_cfg.PixelSnapH = true;
+        font_cfg.FontDataOwnedByAtlas = false;
+        log_debug("load editor font %s", filepath);
+        ImFont* font = io.Fonts->AddFontFromFileTTF(filepath, font_size, &font_cfg);
+        font->Scale = font_scale;
     }
 
-    static const ImWchar iconsRange[3] = {ICON_MIN_FA, ICON_MAX_FA, 0};
+    static const ImWchar icons_range[3] = {ICON_MIN_FA, ICON_MAX_FA, 0};
     {
-        ImFontConfig fontCfg = INIT_ZERO;
-        fontCfg.OversampleH = 1;
-        fontCfg.OversampleV = 1;
-        fontCfg.PixelSnapH = true;
-        fontCfg.FontDataOwnedByAtlas = false;
-        fontCfg.GlyphMinAdvanceX = fontSizeScaled; // <-- _FONT_SizeScaled!
+        ImFontConfig font_cfg = INIT_ZERO;
+        font_cfg.OversampleH = 1;
+        font_cfg.OversampleV = 1;
+        font_cfg.PixelSnapH = true;
+        font_cfg.FontDataOwnedByAtlas = false;
+        font_cfg.GlyphMinAdvanceX = font_size; // <-- _FONT_SizeScaled!
         // MD
-        //fontCfg.GlyphOffset.y = floorf(0.27f * iconSizeScaled);
+        // fontCfg.GlyphOffset.y = floorf(0.27f * iconSizeScaled);
         // FA
-        fontCfg.GlyphOffset.y = floorf(0.05f * iconSizeScaled);
-        fontCfg.MergeMode = true;
-        ImFont* font = io.Fonts->AddFontFromFileTTF("dev/" FONT_ICON_FILE_NAME_FAS,
-                                                    iconSizeScaled, &fontCfg, iconsRange);
-        font->Scale = fontScale;
+        font_cfg.GlyphOffset.y = floorf(0.05f * icon_size);
+        font_cfg.MergeMode = true;
+        const char* icons_filepath = "dev/" FONT_ICON_FILE_NAME_FAS;
+        log_debug("load editor icons font %s", icons_filepath);
+        ImFont* font = io.Fonts->AddFontFromFileTTF(icons_filepath, icon_size, &font_cfg, icons_range);
+        font->Scale = font_scale;
     }
 }
 
-static
-void init_font_image(float dpi_scale) {
+static void init_font_image(float dpi_scale) {
     ImGuiIO& io = ImGui::GetIO();
     add_font_with_icons("dev/sf-pro-text-regular.ttf", dpi_scale);
     add_font_with_icons("dev/sf-mono-text-regular.ttf", dpi_scale);
@@ -90,19 +91,17 @@ void init_font_image(float dpi_scale) {
     img_desc.label = "sokol-imgui-font";
     font_image = sg_make_image(&img_desc);
 
-    ImGui::GetIO().Fonts->TexID = (ImTextureID) (uintptr_t) font_image.id;
+    ImGui::GetIO().Fonts->TexID = (ImTextureID)(uintptr_t)font_image.id;
 }
 
-static
-void set_clipboard_callback(void* context, const char* text) {
+static void set_clipboard_callback(void* context, const char* text) {
     clipboard_text_[0] = 0;
     strncat(clipboard_text_, text, (sizeof clipboard_text_) - 1);
     // TODO: platform clipboard
     //c->_platform->clipboard.set(text);
 }
 
-static
-const char* get_clipboard_callback(void* context) {
+static const char* get_clipboard_callback(void* context) {
     return clipboard_text_;
 }
 
@@ -122,14 +121,14 @@ void ekimgui_setup(void) {
     simgui_setup(&desc);
 
     ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;  // Enable set mouse pos for navigation
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-//    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos; // Enable set mouse pos for navigation
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;    // Enable Keyboard Controls
+                                                             //    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     // Setup back-end capabilities flags
-    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors |// We can honor GetMouseCursor() values (optional)
-                       ImGuiBackendFlags_HasSetMousePos; // We can honor io.WantSetMousePos requests (optional, rarely used)
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors | // We can honor GetMouseCursor() values (optional)
+                       ImGuiBackendFlags_HasSetMousePos;   // We can honor io.WantSetMousePos requests (optional, rarely used)
 
     // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
     MAP_KEY_CODE(EK_KEYCODE_TAB, ImGuiKey_Tab);
@@ -197,8 +196,7 @@ void ekimgui_on_event(ek_app_event event) {
             io.KeyCtrl = isControl;
             io.KeyAlt = isAlt;
             io.KeySuper = isSuper;
-        }
-            break;
+        } break;
 
         case EK_APP_EVENT_TEXT:
             if (*event.text.data /* not empty */) {
@@ -215,8 +213,7 @@ void ekimgui_on_event(ek_app_event event) {
                 button = 2;
             }
             io.MouseDown[button] = (event.type == EK_APP_EVENT_MOUSE_DOWN);
-        }
-            break;
+        } break;
         case EK_APP_EVENT_WHEEL:
             if (fabs(event.wheel.x) > 0.0f) {
                 io.MouseWheelH += event.wheel.x * 0.1f;
@@ -238,11 +235,9 @@ void ekimgui_on_event(ek_app_event event) {
         default:
             break;
     }
-
 }
 
-static
-void update_mouse_cursor(void) {
+static void update_mouse_cursor(void) {
     ImGuiIO& io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange) {
         return;
@@ -281,8 +276,8 @@ void update_mouse_cursor(void) {
 }
 
 void ekimgui_begin_frame(float dt) {
-    auto w = (int) ek_app.viewport.width;
-    auto h = (int) ek_app.viewport.height;
+    auto w = (int)ek_app.viewport.width;
+    auto h = (int)ek_app.viewport.height;
     if (w > 0 && h > 0) {
         update_mouse_cursor();
         simgui_frame_desc_t desc;
@@ -305,4 +300,3 @@ void ekimgui_on_frame_completed(void) {
         reset_keys();
     }
 }
-

@@ -142,22 +142,26 @@ static asset_t* alloc_asset(struct asset_type_* type) {
 asset_t* unpack_asset(calo_reader_t* r, string_hash_t type) {
     asset_t* result = NULL;
     if (type == H("audio")) {
+        log_trace("create asset: audio");
         VAR_NEW_ASSET(audio_asset);
         asset->res = R_AUDIO(read_u32(r));
         asset->flags = read_u32(r);
         asset->path = read_stream_string(r);
         result = &asset->base;
     } else if (type == H("scene")) {
+        log_trace("create asset: scene");
         VAR_NEW_ASSET(scene_asset);
         asset->res = R_SG(read_u32(r));
         asset->path = read_stream_string(r);
         result = &asset->base;
     } else if (type == H("bmfont")) {
+        log_trace("create asset: bmfont");
         VAR_NEW_ASSET(bmfont_asset);
         asset->res = R_FONT(read_u32(r));
         asset->path = read_stream_string(r);
         result = &asset->base;
     } else if (type == H("ttf")) {
+        log_trace("create asset: ttf");
         VAR_NEW_ASSET(ttf_asset);
         asset->res = R_FONT(read_u32(r));
         asset->path = read_stream_string(r);
@@ -165,28 +169,33 @@ asset_t* unpack_asset(calo_reader_t* r, string_hash_t type) {
         asset->base_font_size = read_f32(r);
         result = &asset->base;
     } else if (type == H("atlas")) {
+        log_trace("create asset: atlas");
         VAR_NEW_ASSET(atlas_asset);
         asset->name = read_stream_string(r);
         asset->res = R_ATLAS(read_u32(r));
         asset->format_mask = read_u32(r);
         result = &asset->base;
     } else if (type == H("dynamic_atlas")) {
+        log_trace("create asset: dynamic_atlas");
         VAR_NEW_ASSET(dynamic_atlas_asset);
         asset->res = R_DYNAMIC_ATLAS(read_u32(r));
         asset->flags = read_u32(r);
         result = &asset->base;
     } else if (type == H("model")) {
+        log_trace("create asset: model");
         VAR_NEW_ASSET(model_asset);
         asset->name = read_stream_string(r);
         asset->res = R_MESH3D(read_u32(r));
         result = &asset->base;
     } else if (type == H("texture")) {
+        log_trace("create asset: texture");
         VAR_NEW_ASSET(image_asset);
         asset->res = R_IMAGE(read_u32(r));
         asset->data = read_stream_image_data(r);
         asset->base.weight = (float) arr_size(asset->data.images);
         result = &asset->base;
     } else if (type == H("strings")) {
+        log_trace("create asset: strings");
         VAR_NEW_ASSET(strings_asset);
         asset->name = read_stream_string(r);
         uint32_t langs_num = read_u32(r);
@@ -203,6 +212,7 @@ asset_t* unpack_asset(calo_reader_t* r, string_hash_t type) {
         asset->base.weight = (float) langs_num;
         result = &asset->base;
     } else if (type == H("pack")) {
+        log_trace("create asset: pack");
         VAR_NEW_ASSET(pack_asset);
         asset->name = read_stream_string(r);
         result = &asset->base;

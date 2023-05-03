@@ -3,8 +3,6 @@
 #include "EditorWindow.hpp"
 #include <ekx/app/game_display.h>
 
-namespace ek {
-
 struct SceneView2D {
     float scaleMin = 0.1f;
     float scale = 1.0f;
@@ -45,8 +43,7 @@ struct SceneView {
 };
 
 
-class SceneWindow : public EditorWindow {
-public:
+struct SceneWindow : public EditorWindow {
 
     SceneWindow();
 
@@ -77,5 +74,3 @@ public:
     void manipulateObject2D();
     void manipulateObject3D();
 };
-
-}

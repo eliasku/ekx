@@ -96,7 +96,8 @@ static void log__default(log_msg_t msg) {
 #include <stdio.h>
 #include <time.h>
 
-#if defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
+// disable colored output for all
+#if 1
 #define RESET       ""
 #define BLUE        ""
 #define CYAN        ""
@@ -150,9 +151,8 @@ static void log__default(log_msg_t msg) {
 #endif // SYSTEM
 
 void log_init(void) {
-    memset(&g_log, 0, sizeof(g_log));
-    g_log.mask = 0xFFFF;
     log_add_sink(log__default);
+    g_log.mask = 0xFFFF;
 }
 
 //#if defined(__APPLE__)
