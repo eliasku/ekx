@@ -9,25 +9,25 @@
 #include <stb/stb_image_write.h>
 #endif
 
-bool game_display_begin(game_display* display, sg_pass_action* passAction, const char* debugLabel) {
+bool game_display_begin(game_display* display, sg_pass_action* pass_action, const char* debug_label) {
     const int w = (int) display->info.size.x;
     const int h = (int) display->info.size.y;
     if (w <= 0 || h <= 0) {
         return false;
     }
-    sg_push_debug_group(debugLabel);
+    sg_push_debug_group(debug_label);
 
     if (display->simulated) {
         canvas.framebuffer_color = display->color;
-        canvas.framebuffer_depth = display->depthStencil;
+        canvas.framebuffer_depth = display->depth_stencil;
 
-        if (display->colorFirstClearFlag) {
-            passAction->colors[0].action = SG_ACTION_CLEAR;
-            display->colorFirstClearFlag = false;
+        if (display->color_first_clear_flag) {
+            pass_action->colors[0].action = SG_ACTION_CLEAR;
+            display->color_first_clear_flag = false;
         }
-        sg_begin_pass(display->pass, passAction);
+        sg_begin_pass(display->pass, pass_action);
     } else {
-        sg_begin_default_pass(passAction, w, h);
+        sg_begin_default_pass(pass_action, w, h);
     }
 
     return true;
@@ -90,14 +90,14 @@ void game_display_dev_end(game_display* display) {
 //    }
 }
 
-sg_image game_display_create_image(int w, int h, bool isColor, const char* label) {
+sg_image game_display_create_image(int w, int h, bool is_color, const char* label) {
     sg_image_desc desc = {0};
     desc.type = SG_IMAGETYPE_2D;
     desc.render_target = true;
     desc.width = w;
     desc.height = h;
     desc.usage = SG_USAGE_IMMUTABLE;
-    if (!isColor) {
+    if (!is_color) {
         desc.pixel_format = SG_PIXELFORMAT_DEPTH_STENCIL;
     }
     desc.min_filter = SG_FILTER_NEAREST;
@@ -132,18 +132,18 @@ void game_display_update_simulated(game_display* display) {
         color_img_width = w;
         color_img_height = h;
 
-        display->colorFirstClearFlag = true;
+        display->color_first_clear_flag = true;
 
         if (ek_app.config.need_depth) {
-            sg_destroy_image(display->depthStencil);
-            display->depthStencil = game_display_create_image(w, h, false, "game-display-depth");
+            sg_destroy_image(display->depth_stencil);
+            display->depth_stencil = game_display_create_image(w, h, false, "game-display-depth");
         }
 
         sg_destroy_pass(display->pass);
         sg_pass_desc pass_desc = {0};
         pass_desc.color_attachments[0].image = display->color;
-        if (display->depthStencil.id) {
-            pass_desc.depth_stencil_attachment.image = display->depthStencil;
+        if (display->depth_stencil.id) {
+            pass_desc.depth_stencil_attachment.image = display->depth_stencil;
         }
         display->pass = sg_make_pass(&pass_desc);
 
@@ -162,11 +162,11 @@ void game_display_update(game_display* display) {
     display->info.window.x = ek_app.viewport.width / ek_app.viewport.scale;
     display->info.window.y = ek_app.viewport.height / ek_app.viewport.scale;
     display->info.insets = *(vec4_t*) ek_app.viewport.insets;
-    display->info.dpiScale = ek_app.viewport.scale;
+    display->info.dpi_scale = ek_app.viewport.scale;
 
-    display->info.destinationViewport.position = vec2(0, 0);
-    display->info.destinationViewport.size.x = ek_app.viewport.width;
-    display->info.destinationViewport.size.y = ek_app.viewport.height;
+    display->info.dest_viewport.position = vec2(0, 0);
+    display->info.dest_viewport.size.x = ek_app.viewport.width;
+    display->info.dest_viewport.size.y = ek_app.viewport.height;
 }
 
 void game_display_screenshot(const game_display* display, const char* filename) {

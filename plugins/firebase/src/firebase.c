@@ -1,4 +1,4 @@
-#include "firebase.h"
+#include <ek/firebase.h>
 
 #if defined(__APPLE__)
 

@@ -5,8 +5,6 @@
 #include "PodArray.hpp"
 #include <ek/assert.h>
 
-namespace ek {
-
 // Hash data structure from
 // - https://github.com/niklas-ourmachinery/bitsquid-foundation/blob/master
 
@@ -400,6 +398,4 @@ inline const typename Hash<T>::Entry* Hash<T>::begin() const {
 template<typename T>
 inline const typename Hash<T>::Entry* Hash<T>::end() const {
     return _data.end();
-}
-
 }

@@ -14,6 +14,7 @@
 #include <ek/hash/murmur.c>
 #include <ek/hash/hsp.c>
 #include <ek/sigslot.c>
+#include <ek/core_dbg.c.h>
 
 #ifdef __EMSCRIPTEN__
 #include <ek/sparse_array.c>

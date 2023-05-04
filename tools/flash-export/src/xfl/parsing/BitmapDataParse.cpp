@@ -135,7 +135,7 @@ void readBitmapCLUT(calo_reader_t* r, bitmap_data_t* bitmap) {
         // transparent
         colorTable[0] = 0x0;
     }
-    ek::Array<uint8_t> buffer{};
+    Array<uint8_t> buffer{};
     buffer.resize(desc.stride * desc.height);
     auto written = ekUncompress(r, buffer.data(), buffer.size());
     if (written != buffer.size()) {

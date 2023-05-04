@@ -1,6 +1,6 @@
 #include <ek/buf.h>
 #include <ek/assert.h>
-#include "log.h"
+#include <ek/log.h>
 
 void* _check_ptr_alignment(void* ptr, uint32_t width) {
     EK_ASSERT(((uintptr_t) ptr % width) == 0);

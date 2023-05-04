@@ -26,7 +26,7 @@ struct Editor {
     SceneWindow scene{};
     ConsoleWindow console{};
     ResourcesWindow resources{};
-    ek::PodArray<EditorWindow*> windows{};
+    PodArray<EditorWindow*> windows{};
     EditorConfig config{};
 };
 

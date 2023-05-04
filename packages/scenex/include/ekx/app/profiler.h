@@ -39,17 +39,16 @@ enum {
 };
 
 struct profiler_track {
-    const char* name; // ""
-    const char* titleFormat;// = "%s: %d";
-    float thMin;// = 1.0f / 60.0f;
-    float thMax;// = 1.0f / 30.0f;
-    float accum;//0
-    float value;//0
+    const char* name;
+    const char* title_format;
+    float th_min;
+    float th_max;
+    float accum;
+    float value;
     float hist[PROFILE_TRACK_CAPACITY];
     int hist_i;
-
-    float min;// = 0.0f;
-    float max;// = 33.3f;
+    float min;
+    float max;
 };
 
 typedef struct {

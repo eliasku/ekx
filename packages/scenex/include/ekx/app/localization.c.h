@@ -1,10 +1,10 @@
 #include "localization.h"
-#include <ek/log.h>
 #include <ek/assert.h>
+#include <ek/log.h>
 
-inline static int cmp_key(const void* a, const void* b) {
-    const char* ka = ((const str_pair_t*) a)->k;
-    const char* kb = ((const str_pair_t*) b)->k;
+static int cmp_key(const void* a, const void* b) {
+    const char* ka = ((const str_pair_t*)a)->k;
+    const char* kb = ((const str_pair_t*)b)->k;
     const int r = ka != kb ? strcmp(ka, kb) : 0;
     return r;
 }
@@ -13,8 +13,8 @@ typedef struct mo_header {
     uint32_t magic;
     uint32_t revision;
     uint32_t strings_num;
-    uint32_t offsetOriginalStrings;
-    uint32_t offsetTranslatedStrings;
+    uint32_t offset_original_strings;
+    uint32_t offset_translated_strings;
 } mo_header;
 
 typedef struct mo_string_header {
@@ -26,22 +26,22 @@ typedef struct mo_string_header {
 /// sourceData will be preserved
 /// specification: https://www.gnu.org/software/gettext/manual/gettext.html#Binaries
 bool string_catalog_parse(string_catalog* catalog) {
-    const char* buffer = (const char*) catalog->buffer;
+    const char* buffer = (const char*)catalog->buffer;
     const uint32_t length = catalog->length;
-    EK_ASSERT (buffer && length && "mo-file should have data");
+    EK_ASSERT(buffer && length && "mo-file should have data");
 
-    const mo_header* hdr = (mo_header*) buffer;
-    EK_ASSERT (hdr->magic == 0x950412DE && "mo-file should be little-endian");
+    const mo_header* hdr = (mo_header*)buffer;
+    EK_ASSERT(hdr->magic == 0x950412DE && "mo-file should be little-endian");
     EK_ASSERT(hdr->revision == 0 && "mo-file supports only 0 revision");
-    EK_ASSERT(length >= (hdr->offsetOriginalStrings + 2 * sizeof(uint32_t) * hdr->strings_num) &&
+    EK_ASSERT(length >= (hdr->offset_original_strings + 2 * sizeof(uint32_t) * hdr->strings_num) &&
               "enough data for original strings");
-    EK_ASSERT(length >= (hdr->offsetTranslatedStrings + 2 * 4 * hdr->strings_num) &&
+    EK_ASSERT(length >= (hdr->offset_translated_strings + 2 * 4 * hdr->strings_num) &&
               "enough data for translated strings");
 
-    catalog->strings = (str_pair_t*) malloc(sizeof(str_pair_t) * hdr->strings_num);
+    catalog->strings = (str_pair_t*)malloc(sizeof(str_pair_t) * hdr->strings_num);
     for (uint32_t i = 0; i < hdr->strings_num; ++i) {
-        mo_string_header* original = (mo_string_header*) (buffer + hdr->offsetOriginalStrings) + i;
-        mo_string_header* translated = (mo_string_header*) (buffer + hdr->offsetTranslatedStrings) + i;
+        mo_string_header* original = (mo_string_header*)(buffer + hdr->offset_original_strings) + i;
+        mo_string_header* translated = (mo_string_header*)(buffer + hdr->offset_translated_strings) + i;
         if (length < original->offset + original->length ||
             length < translated->offset + translated->length) {
             log_error("mo-file: not enough data for strings repository");
@@ -64,8 +64,8 @@ bool string_catalog_touch(string_catalog* catalog) {
 const char* string_catalog_get(const string_catalog* catalog, const char* text) {
     str_pair_t key;
     key.k = text;
-    uint32_t num = ((mo_header*) catalog->buffer)->strings_num;
-    str_pair_t* f = (str_pair_t*) bsearch(&key, catalog->strings, num, sizeof(str_pair_t), cmp_key);
+    uint32_t num = ((mo_header*)catalog->buffer)->strings_num;
+    str_pair_t* f = (str_pair_t*)bsearch(&key, catalog->strings, num, sizeof(str_pair_t), cmp_key);
     return f ? f->v : text;
 }
 
@@ -104,15 +104,17 @@ bool set_language_index(uint32_t index) {
 
 lang_name_t current_lang_name(void) {
     const localization_t l = s_localization;
-    return l.lang_index < l.lang_num ? l.languages[l.lang_index].name : (lang_name_t) {0};
+    return l.lang_index < l.lang_num ? l.languages[l.lang_index].name : (lang_name_t){0};
 }
 
 void add_lang(lang_name_t name, void* buffer, uint32_t size) {
     EK_ASSERT(s_localization.lang_num < LANG_MAX_COUNT);
-    string_catalog cat = {0};
+
+    string_catalog cat;
     cat.name = name;
     cat.buffer = buffer;
     cat.length = size;
+    cat.strings = NULL;
 
     s_localization.languages[s_localization.lang_num++] = cat;
 }
@@ -121,8 +123,7 @@ bool is_localized(const char* text) {
     const uint32_t index = s_localization.lang_index;
     const uint32_t num = s_localization.lang_num;
     const string_catalog* langs = s_localization.languages;
-    return text && *text && index < num &&
-           string_catalog_get(&langs[index], text) != text;
+    return text && *text && index < num && string_catalog_get(&langs[index], text) != text;
 }
 
 localization_t s_localization;

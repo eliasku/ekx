@@ -16,12 +16,14 @@ add_executable(${PROJECT_NAME}
         string_test.c
         hash_test.c
         sigslot_test.c
+        legacy_ds/Array_test.cpp
+        legacy_ds/Hash_test.cpp
         )
 
 add_test(NAME ${PROJECT_NAME} COMMAND ${NODE_JS_EXECUTABLE} $<TARGET_FILE:${PROJECT_NAME}>)
 test_code_coverage(${PROJECT_NAME})
 
-set_target_properties(${PROJECT_NAME} PROPERTIES C_STANDARD 11)
+set_target_properties(${PROJECT_NAME} PROPERTIES C_STANDARD 11 CXX_STANDARD 17)
 target_compile_definitions(${PROJECT_NAME} PUBLIC UNIT_TESTING)
 
 target_compile_options(${PROJECT_NAME}

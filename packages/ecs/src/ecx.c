@@ -1,4 +1,4 @@
-#include "ecx.h"
+#include <ecx/ecx.h>
 #include <ek/buf.h>
 #include <ek/sparse_array.h>
 #include <ek/log.h>

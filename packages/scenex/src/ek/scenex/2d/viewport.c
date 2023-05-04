@@ -96,17 +96,17 @@ void Viewport_update(const game_display_info* display0) {
     const vec4_t insets =
             add_vec4(display0->insets,
                      add_vec4(
-                             display0->userInsetsAbsolute,
+                             display0->user_insets_abs,
                              mul_vec4(
                                      vec4(w, h, w, h),
-                                     display0->userInsetsRelative
+                                     display0->user_insets_rel
                              )
                      )
             );
     viewport_scale_input_t input;
     input.fullRect = rect_wh(display0->size.x, display0->size.y);
     input.safeRect = rect(insets.x, insets.y, w - insets.x - insets.z, h - insets.y - insets.w);
-    input.dpiScale = display0->dpiScale;
+    input.dpiScale = display0->dpi_scale;
 
     for (uint32_t i = 1; i < Viewport.size; ++i) {
         entity_t e = get_entity(&Viewport, i);

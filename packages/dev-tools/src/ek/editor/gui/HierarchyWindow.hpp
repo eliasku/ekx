@@ -23,11 +23,11 @@ struct HierarchyWindow : public EditorWindow {
 
     ~HierarchyWindow() override = default;
 
-    ek::PodArray<entity_id_t> selection{};
+    PodArray<entity_id_t> selection{};
     ImGuiTextFilter filter{};
     entity_t root = NULL_ENTITY;
-    ek::Hash<entity_t> openList{};
-    ek::Hash<entity_t> scrollToList{};
+    Hash<entity_t> openList{};
+    Hash<entity_t> scrollToList{};
 
     void onDraw() override;
 

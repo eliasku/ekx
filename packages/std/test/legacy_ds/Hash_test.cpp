@@ -1,9 +1,8 @@
 #include <unit.h>
-#include "Hash.hpp"
+#include <ek/ds/Hash.hpp>
 
 SUITE(cxx_hash) {
     IT("general") {
-        using namespace ek;
         {
             Hash<int> h{};
             REQUIRE(h.get(0, 99) == 99);
@@ -34,7 +33,6 @@ SUITE(cxx_hash) {
     }
 
     IT("stress") {
-        using namespace ek;
         {
             const uint64_t i0 = 0xFFFFFFFF00000000ULL;
             //const uint64_t i1 = i0 + 10000000;

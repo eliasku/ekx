@@ -14,6 +14,6 @@ extern "C" {
 #include "math/mat.c"
 #include "math/color.c"
 #include "math/quat.c"
-#include "math/rect.c"
+#include "math/rect.c.h"
 #include "math/easing.c"
 #include "math/col2d.c"

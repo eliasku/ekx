@@ -24,10 +24,10 @@ void GameWindow::onDraw() {
 
         {
             // update size;
-            const float k = display->info.dpiScale;
-            display->info.destinationViewport = k * rect(displayPos.x, displayPos.y,displaySize.x, displaySize.y);
+            const float k = display->info.dpi_scale;
+            display->info.dest_viewport = rect_scale_f(rect(displayPos.x, displayPos.y,displaySize.x, displaySize.y), k);
             display->info.window = vec2(displaySize.x, displaySize.y);
-            display->info.size = k * vec2(displaySize.x, displaySize.y);
+            display->info.size = scale_vec2(vec2(displaySize.x, displaySize.y), k);
         }
     }
     g_input_state.hovered_by_editor_gui = !ImGui::IsWindowHovered(0);

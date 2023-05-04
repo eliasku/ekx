@@ -3,7 +3,7 @@
 #include "EditorWindow.hpp"
 
 struct InspectorWindow : public EditorWindow {
-    ek::PodArray<entity_id_t> list{};
+    PodArray<entity_id_t> list{};
 
     InspectorWindow() {
         name = "InspectorWindow";

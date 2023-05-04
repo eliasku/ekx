@@ -2,17 +2,14 @@ cmake_minimum_required(VERSION 3.19)
 project(ecs)
 
 add_library(${PROJECT_NAME} STATIC
-        src/ecx/ecx.c
+        src/ecx.c
         )
 
 add_library(ekx::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_code_coverage(${PROJECT_NAME} PUBLIC)
-target_include_directories(${PROJECT_NAME} PUBLIC src)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-        CXX_STANDARD 17
-        C_STANDARD 11
-        )
+set_target_properties(${PROJECT_NAME} PROPERTIES C_STANDARD 11)
 
 if (NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC"))
     set(EK_COMPILE_WARNINGS

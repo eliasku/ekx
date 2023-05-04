@@ -497,7 +497,7 @@ static void bmfont_on_file_loaded(ek_local_res* lr) {
     bmfont_asset_t* asset = (bmfont_asset_t*) lr->userdata;
     if (ek_local_res_success(lr)) {
         font_t* fnt = &REF_RESOLVE(res_font, asset->res);
-        if (fnt->loaded_) {
+        if (fnt->loaded) {
             EK_ASSERT(false && "Font is not unloaded before");
             font_destroy(fnt);
         }
@@ -521,7 +521,7 @@ static void bmfont_do_load(asset_t* base) {
 static void bmfont_do_unload(asset_t* base) {
     bmfont_asset_t* asset = (bmfont_asset_t*) base;
     font_t* fnt = &REF_RESOLVE(res_font, asset->res);
-    if (fnt->loaded_) {
+    if (fnt->loaded) {
         font_destroy(fnt);
     }
     ek_local_res_close(&asset->local_res);
@@ -534,7 +534,7 @@ static void ttf_on_file_loaded(ek_local_res* lr) {
     ttf_asset_t* this_ = (ttf_asset_t*) lr->userdata;
 
     font_t* fnt = &REF_RESOLVE(res_font, this_->res);
-    if (fnt->loaded_) {
+    if (fnt->loaded) {
         EK_ASSERT(false && "Font is not unloaded before");
         font_destroy(fnt);
     }
@@ -563,7 +563,7 @@ static void ttf_do_unload(asset_t* base) {
     ttf_asset_t* asset = (ttf_asset_t*) base;
 
     font_t* fnt = &REF_RESOLVE(res_font, asset->res);
-    if (fnt->loaded_) {
+    if (fnt->loaded) {
         font_destroy(fnt);
     }
 }

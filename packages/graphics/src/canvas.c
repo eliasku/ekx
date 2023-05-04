@@ -1,17 +1,16 @@
-#include "canvas.h"
+#include <ek/canvas.h>
 
 #include "canvas_shader.h"
-#include <ek/log.h>
 #include <ek/assert.h>
+#include <ek/log.h>
 
 /// region Buffers Chain
 
 #define CANVAS_INDEX_LIMIT (CANVAS_INDEX_MAX_COUNT - 1)
 #define CANVAS_VERTEX_LIMIT (CANVAS_VERTEX_MAX_COUNT - 1)
 
-void
-ek_canvas_buffers_init(ek_canvas_buffers *buffers, sg_buffer_type type, uint32_t elements_max_count,
-                       uint32_t element_max_size) {
+void ek_canvas_buffers_init(ek_canvas_buffers* buffers, sg_buffer_type type, uint32_t elements_max_count,
+                            uint32_t element_max_size) {
     EK_ASSERT(elements_max_count > 0x400);
     buffers->type = type;
     const uint32_t c = 0x10 * element_max_size;
@@ -21,8 +20,8 @@ ek_canvas_buffers_init(ek_canvas_buffers *buffers, sg_buffer_type type, uint32_t
     buffers->cap[3] = elements_max_count * element_max_size;
 }
 
-int ek_canvas_buffers_get_bucket(ek_canvas_buffers *buffers, uint32_t required_size) {
-    uint32_t *cap = buffers->cap;
+int ek_canvas_buffers_get_bucket(ek_canvas_buffers* buffers, uint32_t required_size) {
+    uint32_t* cap = buffers->cap;
     if (required_size < cap[0]) {
         return 0;
     } else if (required_size < cap[1]) {
@@ -33,22 +32,21 @@ int ek_canvas_buffers_get_bucket(ek_canvas_buffers *buffers, uint32_t required_s
     return 3;
 }
 
-sg_buffer ek_canvas_buffers_get(ek_canvas_buffers *buffers, uint32_t required_size) {
+sg_buffer ek_canvas_buffers_get(ek_canvas_buffers* buffers, uint32_t required_size) {
 
     const int bucket = ek_canvas_buffers_get_bucket(buffers, required_size);
-    sg_buffer *line = buffers->lines[bucket];
+    sg_buffer* line = buffers->lines[bucket];
     uint16_t index = buffers->pos[bucket];
     if (index == CANVAS_BUFFERS_MAX_COUNT) {
-        return (sg_buffer) {0};
+        return (sg_buffer){0};
     }
     sg_buffer buf = line[index];
     if (buf.id == 0) {
-        sg_buffer_desc desc = (sg_buffer_desc) {
+        sg_buffer_desc desc = (sg_buffer_desc){
                 .size = buffers->cap[bucket],
                 .type = buffers->type,
                 .usage = SG_USAGE_STREAM,
-                .label = buffers->type == SG_BUFFERTYPE_VERTEXBUFFER ? "canvas-vbs" : "canvas-ibs"
-        };
+                .label = buffers->type == SG_BUFFERTYPE_VERTEXBUFFER ? "canvas-vbs" : "canvas-ibs"};
         buf = sg_make_buffer(&desc);
         line[index] = buf;
     }
@@ -58,16 +56,16 @@ sg_buffer ek_canvas_buffers_get(ek_canvas_buffers *buffers, uint32_t required_si
     return buf;
 }
 
-void ek_canvas_buffers_rewind(ek_canvas_buffers *buffers) {
-    uint16_t *positions = buffers->pos;
+void ek_canvas_buffers_rewind(ek_canvas_buffers* buffers) {
+    uint16_t* positions = buffers->pos;
     for (int i = 0; i < 4; ++i) {
         positions[i] = 0;
     }
 }
 
-void ek_canvas_buffers_destroy(ek_canvas_buffers *buffers) {
+void ek_canvas_buffers_destroy(ek_canvas_buffers* buffers) {
     for (int bucket = 0; bucket < 4; ++bucket) {
-        sg_buffer *line = buffers->lines[bucket];
+        sg_buffer* line = buffers->lines[bucket];
         int count = buffers->pos[bucket];
         for (int i = 0; i < count; ++i) {
             sg_destroy_buffer(line[i]);
@@ -225,7 +223,7 @@ void canvas_restore_color(void) {
 }
 
 void canvas_scale_alpha(float alpha) {
-    canvas.color[0].scale.a = u8_norm_mul(canvas.color[0].scale.a, (uint8_t) (alpha * 255));
+    canvas.color[0].scale.a = u8_norm_mul(canvas.color[0].scale.a, (uint8_t)(alpha * 255));
 }
 
 void canvas_scale_color(color_t multiplier) {
@@ -372,8 +370,7 @@ void canvas_fill_rect(const rect_t rc, color_t color) {
 }
 
 // This function should be moved to the dedicated `indexed draw` mode
-void
-canvas_fill_circle(const vec3_t circle, color_t inner_color, color_t outer_color, int segments) {
+void canvas_fill_circle(const vec3_t circle, color_t inner_color, color_t outer_color, int segments) {
     canvas_triangles(1 + segments, 3 * segments);
 
     const float x = circle.x;
@@ -385,7 +382,7 @@ canvas_fill_circle(const vec3_t circle, color_t inner_color, color_t outer_color
     const color_t outer_cm = mul_color(canvas.color[0].scale, outer_color);
     canvas_write_vertex(x, y, 0.0f, 0.0f, inner_cm, co);
 
-    const float da = MATH_TAU / (float) segments;
+    const float da = MATH_TAU / (float)segments;
     float a = 0.0f;
     while (a < MATH_TAU) {
         canvas_write_vertex(x + r * cosf(a), y + r * sinf(a), 1, 1, outer_cm, co);
@@ -405,9 +402,8 @@ canvas_fill_circle(const vec3_t circle, color_t inner_color, color_t outer_color
 
 /////
 
-void
-canvas_line_ex(const vec2_t start, const vec2_t end, color_t color1, color_t color2, float width1,
-               float width2) {
+void canvas_line_ex(const vec2_t start, const vec2_t end, color_t color1, color_t color2, float width1,
+                    float width2) {
     canvas_triangles(4, 6);
 
     const float angle = atan2f(end.y - start.y, end.x - start.x);
@@ -438,7 +434,7 @@ void canvas_line_arc(float x, float y, float r,
                      float angle_from, float angle_to,
                      float line_width, int segments,
                      color_t color_inner, color_t color_outer) {
-    const float da = MATH_TAU / (float) segments;
+    const float da = MATH_TAU / (float)segments;
     const color_t m1 = mul_color(canvas.color[0].scale, color_inner);
     const color_t m2 = mul_color(canvas.color[0].scale, color_outer);
     const color_t co = canvas.color[0].offset;
@@ -481,7 +477,7 @@ void canvas_stroke_circle(const vec3_t circle, color_t color, float lineWidth, i
     const float y = circle.y;
     const float r = circle.z;
 
-    const float da = MATH_TAU / (float) segments;
+    const float da = MATH_TAU / (float)segments;
     float a = da;
     vec2_t pen = vec2(x + r, y);
     while (a < MATH_TAU) {
@@ -493,7 +489,7 @@ void canvas_stroke_circle(const vec3_t circle, color_t color, float lineWidth, i
     canvas_line(pen, vec2(x + r, y), color, lineWidth);
 }
 
-static float triangle_area(const ek_vertex2d *vertices, const uint16_t *indices, int count) {
+static float triangle_area(const ek_vertex2d* vertices, const uint16_t* indices, int count) {
     float sum = 0.0f;
     for (int i = 0; i < count;) {
         const ek_vertex2d a = vertices[indices[i++]];
@@ -520,8 +516,8 @@ create_pipeline_for_cache(sg_shader shader, bool useRenderTarget, bool depthSten
         //pip_desc.colors[0].pixel_format = SG_PIXELFORMAT_RGBA8;
         if (depthStencil) {
             pip_desc.depth.pixel_format = SG_PIXELFORMAT_DEPTH_STENCIL;
-//            pip_desc.depth.write_enabled = false;
-//            pip_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
+            //            pip_desc.depth.write_enabled = false;
+            //            pip_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
         } else {
             pip_desc.depth.pixel_format = SG_PIXELFORMAT_NONE;
         }
@@ -602,13 +598,12 @@ void canvas_triangles(uint32_t vertex_count, uint32_t index_count) {
             canvas.state ^= EK_CANVAS_CHECK_SHADER;
         }
         if (canvas.state & EK_CANVAS_CHECK_SCISSORS) {
-            canvas_set_next_scissors((i16rect_t)
-                                             {{
-                                                      (int16_t) canvas.scissors[0].x,
-                                                      (int16_t) canvas.scissors[0].y,
-                                                      (int16_t) canvas.scissors[0].w,
-                                                      (int16_t) canvas.scissors[0].h,
-                                              }});
+            canvas_set_next_scissors((i16rect_t){{
+                    (int16_t)canvas.scissors[0].x,
+                    (int16_t)canvas.scissors[0].y,
+                    (int16_t)canvas.scissors[0].w,
+                    (int16_t)canvas.scissors[0].h,
+            }});
             canvas.state ^= EK_CANVAS_CHECK_SCISSORS;
         }
     }
@@ -631,19 +626,19 @@ void canvas_triangles(uint32_t vertex_count, uint32_t index_count) {
 }
 
 int canvas__prepare_draw(uint32_t images_num) {
-    int index_num = (int) canvas.index_num;
+    int index_num = (int)canvas.index_num;
     if (index_num == 0) {
         return 0;
     }
 
-    const uint32_t vertexDataSize = (uint32_t) (canvas.vertex_num * sizeof(ek_vertex2d));
+    const uint32_t vertexDataSize = (uint32_t)(canvas.vertex_num * sizeof(ek_vertex2d));
     const uint32_t indexDataSize = index_num << 1u;
     const sg_buffer vb = ek_canvas_buffers_get(&canvas.vbs, vertexDataSize);
     const sg_buffer ib = ek_canvas_buffers_get(&canvas.ibs, indexDataSize);
     EK_ASSERT(vb.id != 0);
     EK_ASSERT(ib.id != 0);
-    sg_update_buffer(vb, &(sg_range) {canvas.vertex, vertexDataSize});
-    sg_update_buffer(ib, &(sg_range) {canvas.index, indexDataSize});
+    sg_update_buffer(vb, &(sg_range){canvas.vertex, vertexDataSize});
+    sg_update_buffer(ib, &(sg_range){canvas.index, indexDataSize});
 
     canvas.bind.vertex_buffers[0] = vb;
     canvas.bind.index_buffer = ib;
@@ -718,13 +713,13 @@ void canvas_shutdown(void) {
 
 void canvas_new_frame(void) {
     EK_ASSERT(!(canvas.state & EK_CANVAS_PASS_ACTIVE));
-    canvas.stats = (ek_canvas_frame_stats) {};
+    canvas.stats = (ek_canvas_frame_stats){};
     ek_canvas_buffers_rewind(&canvas.vbs);
     ek_canvas_buffers_rewind(&canvas.ibs);
 }
 
 void canvas_begin(float w, float h) {
-    canvas_begin_ex(rect_wh(w, h), mat3x2_identity(), (sg_image) {0}, (sg_image) {0});
+    canvas_begin_ex(rect_wh(w, h), mat3x2_identity(), (sg_image){0}, (sg_image){0});
 }
 
 void canvas_begin_ex(const rect_t viewport, const mat3x2_t view, sg_image renderTarget,
@@ -740,14 +735,14 @@ void canvas_begin_ex(const rect_t viewport, const mat3x2_t view, sg_image render
     canvas.color[0] = color2_identity();
     canvas.uv[0] = rect_01();
 
-    canvas.curr = (ek_canvas_batch_state) {};
+    canvas.curr = (ek_canvas_batch_state){};
     canvas.next.shader = canvas.shader[0];
     canvas.next.image = canvas.image[0];
-    canvas.next.scissors = (i16rect_t) {{
-            (int16_t) viewport.x,
-            (int16_t) viewport.y,
-            (int16_t) viewport.w,
-            (int16_t) viewport.h,
+    canvas.next.scissors = (i16rect_t){{
+            (int16_t)viewport.x,
+            (int16_t)viewport.y,
+            (int16_t)viewport.w,
+            (int16_t)viewport.h,
     }};
     canvas.pipeline.id = SG_INVALID_ID;
 
@@ -779,7 +774,7 @@ void canvas_write_vertex(float x, float y, float u, float v, color_t cm, color_t
     const mat3x2_t m = canvas.matrix[0];
     const rect_t uv = canvas.uv[0];
 
-    ek_vertex2d *ptr = canvas.vertex_it++;
+    ek_vertex2d* ptr = canvas.vertex_it++;
     ptr->x = x * m.a + y * m.c + m.tx;
     ptr->y = x * m.b + y * m.d + m.ty;
     ptr->u = uv.x + u * uv.w;
@@ -789,7 +784,7 @@ void canvas_write_vertex(float x, float y, float u, float v, color_t cm, color_t
 }
 
 void canvas_write_raw_vertex(const vec2_t pos, const vec2_t tex_coord, color_t cm, color_t co) {
-    ek_vertex2d *ptr = canvas.vertex_it++;
+    ek_vertex2d* ptr = canvas.vertex_it++;
     ptr->x = pos.x;
     ptr->y = pos.y;
     ptr->u = tex_coord.x;
@@ -812,7 +807,7 @@ void canvas_write_quad_indices(void) {
     *(canvas.index_it++) = index;
 }
 
-void canvas_write_indices(const uint16_t *source, uint16_t count, uint16_t vertex_base) {
+void canvas_write_indices(const uint16_t* source, uint16_t count, uint16_t vertex_base) {
     const uint16_t index = canvas.vertex_base + vertex_base;
     for (int i = 0; i < count; ++i) {
         *(canvas.index_it++) = *(source++) + index;

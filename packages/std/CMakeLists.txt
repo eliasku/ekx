@@ -9,9 +9,7 @@ add_library(${PROJECT_NAME} STATIC
 add_library(ekx::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_code_coverage(${PROJECT_NAME} PUBLIC)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-        C_STANDARD 11
-        )
+set_target_properties(${PROJECT_NAME} PROPERTIES C_STANDARD 11)
 
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
@@ -40,8 +38,7 @@ target_link_options(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} PUBLIC ekx::headers)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
-elseif (${CMAKE_SYSTEM_NAME} MATCHES "iOS")
-elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin|iOS")
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Android")
     target_link_libraries(${PROJECT_NAME}
             PUBLIC log

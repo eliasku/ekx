@@ -55,6 +55,7 @@ export async function setup(project: Project) {
     project.addModule({
         name: "plugin-firebase",
         cpp: "src",
+        cpp_include: "include",
         android: {
             // TODO: fastlane
             // gradle(task: "uploadCrashlyticsSymbolFile", build_type: "Release")
@@ -90,7 +91,7 @@ export async function setup(project: Project) {
             ],
             cpp_flags: {
                 files: [
-                    "src/ek/firebase.c"
+                    "src/firebase.c"
                 ],
                 flags: "-x objective-c"
             },

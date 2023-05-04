@@ -10,8 +10,6 @@
 #include <ek/assert.h>
 #include <ek/core_dbg.h>
 
-namespace ek {
-
 // TODO: add `clear` method
 // TODO; `resize` should not change capacity and just set \0 in case of smaller size
 class String final {
@@ -240,11 +238,9 @@ public:
     }
 };
 
-}
-
 template<>
-struct std::hash<ek::String> {
-    std::size_t operator()(const ek::String& s) const noexcept {
+struct std::hash<String> {
+    std::size_t operator()(const String& s) const noexcept {
         if (sizeof(std::size_t) == 4) {
             return s.hash32();
         } else {

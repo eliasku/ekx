@@ -2,11 +2,11 @@
 #define SCENEX_FONT_H
 
 #include <ek/gfx.h>
+#include <ek/local_res.h>
 #include <ek/math.h>
 #include <ek/rr.h>
-#include <stb/stb_truetype.h>
 #include <gen_sg.h>
-#include <ek/local_res.h>
+#include <stb/stb_truetype.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,21 +57,23 @@ typedef struct {
 
 // Font resource
 struct font_ {
-    font_type_t fontType;
-    R(font_t) fallback;
+    font_type_t font_type;
 
-    float lineHeightMultiplier;
+    /* R(font_t) */
+    res_id fallback;
 
-    bool loaded_;
-    bool ready_;
+    float line_height_multiplier;
+
+    bool loaded;
+    bool ready;
 
     // dynamic hash-map to map 64-bit key(effect+codepoint) to 16-bit glyph index
     glyph_map_t map;
 
-    uint64_t effectKeyBits;
-    uint8_t blurRadius_;
-    uint8_t blurIterations_;
-    uint8_t strengthPower_;
+    uint64_t effect_key_bits;
+    uint8_t blur_radius;
+    uint8_t blur_iterations;
+    uint8_t strength_power;
 
     union {
         // bmfont is mapped to memory, we use this control structure with mapped pointers as source of data
@@ -81,10 +83,10 @@ struct font_ {
             stbtt_fontinfo info;
             ek_local_res source;
 
-            float baseFontSize;
-            float dpiScale;
-            R(dynamic_atlas_ptr) atlas;
-            uint32_t atlasVersion;
+            float base_font_size;
+            float dpi_scale;
+            res_id atlas;
+            uint32_t atlas_version;
             // pre-rendered dynamic glyphs or glyph effects
             glyph_t* glyphs;
 
@@ -94,22 +96,21 @@ struct font_ {
     };
 };
 
-void
-font_draw(const font_t* font,
-          const char* text,
-          float size,
-          vec2_t position,
-          color_t color,
-          float line_height,
-          float line_spacing);
+void font_draw(const font_t* font,
+               const char* text,
+               float size,
+               vec2_t position,
+               color_t color,
+               float line_height,
+               float line_spacing);
 
 float font_get_text_segment_width(const font_t* font, const char* text, float size, int begin, int end);
 
-bool font_get_glyph(font_t* font, uint32_t codepoint, glyph_t* outGlyph);
+bool font_get_glyph(font_t* font, uint32_t codepoint, glyph_t* out_glyph);
 
-bool font_get_glyph_metrics(font_t* font, uint32_t codepoint, glyph_t* outGlyph);
+bool font_get_glyph_metrics(font_t* font, uint32_t codepoint, glyph_t* out_glyph);
 
-void font_set_blur(font_t* font, float radius, int iterations, int strengthPower);
+void font_set_blur(font_t* font, float radius, int iterations, int strength_power);
 
 float font_kerning(font_t* font, uint32_t codepoint1, uint32_t codepoint2);
 
@@ -121,7 +122,7 @@ void font_destroy(font_t* font);
 
 void font_init(font_t* font, font_type_t fontType_);
 
-void font_init_ttf(font_t* font, float dpiScale_, float fontSize, string_hash_t dynamicAtlasName);
+void font_init_ttf(font_t* font, float dpi_scale, float fontSize, string_hash_t dynamic_atlas_name);
 
 void ttf_loadFromMemory(font_t* font, ek_local_res* lr);
 

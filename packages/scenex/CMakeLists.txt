@@ -12,10 +12,7 @@ if(EK_UITEST)
     add_definitions(-DEK_UITEST)
 endif(EK_UITEST)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-        C_STANDARD 11
-        CXX_STANDARD 17
-        )
+set_target_properties(${PROJECT_NAME} PROPERTIES C_STANDARD 11)
 
 add_subdirectory(src/ek/scenex)
 add_subdirectory(src/ek/goodies)

@@ -1,7 +1,7 @@
-#include <ek/gfx.h>
-#include <ek/assert.h>
-#include <ek/log.h>
 #include <ek/app.h>
+#include <ek/assert.h>
+#include <ek/gfx.h>
+#include <ek/log.h>
 
 #define SOKOL_GFX_IMPL
 #define SOKOL_ASSERT(x) EK_ASSERT(x)
@@ -20,8 +20,7 @@ static void ek_gfx_log_backend() {
             "SG_BACKEND_METAL_SIMULATOR",
             "SG_BACKEND_WGPU",
             "SG_BACKEND_DUMMY",
-            0
-    };
+            0};
     const int backend = sg_query_backend();
     EK_ASSERT(backend >= 0);
     EK_ASSERT(backend < (int)(sizeof(backend_strings) / sizeof(backend_strings[0])));
@@ -58,72 +57,48 @@ void ek_gfx_shutdown(void) {
 
 bool ek_gfx_read_pixels(sg_image image, void* pixels) {
 #if TARGET_OS_OSX
-// get the texture from the sokol internals here...
+    // get the texture from the sokol internals here...
     _sg_image_t* img = _sg_lookup_image(&_sg.pools, image.id);
     __unsafe_unretained id<MTLTexture> tex = _sg_mtl_id(img->mtl.tex[img->cmn.active_slot]);
     sg_image_desc info = sg_query_image_desc(image);
     const int width = info.width;
     const int height = info.height;
-    id < MTLTexture > temp_texture = 0;
+    id<MTLTexture> temp_texture = 0;
     if (_sg.mtl.cmd_queue && tex) {
-        const MTLPixelFormat format = [tex
-        pixelFormat];
-        MTLTextureDescriptor * textureDescriptor = [MTLTextureDescriptor
-        texture2DDescriptorWithPixelFormat:
-        format
-        width:
-        (width)
-        height:
-        (height)
-        mipmapped:
-        NO];
+        const MTLPixelFormat format = [tex pixelFormat];
+        MTLTextureDescriptor* textureDescriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:format
+                                                                                                     width:(width)
+                                                                                                     height:(height)
+                                                                                                     mipmapped:NO];
 
         textureDescriptor.storageMode = MTLStorageModeManaged;
         textureDescriptor.resourceOptions = MTLResourceStorageModeManaged;
         textureDescriptor.usage = MTLTextureUsageShaderRead + MTLTextureUsageShaderWrite;
-        temp_texture = [_sg.mtl.device
-        newTextureWithDescriptor:
-        textureDescriptor];
+        temp_texture = [_sg.mtl.device newTextureWithDescriptor:textureDescriptor];
         if (temp_texture) {
             id<MTLCommandBuffer> cmdbuffer = [_sg.mtl.cmd_queue commandBuffer];
             id<MTLBlitCommandEncoder> blitcmd = [cmdbuffer blitCommandEncoder];
 
-            [blitcmd copyFromTexture:tex sourceSlice:
-            0
-            sourceLevel:
-            0
-            sourceOrigin:
-            MTLOriginMake(0, 0, 0)
-            sourceSize:
-            MTLSizeMake(width, height, 1)
-            toTexture:
-            temp_texture
-            destinationSlice:
-            0
-            destinationLevel:
-            0
-            destinationOrigin:
-            MTLOriginMake(0, 0, 0)];
+            [blitcmd copyFromTexture:tex
+                          sourceSlice:0
+                          sourceLevel:0
+                         sourceOrigin:MTLOriginMake(0, 0, 0)
+                           sourceSize:MTLSizeMake(width, height, 1)
+                            toTexture:temp_texture
+                     destinationSlice:0
+                     destinationLevel:0
+                    destinationOrigin:MTLOriginMake(0, 0, 0)];
 
-            [blitcmd
-            synchronizeTexture:
-            temp_texture
-            slice:
-            0
-            level:
-            0];
-            [blitcmd
-            endEncoding];
-            [cmdbuffer
-            commit];
-            [cmdbuffer
-            waitUntilCompleted];
+            [blitcmd synchronizeTexture:temp_texture slice:0 level:0];
+            [blitcmd endEncoding];
+            [cmdbuffer commit];
+            [cmdbuffer waitUntilCompleted];
         }
     }
     if (temp_texture) {
         MTLRegion region = MTLRegionMake2D(0, 0, width, height);
         NSUInteger rowbyte = width * 4;
-        [temp_texture getBytes: pixels bytesPerRow: rowbyte fromRegion: region mipmapLevel:0];
+        [temp_texture getBytes:pixels bytesPerRow:rowbyte fromRegion:region mipmapLevel:0];
         return true;
     }
 #else // OSX
@@ -134,7 +109,7 @@ bool ek_gfx_read_pixels(sg_image image, void* pixels) {
 }
 
 sg_image ek_gfx_make_color_image(int width, int height, uint32_t color) {
-    sg_image_desc desc = {
+    sg_image_desc desc = (sg_image_desc){
             // defaults:
             //.type = SG_IMAGETYPE_2D,
             //.usage = SG_USAGE_IMMUTABLE,
@@ -143,19 +118,19 @@ sg_image ek_gfx_make_color_image(int width, int height, uint32_t color) {
             .pixel_format = SG_PIXELFORMAT_RGBA8,
     };
     int count = width * height;
-    uint32_t * buffer = (uint32_t*) malloc(count * 4);
+    uint32_t* buffer = (uint32_t*)malloc(count * 4);
     for (int i = 0; i < count; ++i) {
         buffer[i] = color;
     }
     desc.data.subimage[0][0].ptr = buffer;
-    desc.data.subimage[0][0].size = (size_t) count * 4;
+    desc.data.subimage[0][0].size = (size_t)count * 4;
     sg_image image = sg_make_image(&desc);
     free(buffer);
     return image;
 }
 
 sg_image ek_gfx_make_render_target(int width, int height, const char* label) {
-    sg_image_desc desc = {
+    sg_image_desc desc = (sg_image_desc){
             // defaults:
             //.type = SG_IMAGETYPE_2D,
             //.usage = SG_USAGE_IMMUTABLE,
@@ -183,9 +158,8 @@ void ek_gfx_update_image_0(sg_image image, void* data, size_t size) {
 
 ek_shader ek_shader_make(const sg_shader_desc* desc) {
     return (ek_shader){
-        .shader = sg_make_shader(desc),
-        .images_num = desc->fs.images[0].name ? 1 : 0
-    };
+            .shader = sg_make_shader(desc),
+            .images_num = desc->fs.images[0].name ? 1 : 0};
 }
 
 // region Global references for `image` and `shader`
@@ -239,4 +213,3 @@ void ek_gfx_res_setup(void) {
 //        p->images_num = 0;
 //    }
 //}
-

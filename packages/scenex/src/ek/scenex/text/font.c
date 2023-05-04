@@ -69,17 +69,17 @@ static void ttf_reset_glyphs(font_t* font) {
 
     // update dynamic atlas version
     if (font->atlas) {
-        font->atlasVersion = REF_RESOLVE(res_dynamic_atlas, font->atlas).version;
+        font->atlas_version = REF_RESOLVE(res_dynamic_atlas, font->atlas).version;
     }
 }
 
 static bool get_glyph_impl(font_t* font, uint32_t codepoint, glyph_t* outGlyph) {
-    if (font->fontType == FONT_TYPE_BITMAP) {
+    if (font->font_type == FONT_TYPE_BITMAP) {
         const uint16_t* p_index = gm_find(&font->map, codepoint);
         if (p_index) {
             bmfont_glyph_t* glyph = font->bmfont.glyphs + *p_index;
             outGlyph->advanceWidth = glyph->advance_x;
-            outGlyph->lineHeight = font->lineHeightMultiplier;
+            outGlyph->lineHeight = font->line_height_multiplier;
             sprite_t* spr = &RES_NAME_RESOLVE(res_sprite, glyph->sprite);
             if (spr->state & SPRITE_LOADED) {
                 outGlyph->rect = rect_scale_f(spr->rect, 1.0f / font->bmfont.header.base_font_size);
@@ -92,10 +92,10 @@ static bool get_glyph_impl(font_t* font, uint32_t codepoint, glyph_t* outGlyph) 
             outGlyph->source = font;
             return true;
         }
-    } else if (font->fontType == FONT_TYPE_TTF) {
-        // store pre-rendered glyph for baseFontSize and upscaled by dpiScale
+    } else if (font->font_type == FONT_TYPE_TTF) {
+        // store pre-rendered glyph for baseFontSize and upscaled by dpi_scale
         // quad scale just multiplier to get fontSize relative to baseFontSize
-        if (!font->loaded_ || !font->atlas) {
+        if (!font->loaded || !font->atlas) {
             return false;
         }
 
@@ -104,11 +104,11 @@ static bool get_glyph_impl(font_t* font, uint32_t codepoint, glyph_t* outGlyph) 
             ttf_reset_glyphs(font);
             // not ready to fill dynamic atlas :(
             return false;
-        } else if (font->atlasVersion != atlas_instance->version) {
+        } else if (font->atlas_version != atlas_instance->version) {
             ttf_reset_glyphs(font);
         }
 
-        const uint64_t hash = font->effectKeyBits | codepoint;
+        const uint64_t hash = font->effect_key_bits | codepoint;
         const uint16_t* it = gm_find(&font->map, hash);
         if (it) {
             *outGlyph = font->glyphs[*it];
@@ -121,25 +121,25 @@ static bool get_glyph_impl(font_t* font, uint32_t codepoint, glyph_t* outGlyph) 
             return false;
         }
 
-        const float scale = stbtt_ScaleForPixelHeight(&font->info, font->baseFontSize);
+        const float scale = stbtt_ScaleForPixelHeight(&font->info, font->base_font_size);
         glyph_t glyph = {0};
         gm_set(&font->map, hash, arr_size(font->glyphs));
         glyph.source = font;
 
         int advanceWidth = 0, leftSideBearing = 0;
         stbtt_GetGlyphHMetrics(&font->info, glyphIndex, &advanceWidth, &leftSideBearing);
-        glyph.advanceWidth = scale * (float) (advanceWidth) / font->baseFontSize;
-        glyph.bearingX = scale * (float) (leftSideBearing) / font->baseFontSize;
+        glyph.advanceWidth = scale * (float) (advanceWidth) / font->base_font_size;
+        glyph.bearingX = scale * (float) (leftSideBearing) / font->base_font_size;
 
         int x0, y0, x1, y1;
         stbtt_GetGlyphBitmapBox(&font->info, glyphIndex,
-                                font->dpiScale * scale, font->dpiScale * scale, &x0, &y0, &x1, &y1);
+                                font->dpi_scale * scale, font->dpi_scale * scale, &x0, &y0, &x1, &y1);
 
         int glyphWidth = x1 - x0;
         int glyphHeight = y1 - y0;
 
         if (glyphWidth > 0 && glyphHeight > 0) {
-            int pad = font->blurRadius_;
+            int pad = font->blur_radius;
 
             x0 -= pad;
             y0 -= pad;
@@ -156,10 +156,10 @@ static bool get_glyph_impl(font_t* font, uint32_t codepoint, glyph_t* outGlyph) 
             //uint8_t* bmp = (uint8_t*)calloc(1, bmpSize);
 
             stbtt_MakeGlyphBitmap(&font->info, bmp + pad * bitmapWidth + pad, glyphWidth, glyphHeight, bitmapWidth,
-                                  font->dpiScale * scale, font->dpiScale * scale, glyphIndex);
+                                  font->dpi_scale * scale, font->dpi_scale * scale, glyphIndex);
 
-            bitmap_blur_gray(bmp, bitmapWidth, bitmapHeight, bitmapWidth, font->blurRadius_, font->blurIterations_,
-                             font->strengthPower_);
+            bitmap_blur_gray(bmp, bitmapWidth, bitmapHeight, bitmapWidth, font->blur_radius, font->blur_iterations,
+                             font->strength_power);
 
             dynamic_atlas_sprite_t sprite = dynamic_atlas_add_bitmap(atlas_instance, bitmapWidth, bitmapHeight, bmp,
                                                                      bmpSize);
@@ -174,8 +174,8 @@ static bool get_glyph_impl(font_t* font, uint32_t codepoint, glyph_t* outGlyph) 
             glyph.rect.h = bitmapHeight;
 
             // scale to font size unit space
-            glyph.rect = rect_scale_f(glyph.rect, 1.0f / (font->dpiScale * font->baseFontSize));
-            glyph.lineHeight = font->lineHeightMultiplier;
+            glyph.rect = rect_scale_f(glyph.rect, 1.0f / (font->dpi_scale * font->base_font_size));
+            glyph.lineHeight = font->line_height_multiplier;
             glyph.ascender = font->ascender;
             glyph.descender = font->descender;
         }
@@ -270,17 +270,17 @@ bool font_get_glyph(font_t* font, uint32_t codepoint, glyph_t* outGlyph) {
 void font_set_blur(font_t* font, float radius, int iterations, int strength_power) {
     while (font) {
         if (radius > 0.0f && iterations > 0) {
-            radius = roundf(font->dpiScale * radius);
-            font->blurRadius_ = radius < 0 ? 0 : (radius > 0xFF ? 0xFF : (uint8_t) radius);
-            font->blurIterations_ = iterations > 3 ? 3 : iterations;
-            font->strengthPower_ = strength_power < 0 ? 0 : (strength_power > 7 ? 7 : strength_power);
-            font->effectKeyBits =
-                    (uint64_t) ((font->strengthPower_ << 16) | (font->blurIterations_ << 8) | font->blurRadius_) << 32;
+            radius = roundf(font->dpi_scale * radius);
+            font->blur_radius = radius < 0 ? 0 : (radius > 0xFF ? 0xFF : (uint8_t) radius);
+            font->blur_iterations = iterations > 3 ? 3 : iterations;
+            font->strength_power = strength_power < 0 ? 0 : (strength_power > 7 ? 7 : strength_power);
+            font->effect_key_bits =
+                    (uint64_t) ((font->strength_power << 16) | (font->blur_iterations << 8) | font->blur_radius) << 32;
         } else {
-            font->blurRadius_ = 0;
-            font->blurIterations_ = 0;
-            font->strengthPower_ = 0;
-            font->effectKeyBits = 0;
+            font->blur_radius = 0;
+            font->blur_iterations = 0;
+            font->strength_power = 0;
+            font->effect_key_bits = 0;
         }
 
         font = font->fallback ? &REF_RESOLVE(res_font, font->fallback) : NULL;
@@ -290,24 +290,24 @@ void font_set_blur(font_t* font, float radius, int iterations, int strength_powe
 bool font_get_glyph_metrics(font_t* font, uint32_t codepoint, glyph_t* outGlyph) {
     while (font) {
 
-        if (font->fontType == FONT_TYPE_BITMAP) {
+        if (font->font_type == FONT_TYPE_BITMAP) {
             const uint16_t* index = gm_find(&font->map, codepoint);
             if (index) {
                 bmfont_glyph_t* glyph = font->bmfont.glyphs + *index;
                 outGlyph->advanceWidth = glyph->advance_x;
-                outGlyph->lineHeight = font->lineHeightMultiplier;
+                outGlyph->lineHeight = font->line_height_multiplier;
                 outGlyph->ascender = font->bmfont.header.ascender;
                 outGlyph->descender = font->bmfont.header.descender;
                 outGlyph->rect = glyph->box;
                 outGlyph->source = font;
                 return true;
             }
-        } else if (font->fontType == FONT_TYPE_TTF) {
-            if (!font->loaded_) {
+        } else if (font->font_type == FONT_TYPE_TTF) {
+            if (!font->loaded) {
                 return false;
             }
 
-            const uint16_t* it = gm_find(&font->map, font->effectKeyBits | codepoint);
+            const uint16_t* it = gm_find(&font->map, font->effect_key_bits | codepoint);
             if (it) {
                 *outGlyph = font->glyphs[*it];
                 return true;
@@ -318,23 +318,23 @@ bool font_get_glyph_metrics(font_t* font, uint32_t codepoint, glyph_t* outGlyph)
                 return false;
             }
 
-            const float scale = stbtt_ScaleForPixelHeight(&font->info, font->baseFontSize);
+            const float scale = stbtt_ScaleForPixelHeight(&font->info, font->base_font_size);
             int advanceWidth = 0, leftSideBearing = 0;
             stbtt_GetGlyphHMetrics(&font->info, glyphIndex, &advanceWidth, &leftSideBearing);
-            outGlyph->advanceWidth = scale * (float) advanceWidth / font->baseFontSize;
-            outGlyph->bearingX = scale * (float) leftSideBearing / font->baseFontSize;
-            outGlyph->lineHeight = font->lineHeightMultiplier;
+            outGlyph->advanceWidth = scale * (float) advanceWidth / font->base_font_size;
+            outGlyph->bearingX = scale * (float) leftSideBearing / font->base_font_size;
+            outGlyph->lineHeight = font->line_height_multiplier;
             outGlyph->ascender = font->ascender;
             outGlyph->descender = font->descender;
 
             int x0, y0, x1, y1;
-            stbtt_GetGlyphBitmapBox(&font->info, glyphIndex, font->dpiScale * scale, font->
-                    dpiScale * scale, &x0, &y0, &x1, &y1);
+            stbtt_GetGlyphBitmapBox(&font->info, glyphIndex, font->dpi_scale * scale, font->
+                    dpi_scale * scale, &x0, &y0, &x1, &y1);
             outGlyph->rect.x = x0;
             outGlyph->rect.y = y0;
             outGlyph->rect.w = x1 - x0;
             outGlyph->rect.h = y1 - y0;
-            outGlyph->rect = rect_scale_f(outGlyph->rect, 1.0f / (font->dpiScale * font->baseFontSize));
+            outGlyph->rect = rect_scale_f(outGlyph->rect, 1.0f / (font->dpi_scale * font->base_font_size));
 
             outGlyph->source = font;
             return true;
@@ -347,11 +347,11 @@ bool font_get_glyph_metrics(font_t* font, uint32_t codepoint, glyph_t* outGlyph)
 
 
 float font_kerning(font_t* font, uint32_t codepoint1, uint32_t codepoint2) {
-    if (font->loaded_ && font->fontType == FONT_TYPE_TTF && font->info.kern) {
+    if (font->loaded && font->font_type == FONT_TYPE_TTF && font->info.kern) {
         const int kern = stbtt_GetCodepointKernAdvance(&font->info, codepoint1, codepoint2);
         if (kern) {
-            const float scale = stbtt_ScaleForPixelHeight(&font->info, font->baseFontSize);
-            return (float) kern * scale / font->baseFontSize;
+            const float scale = stbtt_ScaleForPixelHeight(&font->info, font->base_font_size);
+            return (float) kern * scale / font->base_font_size;
         }
     }
     return 0.0f;
@@ -360,8 +360,8 @@ float font_kerning(font_t* font, uint32_t codepoint1, uint32_t codepoint2) {
 ////
 void font_init(font_t* font, font_type_t fontType_) {
     *font = (font_t) {0};
-    font->fontType = fontType_;
-    font->lineHeightMultiplier = 1;
+    font->font_type = fontType_;
+    font->line_height_multiplier = 1;
 }
 
 void ttf_unload(font_t* font);
@@ -378,29 +378,29 @@ void font_load_bmfont(font_t* font, const uint8_t* buffer, size_t length) {
     r.p = (uint8_t*) buffer;
     read_calo(&r);
     font->bmfont = read_stream_bmfont(&r);
-    font->lineHeightMultiplier = font->bmfont.header.line_height_multiplier;
+    font->line_height_multiplier = font->bmfont.header.line_height_multiplier;
     arr_for(entry, font->bmfont.dict) {
         gm_set(&font->map, entry->codepoint, entry->glyph_index);
     }
 
-    font->ready_ = font->loaded_ = true;
+    font->ready = font->loaded = true;
 }
 
 // ttf font utils
 
 void font_init_ttf(font_t* font, float dpiScale_, float fontSize, string_hash_t dynamicAtlasName) {
     font_init(font, FONT_TYPE_TTF);
-    font->baseFontSize = fontSize;
-    font->dpiScale = dpiScale_;
+    font->base_font_size = fontSize;
+    font->dpi_scale = dpiScale_;
     font->atlas = R_DYNAMIC_ATLAS(dynamicAtlasName);
 }
 
 void font_destroy(font_t* font) {
     arr_reset(font->map.entries);
-    if (font->fontType == FONT_TYPE_TTF) {
+    if (font->font_type == FONT_TYPE_TTF) {
         ttf_unload(font);
     }
-    font->loaded_ = false;
+    font->loaded = false;
 }
 
 bool ttf_initFromMemory(font_t* font, const uint8_t* data, size_t size) {
@@ -417,7 +417,7 @@ bool ttf_initFromMemory(font_t* font, const uint8_t* data, size_t size) {
         int fh = ascent - descent;
         font->ascender = (float) ascent / (float) fh;
         font->descender = (float) descent / (float) fh;
-        font->lineHeightMultiplier = (float) (fh + lineGap) / (float) fh;
+        font->line_height_multiplier = (float) (fh + lineGap) / (float) fh;
         return true;
     }
 
@@ -425,18 +425,18 @@ bool ttf_initFromMemory(font_t* font, const uint8_t* data, size_t size) {
 }
 
 void ttf_loadFromMemory(font_t* font, ek_local_res* lr) {
-    EK_ASSERT(!font->loaded_);
+    EK_ASSERT(!font->loaded);
     if (lr && lr->buffer && ttf_initFromMemory(font, lr->buffer, lr->length)) {
         font->source = *lr;
-        font->loaded_ = true;
+        font->loaded = true;
     }
 }
 
 void ttf_unload(font_t* font) {
-    if (font->loaded_) {
+    if (font->loaded) {
         arr_reset(font->glyphs);
         ek_local_res_close(&font->source);
-        font->loaded_ = false;
+        font->loaded = false;
     }
 }
 
@@ -449,7 +449,7 @@ void on_ttf_loaded(ek_local_res* lr) {
 }
 
 void font_load_device_font(font_t* font, const char* font_name) {
-    EK_ASSERT(!font->loaded_);
+    EK_ASSERT(!font->loaded);
     char font_path[1024];
     if (0 == ek_app_font_path(font_path, sizeof(font_path), font_name) && font_path[0]) {
         ek_local_res_load(font_path, on_ttf_loaded, font);

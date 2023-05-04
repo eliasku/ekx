@@ -104,7 +104,7 @@ void draw_text_block(const char* text, const text_block_t* info) {
         if (!layer->visible) {
             continue;
         }
-        if (font->fontType == FONT_TYPE_BITMAP && layer->blurRadius > 0.0f &&
+        if (font->font_type == FONT_TYPE_BITMAP && layer->blurRadius > 0.0f &&
             length_sqr_vec2(layer->offset) <= 0.1f) {
             // skip {0;0} strokes for bitmap fonts
             continue;

@@ -23,7 +23,6 @@ add_subdirectory(external)
 
 add_subdirectory(packages/std)
 add_subdirectory(packages/calo)
-add_subdirectory(packages/core)
 add_subdirectory(packages/app)
 add_subdirectory(packages/ecs)
 add_subdirectory(packages/graphics)

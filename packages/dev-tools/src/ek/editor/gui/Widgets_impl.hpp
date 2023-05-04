@@ -4,7 +4,7 @@
 namespace ImGui {
 
 struct InputTextCallback_UserData {
-    ek::String* Str;
+    String* Str;
     ImGuiInputTextCallback ChainCallback;
     void* ChainCallbackUserData;
 };
@@ -26,7 +26,7 @@ static int InputTextCallback_ek_String(ImGuiInputTextCallbackData* data) {
     return 0;
 }
 
-bool InputText(const char* label, ek::String* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback,
+bool InputText(const char* label, String* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback,
                void* user_data) {
     IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
     flags |= ImGuiInputTextFlags_CallbackResize;
@@ -38,7 +38,7 @@ bool InputText(const char* label, ek::String* str, ImGuiInputTextFlags flags, Im
     return InputText(label, str->data(), str->capacity() + 1, flags, InputTextCallback_ek_String, &cb_user_data);
 }
 
-bool InputTextMultiline(const char* label, ek::String* str, const ImVec2& size, ImGuiInputTextFlags flags,
+bool InputTextMultiline(const char* label, String* str, const ImVec2& size, ImGuiInputTextFlags flags,
                         ImGuiInputTextCallback callback, void* user_data) {
     IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
     flags |= ImGuiInputTextFlags_CallbackResize;
@@ -200,11 +200,11 @@ void guiFont(const font_t* font) {
         ImGui::TextColored(ImColor{1.0f, 0.0f, 0.0f}, "ERROR: font resource slot could not be null");
         return;
     }
-    if (!font->loaded_) {
+    if (!font->loaded) {
         ImGui::TextColored(ImColor{1.0f, 0.0f, 0.0f}, "not loaded");
         return;
     }
-    ImGui::Text("Type: %s", font_type_names[font->fontType]);
+    ImGui::Text("Type: %s", font_type_names[font->font_type]);
     ImGui::Text("Glyphs: %u", arr_size(font->map.entries));
 }
 

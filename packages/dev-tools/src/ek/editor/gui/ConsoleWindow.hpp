@@ -35,9 +35,9 @@ struct ConsoleWindow : public EditorWindow {
     ConsoleMsg messages[1024];
     uint32_t messages_num = 0;
     uint32_t messages_cur = 0;
-    ek::PodArray<const char*> commands;
-    ek::PodArray<const char*> candidates;
-    ek::PodArray<char*> history;
+    PodArray<const char*> commands;
+    PodArray<const char*> candidates;
+    PodArray<char*> history;
     ImGuiTextFilter text_filter{};
     VerbosityFilterInfo infos[6]{};
 

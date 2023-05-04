@@ -1,18 +1,18 @@
-#include "appbox.h"
+#include <appbox/ads.h>
+#include <appbox/appbox.h>
 
-#include "ads.h"
-#include <ek/app.h>
-#include <ek/scenex/base/node.h>
-#include <ek/scenex/2d/text2d.h>
-#include <ek/scenex/2d/button.h>
-#include <ek/scenex/base/interactive.h>
 #include <billing.h>
-#include <ekx/app/audio_manager.h>
+#include <ek/app.h>
 #include <ek/game_services.h>
-#include <ekx/app/localization.h>
-#include <ek/print.h>
-#include <ek/scenex/base/node_events.h>
 #include <ek/local_storage.h>
+#include <ek/print.h>
+#include <ek/scenex/2d/button.h>
+#include <ek/scenex/2d/text2d.h>
+#include <ek/scenex/base/interactive.h>
+#include <ek/scenex/base/node.h>
+#include <ek/scenex/base/node_events.h>
+#include <ekx/app/audio_manager.h>
+#include <ekx/app/localization.h>
 
 appbox_config_t appbox_config_default(void) {
     appbox_config_t config = {0};
@@ -51,7 +51,7 @@ void appbox_setup(appbox_config_t config) {
     // initialize translations
     // TODO: wtf
     lang_name_t lang = {{0}};
-    lang_name_t default_lang = {{'e','n',0}};
+    lang_name_t default_lang = {{'e', 'n', 0}};
     int n = ek_ls_get_s("selected_lang", lang.str, sizeof(lang_name_t));
     EK_ASSERT(sizeof(lang_name_t) <= sizeof(ek_app.lang));
     if (n < 2) {
@@ -82,7 +82,7 @@ static void set_state_on_off(entity_t e, bool enabled) {
 static void appbox_on_crash(const node_event_t* event) {
     UNUSED(event);
     // force crash
-    volatile uint8_t* invalid_ptr = (uint8_t*) NULL;
+    volatile uint8_t* invalid_ptr = (uint8_t*)NULL;
     *invalid_ptr = 0;
 }
 #endif
@@ -173,29 +173,56 @@ void appbox_init_default_controls(entity_t e) {
 
     // Settings
     {
+        entity_t btn = find(e, H("sound"));
+        if (btn.id) {
+            add_node_event_listener(btn, BUTTON_EVENT_CLICK, appbox_on_sound);
+            set_state_on_off(btn, g_audio.prefs & AUDIO_PREF_SOUND);
+        }
+    }
+    {
+        entity_t btn = find(e, H("music"));
+        if (btn.id) {
+            add_node_event_listener(btn, BUTTON_EVENT_CLICK, appbox_on_music);
+            set_state_on_off(btn, g_audio.prefs & AUDIO_PREF_MUSIC);
+        }
+    }
+    {
+        entity_t btn = find(e, H("vibro"));
+        if (btn.id) {
+            add_node_event_listener(btn, BUTTON_EVENT_CLICK, appbox_on_vibro);
+            set_state_on_off(btn, g_audio.prefs & AUDIO_PREF_VIBRO);
+        }
+    }
+
+    appbox_init_language_button(e);
+}
+
+void appbox_update_default_controls(entity_t e) {
+    if (is_entity(e)) {
+        {
+            entity_t btn = find(e, H("remove_ads"));
+            if (btn.id) {
+                set_visible(btn, !g_ads.removed);
+            }
+        }
         {
             entity_t btn = find(e, H("sound"));
             if (btn.id) {
-                add_node_event_listener(btn, BUTTON_EVENT_CLICK, appbox_on_sound);
                 set_state_on_off(btn, g_audio.prefs & AUDIO_PREF_SOUND);
             }
         }
         {
             entity_t btn = find(e, H("music"));
             if (btn.id) {
-                add_node_event_listener(btn, BUTTON_EVENT_CLICK, appbox_on_music);
                 set_state_on_off(btn, g_audio.prefs & AUDIO_PREF_MUSIC);
             }
         }
         {
             entity_t btn = find(e, H("vibro"));
             if (btn.id) {
-                add_node_event_listener(btn, BUTTON_EVENT_CLICK, appbox_on_vibro);
                 set_state_on_off(btn, g_audio.prefs & AUDIO_PREF_VIBRO);
             }
         }
-
-        appbox_init_language_button(e);
     }
 }
 
@@ -237,14 +264,14 @@ void appbox_rate_us(void) {
 
 void appbox_init_download_app_buttons(entity_t e) {
     UNUSED(e);
-//    auto banner = sg_create("gfx", "cross_banner");
-//    setName(banner, "banner");
-//    layout_wrapper{banner}.aligned(0.5f, 0.0f, 1.0f, 0.0f);
-//
-//    wrap_button(banner, "google_play", config.downloadApp.googlePlay);
-//    wrap_button(banner, "app_store", config.downloadApp.appStore);
-//
-//    append(e, banner);
+    //    auto banner = sg_create("gfx", "cross_banner");
+    //    setName(banner, "banner");
+    //    layout_wrapper{banner}.aligned(0.5f, 0.0f, 1.0f, 0.0f);
+    //
+    //    wrap_button(banner, "google_play", config.downloadApp.googlePlay);
+    //    wrap_button(banner, "app_store", config.downloadApp.appStore);
+    //
+    //    append(e, banner);
 }
 
 static void appbox_on_language_button(const node_event_t* event) {

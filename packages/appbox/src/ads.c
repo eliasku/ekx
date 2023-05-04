@@ -1,9 +1,9 @@
-#include "ads.h"
+#include <appbox/ads.h>
 
-#include <ek/time.h>
-#include <ek/local_storage.h>
 #include <ek/admob.h>
 #include <ek/admob_wrapper.h>
+#include <ek/local_storage.h>
+#include <ek/time.h>
 
 #if EK_DEV_TOOLS
 const bool use_admob_simulator = true;
@@ -86,7 +86,7 @@ static void on_interstitial_ad_end(void) {
     }
 }
 
-void ads_game_over(void(* callback)(void)) {
+void ads_game_over(void (*callback)(void)) {
     if (g_ads.removed) {
         if (callback) {
             callback();
@@ -97,7 +97,7 @@ void ads_game_over(void(* callback)(void)) {
     }
 }
 
-void ads_show_reward_video(void(* callback)(bool)) {
+void ads_show_reward_video(void (*callback)(bool)) {
     g_ads.on_rewarded = callback;
     admob_wrapper_show_rewarded_ad(on_rewarded_ad_end);
 }
@@ -128,4 +128,3 @@ void ads_init(ads_premium_config config) {
 
     g_ads.removed = ads_check_remove_ads_purchase();
 }
-

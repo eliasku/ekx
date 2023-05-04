@@ -30,7 +30,7 @@ export async function setup(project: Project) {
         ios: {
             cpp_flags: {
                 files: [
-                    "src/ek_game_services.c"
+                    "src/game_services.c"
                 ],
                 flags: "-x objective-c"
             },

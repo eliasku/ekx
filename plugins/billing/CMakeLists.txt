@@ -1,13 +1,12 @@
 cmake_minimum_required(VERSION 3.19)
 project(plugin-billing)
 add_library(${PROJECT_NAME} STATIC
-        src/billing.h
         src/billing.c
         )
 
 add_library(ekx::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-target_include_directories(${PROJECT_NAME} PUBLIC src)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME}
         PUBLIC ekx::scenex)
 

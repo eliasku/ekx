@@ -2,7 +2,6 @@
 
 #include <ek/scenex/text/text_engine.h>
 #include <ek/canvas.h>
-//#include <ek/app.h>
 
 // TODO: EK_DEV_BUILD
 #ifndef ENABLE_PROFILER
@@ -37,7 +36,7 @@ float calculateY(const struct profiler_track* track, float val) {
 
 color_t calculateColor(const struct profiler_track* track, float val) {
     return lerp_color(RGB(0x00FF00), RGB(0xFF0000),
-                      clamp((val - track->thMin) / (track->thMax - track->thMin), 0, 1));
+                      clamp((val - track->th_min) / (track->th_max - track->th_min), 0, 1));
 }
 
 void write_track_value(struct profiler_track* track, float hist_value, float value) {
@@ -53,42 +52,42 @@ void profiler_init(void) {
     for (uint32_t i = 0; i < PROFILE_TRACKS_MAX_COUNT; ++i) {
         track = &s_profile_metrics.tracks[i];
         track->name = "-";
-        track->titleFormat = "%s: %d";
-        track->thMin = 4;
-        track->thMax = 8;
+        track->title_format = "%s: %d";
+        track->th_min = 4;
+        track->th_max = 8;
         track->min = 0;
         track->max = 16;
     }
 
     track = &s_profile_metrics.tracks[PROFILE_FPS];
     track->name = "FPS";
-    track->titleFormat = "%s: %d";
-    track->thMin = 1000.0f / 60.0f;
-    track->thMax = 1000.0f / 30.0f;
+    track->title_format = "%s: %d";
+    track->th_min = 1000.0f / 60.0f;
+    track->th_max = 1000.0f / 30.0f;
     track->min = 16.0f;
     track->max = 100.0f;
 
     track = &s_profile_metrics.tracks[PROFILE_TRIANGLES];
     track->name = "TRIS";
-    track->titleFormat = "%s: %d";
-    track->thMin = 1000;
-    track->thMax = 2000;
+    track->title_format = "%s: %d";
+    track->th_min = 1000;
+    track->th_max = 2000;
     track->min = 0;
     track->max = 3000;
 
     track = &s_profile_metrics.tracks[PROFILE_DRAW_CALLS];
     track->name = "DC";
-    track->titleFormat = "%s: %d";
-    track->thMin = 20;
-    track->thMax = 50;
+    track->title_format = "%s: %d";
+    track->th_min = 20;
+    track->th_max = 50;
     track->min = 0;
     track->max = 200;
 
     track = &s_profile_metrics.tracks[PROFILE_FILL_RATE];
     track->name = "FR";
-    track->titleFormat = "%s: %d";
-    track->thMin = 1;
-    track->thMax = 3;
+    track->title_format = "%s: %d";
+    track->th_min = 1;
+    track->th_max = 3;
     track->min = 0;
     track->max = 5;
 
@@ -144,7 +143,7 @@ void profiler_render_end(void) {
 }
 
 void profiler_draw_text(const struct profiler_track* track) {
-    draw_text_format(track->titleFormat, track->name, (int) track->value);
+    draw_text_format(track->title_format, track->name, (int) track->value);
 }
 
 void profiler_draw_graph(const struct profiler_track* track) {
@@ -177,7 +176,7 @@ void profiler_draw(const game_display_info* display_info) {
     if (!s_profile_metrics.enabled) {
         return;
     }
-    const float scale = display_info->dpiScale;
+    const float scale = display_info->dpi_scale;
     canvas.matrix[0].rot = (mat2_t){{scale, 0, 0, scale}};
     canvas.matrix[0].pos = display_info->insets.xy;
     canvas_set_empty_image();

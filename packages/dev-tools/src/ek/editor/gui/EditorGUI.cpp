@@ -49,10 +49,10 @@ void editor_draw_gui(void) {
             ImGui::Separator();
             ImGui::Text("User Insets Absolute");
             ImGui::DragFloat4("##userInsetsAbsolute",
-                              game_app_state.display.info.userInsetsAbsolute.data);
+                              game_app_state.display.info.user_insets_abs.data);
             ImGui::Text("User Insets Relative");
             ImGui::SliderFloat4("##userInsetsRelative",
-                                game_app_state.display.info.userInsetsRelative.data, 0.0f, 1.0f);
+                                game_app_state.display.info.user_insets_rel.data, 0.0f, 1.0f);
 
             ImGui::Separator();
 

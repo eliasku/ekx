@@ -8,8 +8,6 @@
 #include <initializer_list>
 #include <utility>
 
-namespace ek {
-
 template<typename T>
 class PodArray final {
 public:
@@ -197,5 +195,3 @@ public:
         return (T*) arr_search(buffer, sizeof(T), &v);
     }
 };
-
-}

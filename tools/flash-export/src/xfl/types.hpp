@@ -13,7 +13,7 @@ typedef struct bitmap_data {
     int height = 0;
     int bpp = 4;
     bool alpha = true;
-    ek::Array<uint8_t> data;
+    Array<uint8_t> data;
 } bitmap_data_t;
 
 // TODO: data is data, remove string usage

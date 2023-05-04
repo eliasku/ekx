@@ -50,7 +50,10 @@
 #define EK_DISABLE_WARNING(option) EK_PRAGMA(clang diagnostic ignored option)
 #define EK_DISABLE_WARNING_END() EK_PRAGMA(clang diagnostic pop)
 
-#define UNUSED(x) (void)(x)
+// static inline void unused_(int dummy, ...) {(void)(sizeof(dummy));}
+// #define UNUSED(...) unused_(0,__VA_ARGS__)
+
+#define UNUSED(x) (void)(sizeof(x))
 #define UNREACHABLE() __buildin_unreachable()
 #define UNLIKELY(x) __builtin_expect(!!(x), 0)
 #define LIKELY(x) __builtin_expect(!!(x), 1)

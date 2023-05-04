@@ -2,11 +2,11 @@ cmake_minimum_required(VERSION 3.19)
 project(graphics)
 
 add_library(${PROJECT_NAME} STATIC
-        src/ek/ek_gfx.c
-        src/ek/ek_canvas.c
+        src/gfx.c
+        src/canvas.c
         )
 
-target_include_directories(${PROJECT_NAME} PUBLIC src)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 add_library(ekx::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
@@ -32,14 +32,9 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
 
-elseif (${CMAKE_SYSTEM_NAME} MATCHES "iOS")
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin|iOS")
 
-    set_source_files_properties("src/ek/ek_gfx.c" PROPERTIES
-            COMPILE_FLAGS "-x objective-c")
-
-elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-
-    set_source_files_properties("src/ek/ek_gfx.c" PROPERTIES
+    set_source_files_properties("src/gfx.c" PROPERTIES
             COMPILE_FLAGS "-x objective-c")
 
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Android")

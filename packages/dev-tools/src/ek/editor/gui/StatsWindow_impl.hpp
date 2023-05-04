@@ -40,7 +40,7 @@ void StatsWindow::onDraw() {
         ImGui::PushID(track);
         ImGui::PlotLines("", &getterProfilerTrackValue, track, PROFILE_TRACK_CAPACITY);
         ImGui::SameLine();
-        ImGui::Text(track->titleFormat, track->name, (int) track->value);
+        ImGui::Text(track->title_format, track->name, (int) track->value);
         ImGui::PopID();
     }
 }

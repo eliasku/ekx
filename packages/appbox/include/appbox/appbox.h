@@ -37,6 +37,7 @@ typedef struct {
 } appbox_context_t;
 
 void appbox_init_default_controls(entity_t e);
+void appbox_update_default_controls(entity_t e);
 
 void appbox_share_with_app_link(const char* text);
 

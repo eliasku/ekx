@@ -1,2 +1,2 @@
-- [ ] 
-- [ ] 
+- [ ] C port: dev-tools (editor/inspector)
+- [ ] C port: flash-export

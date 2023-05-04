@@ -10,8 +10,6 @@
 #include <utility>
 #include <type_traits>
 
-namespace ek {
-
 template<typename T, bool Overlap = false>
 inline void constructMove(T* dest, T* src, uint32_t count) {
     if constexpr(std::is_trivial_v<T>) {
@@ -371,5 +369,3 @@ public:
         return nullptr;
     }
 };
-
-}

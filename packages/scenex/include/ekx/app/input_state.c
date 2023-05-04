@@ -18,15 +18,15 @@ touch_t* get_or_create_touch(uint64_t id) {
     return NULL;
 }
 
-vec2_t coord_screen_to_game_display(const game_display_info* display_info, const vec2_t screenPos) {
-    const vec2_t size = display_info->destinationViewport.size;
-    const vec2_t offset = display_info->destinationViewport.position;
-    const vec2_t displaySize = display_info->size;
-    const float invScale = 1.0f / fminf(size.x / displaySize.x, size.y / displaySize.y);
+static vec2_t coord_screen_to_game_display(const game_display_info* display_info, const vec2_t screenPos) {
+    const vec2_t size = display_info->dest_viewport.size;
+    const vec2_t offset = display_info->dest_viewport.position;
+    const vec2_t display_size = display_info->size;
+    const float invScale = 1.0f / fminf(size.x / display_size.x, size.y / display_size.y);
     return scale_vec2(sub_vec2(screenPos, offset), invScale);
 }
 
-void emulate_mouse_as_touch(const ek_app_event* event, touch_t* data, vec2_t pos) {
+static void emulate_mouse_as_touch(const ek_app_event* event, touch_t* data, vec2_t pos) {
     const bool active_prev = data->state & TOUCH_STATE_ACTIVE;
     // keep prev state
     uint32_t new_state = data->state & TOUCH_STATE_ACTIVE;

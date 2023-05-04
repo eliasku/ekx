@@ -15,10 +15,10 @@ bool EditRect(const char* label, float* xywh, float v_speed = 1.0f, const char* 
 
 bool ToolbarButton(const char* label, bool active, const char* tooltip);
 
-bool InputText(const char* label, ek::String* str, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr,
+bool InputText(const char* label, String* str, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr,
                void* user_data = nullptr);
 
-bool InputTextMultiline(const char* label, ek::String* str, const ImVec2& size = ImVec2(0, 0), ImGuiInputTextFlags flags = 0,
+bool InputTextMultiline(const char* label, String* str, const ImVec2& size = ImVec2(0, 0), ImGuiInputTextFlags flags = 0,
                         ImGuiInputTextCallback callback = nullptr, void* user_data = nullptr);
 
 }

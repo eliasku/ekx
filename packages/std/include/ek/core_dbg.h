@@ -21,16 +21,17 @@ enum {
 extern int _core_dbg_stats[EK_CORE_DBG_MAX_COUNT];
 
 #ifndef NDEBUG
+
 void ek_core_dbg_inc(int m);
-
 void ek_core_dbg_dec(int m);
-
 int ek_core_dbg_get(int m);
 
 #else
+
 #define ek_core_dbg_inc(x) ((void)(x))
 #define ek_core_dbg_dec(x) ((void)(x))
 #define ek_core_dbg_get(x) (0)
+
 #endif
 
 #ifdef __cplusplus

@@ -72,7 +72,7 @@ target_link_libraries(${PROJECT_NAME}
         PUBLIC pugixml
         PUBLIC cairo
         PUBLIC miniz
-        PUBLIC ekx::core
+        PUBLIC ekx::std
         PUBLIC calo
         )
 

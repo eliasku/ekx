@@ -1,10 +1,13 @@
 cmake_minimum_required(VERSION 3.19)
 project(appbox)
 
-add_library(${PROJECT_NAME} STATIC "")
-add_library(ekx::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_library(${PROJECT_NAME} STATIC
+        src/ads.c
+        src/appbox.c
+)
 
-add_subdirectory(src)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
+add_library(ekx::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME}
         PUBLIC scenex
@@ -35,8 +38,6 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(EK_COMPILER_LTO "")
 endif ()
 
-#target_compile_definitions(${PROJECT_NAME} PUBLIC)
-
 target_compile_options(${PROJECT_NAME}
         PRIVATE -fno-exceptions
         PRIVATE -fno-rtti
@@ -44,14 +45,3 @@ target_compile_options(${PROJECT_NAME}
         PRIVATE -Wstrict-aliasing=2
         ${EK_COMPILE_WARNINGS}
         )
-
-#if (CMAKE_BUILD_TYPE MATCHES Debug)
-#    target_compile_options(${PROJECT_NAME} PRIVATE -g)
-#else ()
-#    target_compile_options(${PROJECT_NAME} PRIVATE -Oz)
-#    if (${CMAKE_SYSTEM_NAME} MATCHES "Android" OR
-#            ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-#    else ()
-#        target_compile_options(${PROJECT_NAME} PRIVATE -flto)
-#    endif ()
-#endif ()

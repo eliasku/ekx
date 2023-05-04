@@ -117,8 +117,8 @@ void SceneWindow::onDraw() {
     }
 
     // update size
-    const float k = display.info.dpiScale;
-    display.info.destinationViewport = rect(
+    const float k = display.info.dpi_scale;
+    display.info.dest_viewport = rect(
             k * displayPos.x, k * displayPos.y,
             k * displaySize.x, k * displaySize.y
     );
@@ -182,7 +182,7 @@ SceneWindow::SceneWindow() {
     display.simulated = true;
     display.info.size = {120, 120};
     display.info.window = {120, 120};
-    display.info.dpiScale = 1.0f;
+    display.info.dpi_scale = 1.0f;
 
     view.view3.projectionMatrix = mat4_perspective_rh(to_radians(45.0f), 4.0f / 3.0f, 10.0f, 1000.0f);
     view.view3.viewMatrix = mat4_look_at_rh(vec3(0, 0, 100), {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});

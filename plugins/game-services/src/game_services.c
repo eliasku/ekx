@@ -3,9 +3,9 @@
 #include <ek/log.h>
 
 #if defined(__APPLE__) && (TARGET_OS_IOS || TARGET_OS_TV)
-#include "ek_game_services_ios.c.h"
+#include "game_services_ios.c.h"
 #elif defined(__ANDROID__)
-#include "ek_game_services_android.c.h"
+#include "game_services_android.c.h"
 #else
 
 void ek_game_services_init(void) {

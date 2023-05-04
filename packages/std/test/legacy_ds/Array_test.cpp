@@ -1,6 +1,5 @@
 #include <unit.h>
-#include "Array.hpp"
-
+#include <ek/ds/Array.hpp>
 
 struct NonTrivialStruct {
     int counter = 0;
@@ -29,7 +28,6 @@ SUITE(cxx_array) {
 
     IT("move and copy")
     {
-        using namespace ek;
         {
             Array<int> a;
             a.push_back(1);
@@ -83,7 +81,7 @@ SUITE(cxx_array) {
     IT("push, erase, insert")
     {
 
-        ek::Array<int> arr{};
+        Array<int> arr{};
 
         REQUIRE(arr.size() == 0);
         for (int i = 0; i < 20000; i += 50) {
