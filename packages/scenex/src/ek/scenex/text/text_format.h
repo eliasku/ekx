@@ -44,15 +44,6 @@ typedef struct text_layer_effect_ {
     uint8_t strength;
     bool visible;
     bool showGlyphBounds;
-
-//    text_layer_type type = TEXT_LAYER_TEXT;
-//    color_t color = COLOR_WHITE;
-//    vec2_t offset = {};
-//    float blurRadius = 0.0f;
-//    uint8_t blurIterations = 0;
-//    uint8_t strength = 0;
-//    bool visible = true;
-//    bool showGlyphBounds = false;
 } text_layer_effect_t;
 
 // 8 + 4 + 4 + 4 + 8 + 4(flags) = 32

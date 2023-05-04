@@ -219,7 +219,7 @@ vec4_t mul_vec4(vec4_t a, vec4_t b) {
 }
 
 vec2_t normalize_vec2(vec2_t a) {
-    vec2_t result = {};
+    vec2_t result = {0};
     const float ls = length_vec2(a);
     if (ls != 0.0f) {
         result = scale_vec2(a, 1.0f / ls);
@@ -228,7 +228,7 @@ vec2_t normalize_vec2(vec2_t a) {
 }
 
 vec3_t normalize_vec3(vec3_t a) {
-    vec3_t result = {};
+    vec3_t result = {0};
     const float ls = length_vec3(a);
     if (ls != 0.0f) {
         result = scale_vec3(a, 1.0f / ls);
@@ -237,7 +237,7 @@ vec3_t normalize_vec3(vec3_t a) {
 }
 
 vec4_t normalize_vec4(vec4_t a) {
-    vec4_t result = {};
+    vec4_t result = {0};
     const float ls = length_vec4(a);
     if (ls != 0.0f) {
         result = scale_vec4(a, 1.0f / ls);

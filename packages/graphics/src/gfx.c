@@ -150,7 +150,7 @@ sg_image ek_gfx_make_render_target(int width, int height, const char* label) {
 }
 
 void ek_gfx_update_image_0(sg_image image, void* data, size_t size) {
-    sg_image_data image_data = {};
+    sg_image_data image_data = {0};
     image_data.subimage[0][0].ptr = data;
     image_data.subimage[0][0].size = size;
     sg_update_image(image, &image_data);

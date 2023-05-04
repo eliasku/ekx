@@ -340,42 +340,41 @@ static void launcher_on_frame(void) {
     static int init_step = 0;
 
     const float steps = 5.0f;
-    {
-        //EK_PROFILE_SCOPE(INIT_JOB);
-        switch (init_step) {
-            case 0:
-                ++init_step;
-                ek_gfx_setup(DRAW_CALLS_MAX);
-                EDITOR_SETUP;
-                break;
-            case 1:
-                ++init_step;
-                canvas_setup();
-                break;
-            case 2:
-                ++init_step;
-                ecx_setup();
-                setup_scene_x();
-                break;
-            case 3:
-                ++init_step;
-                UITEST_SETUP;
-                game_app_pre_load();
-                break;
-            case 4:
-                // dispatch pre-load event
-                if(game_app_state.delegate.pre_load) {
-                    game_app_state.delegate.pre_load();
-                }
-                // load root pack asset, which will load all dependent assets
-                assets_root_pack_load("pack.bin");
-                ++init_step;
-                break;
-            default:
-                ek_app.on_frame = game_app_frame;
-                ek_app.on_event = game_app_event;
-                break;
-        }
+
+    //EK_PROFILE_SCOPE(INIT_JOB);
+    switch (init_step) {
+        case 0:
+            ++init_step;
+            ek_gfx_setup(DRAW_CALLS_MAX);
+            EDITOR_SETUP;
+            break;
+        case 1:
+            ++init_step;
+            canvas_setup();
+            break;
+        case 2:
+            ++init_step;
+            ecx_setup();
+            setup_scene_x();
+            break;
+        case 3:
+            ++init_step;
+            UITEST_SETUP;
+            game_app_pre_load();
+            break;
+        case 4:
+            // dispatch pre-load event
+            if(game_app_state.delegate.pre_load) {
+                game_app_state.delegate.pre_load();
+            }
+            // load root pack asset, which will load all dependent assets
+            assets_root_pack_load("pack.bin");
+            ++init_step;
+            break;
+        default:
+            ek_app.on_frame = game_app_frame;
+            ek_app.on_event = game_app_event;
+            break;
     }
 
     if (init_step > 0) {

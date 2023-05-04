@@ -227,7 +227,7 @@ sweep_test_t intersect_ray_rect(const rect_t rc, const vec2_t origin, const vec2
 sweep_test_t sweep_circles(const vec3_t c0,
                            const vec3_t c1,
                            const vec2_t delta) {
-    sweep_test_t result = {};
+    sweep_test_t result = {0};
     const vec2_t s = sub_vec2(c1.xy, c0.xy);
     const float r = c1.z + c0.z;
     const float c = dot_vec2(s, s) - r * r;
@@ -284,7 +284,7 @@ sweep_test_t sweep_circle_rect(const vec3_t circle,
     float r = circle.z;
 //    float dx = rect_delta.x - circle_delta.x;
 //    float dy = rect_delta.y - circle_delta.y;
-    vec2_t cp = {};
+    vec2_t cp = {0};
     bool corner = false;
 
     float t0 = 1000000.0f;

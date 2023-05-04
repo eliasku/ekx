@@ -191,7 +191,7 @@ void color2_mul(color2_t* out, color2_t l, color2_t r) {
 }
 
 color2f_t color2f(void) {
-    return color2f_v(vec4(1, 1, 1, 1), (vec4_t) {});
+    return color2f_v(vec4(1, 1, 1, 1), (vec4_t) {0});
 }
 
 color2f_t color2f_v(vec4_t scale, vec4_t offset) {

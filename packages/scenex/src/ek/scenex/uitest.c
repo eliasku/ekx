@@ -136,6 +136,8 @@ void uitest_setup(void) {
 
 #else
 
-void uitest_setup(void) {}
+void uitest_setup(void) {
+    // empty
+}
 
 #endif // EK_UITEST

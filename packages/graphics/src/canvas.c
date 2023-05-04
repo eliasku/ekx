@@ -76,7 +76,7 @@ void ek_canvas_buffers_destroy(ek_canvas_buffers* buffers) {
 /// endregion
 
 sg_layout_desc ek_vertex2d_layout_desc(void) {
-    sg_layout_desc layout = {};
+    sg_layout_desc layout = {0};
     layout.buffers[0].stride = sizeof(ek_vertex2d);
     layout.attrs[0].offset = offsetof(ek_vertex2d, x);
     layout.attrs[0].format = SG_VERTEXFORMAT_FLOAT2;
@@ -502,7 +502,7 @@ static float triangle_area(const ek_vertex2d* vertices, const uint16_t* indices,
 
 static sg_pipeline
 create_pipeline_for_cache(sg_shader shader, bool useRenderTarget, bool depthStencil) {
-    sg_pipeline_desc pip_desc = {};
+    sg_pipeline_desc pip_desc = {0};
     pip_desc.layout = ek_vertex2d_layout_desc();
     pip_desc.shader = shader;
     pip_desc.index_type = SG_INDEXTYPE_UINT16;
@@ -713,7 +713,7 @@ void canvas_shutdown(void) {
 
 void canvas_new_frame(void) {
     EK_ASSERT(!(canvas.state & EK_CANVAS_PASS_ACTIVE));
-    canvas.stats = (ek_canvas_frame_stats){};
+    canvas.stats = (ek_canvas_frame_stats){0};
     ek_canvas_buffers_rewind(&canvas.vbs);
     ek_canvas_buffers_rewind(&canvas.ibs);
 }
@@ -735,7 +735,7 @@ void canvas_begin_ex(const rect_t viewport, const mat3x2_t view, sg_image render
     canvas.color[0] = color2_identity();
     canvas.uv[0] = rect_01();
 
-    canvas.curr = (ek_canvas_batch_state){};
+    canvas.curr = (ek_canvas_batch_state){0};
     canvas.next.shader = canvas.shader[0];
     canvas.next.image = canvas.image[0];
     canvas.next.scissors = (i16rect_t){{

@@ -48,7 +48,7 @@ SUITE(bitmap) {
     }
 
     IT("fill") {
-        uint32_t pixels[4] = {};
+        uint32_t pixels[4] = {0};
         bitmap_t bmp2x2 = {2, 2, (color_t*) pixels};
 
         CHECK_EQ(pixels[0], 0u);

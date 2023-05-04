@@ -46,7 +46,7 @@ void on_frame() {
     const float width = ek_app.viewport.width;
     const float height = ek_app.viewport.height;
     if (width > 0 && height > 0) {
-        static sg_pass_action pass_action = {};
+        static sg_pass_action pass_action = {0};
         pass_action.colors[0].action = SG_ACTION_CLEAR;
         const vec4_t fillColor = vec4_color(ARGB(ek_app.config.background_color));
         pass_action.colors[0].value.r = fillColor.x;
