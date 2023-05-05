@@ -526,12 +526,12 @@ create_pipeline_for_cache(sg_shader shader, bool useRenderTarget, bool depthSten
     return sg_make_pipeline(&pip_desc);
 }
 
-static sg_pipeline get_pipeline(sg_shader shader, bool useRenderTarget, bool depthStencilPass) {
+static sg_pipeline get_pipeline(sg_shader shader, bool use_render_target, bool depth_stencil_pass) {
     uint32_t mode = 0;
-    if (useRenderTarget) {
+    if (use_render_target) {
         mode |= 0x1;
     }
-    if (depthStencilPass) {
+    if (depth_stencil_pass) {
         mode |= 0x2;
     }
     for (int i = 0; i < canvas.pipelines_num; ++i) {
@@ -544,7 +544,7 @@ static sg_pipeline get_pipeline(sg_shader shader, bool useRenderTarget, bool dep
     ek_canvas_pipeline_item item;
     item.mode = mode;
     item.shader = shader;
-    item.pipeline = create_pipeline_for_cache(shader, useRenderTarget, depthStencilPass);
+    item.pipeline = create_pipeline_for_cache(shader, use_render_target, depth_stencil_pass);
 
     canvas.pipelines[canvas.pipelines_num++] = item;
     log_debug("pipelines: %d", canvas.pipelines_num);

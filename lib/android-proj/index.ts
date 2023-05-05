@@ -191,8 +191,8 @@ export function generateNativeApp(): BaseModuleConfig {
         ],
         android: {
             compileSdk: 33,
-            buildToolsVersion: "33.0.0",
-            ndkVersion: "23.1.7779620",
+            buildToolsVersion: "34.0.0-rc3",
+            ndkVersion: "25.2.9519653",
             signingConfigs: {},
             defaultConfig: {
                 applicationId: "com.eliasku.native_project_preset",

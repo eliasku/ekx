@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 android {
     compileSdk 30
-    buildToolsVersion "30.0.3"
-    ndkVersion "23.1.7779620"
+    buildToolsVersion "34.0.0-rc3"
+    ndkVersion "25.2.9519653"
     signingConfigs {
         // SIGNING_CONFIGS
     }
