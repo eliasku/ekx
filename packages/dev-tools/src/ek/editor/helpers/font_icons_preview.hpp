@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ek/editor/imgui/cimgui.h>
 #include <fonts/IconsMaterialDesign.h>
 #include <fonts/IconsFontAwesome5.h>
 
@@ -10,11 +11,11 @@ void show_icons_md(void);
 void show_icons_fa(void);
 
 void font_icons_preview(bool* opened) {
-    if (ImGui::Begin("Preview Font Icons###FontIconsPreview", opened)) {
+    if (ImGui_Begin("Preview Font Icons###FontIconsPreview", opened, 0)) {
         font_icons_preview_filter.Draw();
         show_icons_fa();
     }
-    ImGui::End();
+    ImGui_End();
 }
 
 void button_preview_icon(const char* title) {
@@ -23,7 +24,7 @@ void button_preview_icon(const char* title) {
             return;
         }
     }
-    ImGui::Button(title);
+    ImGui_Button(title);
 }
 
 #define ICONS_PREVIEW_ICON_BUTTON(s) button_preview_icon(s " " #s)

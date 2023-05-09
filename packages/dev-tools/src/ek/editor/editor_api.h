@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-// load editor config and set window size from prev session
-void editor_load(void);
+// init editor and load state: set window size and windows layout and state from prev session
+void editor_init(void);
 
 // create editor instance
 void editor_setup(void);

@@ -430,7 +430,7 @@ void run_app(void) {
     assets_init();
     game_app_state.scale_factor = 1;
 
-    EDITOR_LOAD_SETTINGS;
+    EDITOR_INIT;
 
     ek_app.on_ready = launcher_on_ready;
     ek_app.on_frame = launcher_on_frame;

@@ -1,8 +1,6 @@
 #pragma once
 
-#include "ResourcesWindow.hpp"
 #include <gen_sg.h>
-
 #include <ek/audio.h>
 #include <ek/scenex/text/font.h>
 #include <ek/scenex/3d/scene3d.h>
@@ -27,29 +25,29 @@ void draw_sg_info(void* asset) {
         return;
     }
     uint32_t scenes_count = arr_size(sg_file->scenes);
-    if (ImGui::TreeNode("##scene-list", "Scenes (%u)", scenes_count)) {
+    if (ImGui_TreeNode("##scene-list", "Scenes (%u)", scenes_count)) {
         for(uint32_t i = 0; i < scenes_count; ++i) {
             string_hash_t name = sg_file->scenes[i];
             ImGui::Text("%u %s", name, hsp_get(name));
         }
-        ImGui::TreePop();
+        ImGui_TreePop();
     }
     uint32_t linkages_count = arr_size(sg_file->linkages);
-    if (ImGui::TreeNode("##linkages-list", "Linkages (%u)", linkages_count)) {
+    if (ImGui_TreeNode("##linkages-list", "Linkages (%u)", linkages_count)) {
         for(uint32_t i = 0; i < linkages_count; ++i) {
             sg_scene_info_t info = sg_file->linkages[i];
-            auto* node = sg_get(sg_file, info.linkage);
-            if (ImGui::TreeNode(node, "%u %s -> %u %s", info.name, hsp_get(info.name), info.linkage,
+            const sg_node_data_t* node = sg_get(sg_file, info.linkage);
+            if (ImGui_TreeNode(node, "%u %s -> %u %s", info.name, hsp_get(info.name), info.linkage,
                                 hsp_get(info.linkage))) {
                 if (node) {
                     ImGui::TextUnformatted("todo:");
                 } else {
                     ImGui::TextDisabled("Not found");
                 };
-                ImGui::TreePop();
+                ImGui_TreePop();
             }
         }
-        ImGui::TreePop();
+        ImGui_TreePop();
     }
 }
 
@@ -81,7 +79,7 @@ void draw_atlas_info(void* asset) {
         } else {
             ImGui::TextDisabled("Unloaded");
         }
-        ImGui::Separator();
+        ImGui_Separator();
     }
 }
 
@@ -152,7 +150,7 @@ void draw_rr_items(const char* type_name, rr_man_t* rr, void (* fn)(void* item))
     }
 }
 
-void ResourcesWindow::onDraw() {
+void draw_resources_window(void) {
     if (ImGui::BeginTabBar("res_by_type", 0)) {
         draw_rr_items("image", &res_image.rr, 0);
         draw_rr_items("shader", &res_shader.rr, 0);

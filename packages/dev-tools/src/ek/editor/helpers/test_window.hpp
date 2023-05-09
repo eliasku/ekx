@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ek/editor/imgui/cimgui.h>
+
 struct gain_bias_params_t {
     float bias = 0.5f;
     bool gain = true;
@@ -33,14 +35,14 @@ void plot_linear() {
 }
 
 static
-void draw_test_window() {
+void draw_test_window(void) {
     {
         static gain_bias_params_t gain_bias{};
         ImGui::DragFloat("Bias", &gain_bias.bias, 0.01f, 0.01f, 0.99f);
         ImGui::Checkbox("Gain", &gain_bias.gain);
         static back_params_t back_params{};
         ImGui::DragFloat("Back Overshoot", &back_params.overshoot, 0.01f, 0.0f, 10.0f);
-        if (ImGui::Button("Reset##back_overshoot")) {
+        if (ImGui_Button("Reset##back_overshoot")) {
             back_params = {};
         }
         if (ImPlot::BeginPlot("Gain Bias", ImVec2(300, 300))) {

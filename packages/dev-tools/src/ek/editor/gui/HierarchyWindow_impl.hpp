@@ -14,6 +14,32 @@
 #include <ek/scenex/2d/camera2d.h>
 #include <ek/scenex/3d/scene3d.h>
 
+HierarchyWindow editor_hierarchy_window;
+
+void draw_hierarchy_window(void) {
+    editor_hierarchy_window.drawFilter();
+    if (!is_entity(editor_hierarchy_window.root)) {
+        ImGui::TextColored({1, 0, 0, 1}, "No roots");
+    } else {
+        ImGui::Indent(40.0f);
+        if (editor_hierarchy_window.filter.IsActive()) {
+            editor_hierarchy_window.drawEntityFiltered(editor_hierarchy_window.root, true, true);
+        } else {
+            editor_hierarchy_window.drawEntityInTree(editor_hierarchy_window.root, true, true);
+        }
+//        for(auto e3d: ecs::view<Transform3D>()) {
+//            if(ecs::get<NodeName>(e3d).name == "scene 3d") {
+//                drawEntityInTree(e3d, true, true);
+//            }
+//        }
+        ImGui::Unindent(40.0f);
+    }
+}
+
+HierarchyWindow::HierarchyWindow() = default;
+
+HierarchyWindow::~HierarchyWindow() = default;
+
 entity_t HierarchyWindow::getSiblingNext(entity_t e) {
     const auto* node = get_node(e);
     return node ? node->sibling_next : NULL_ENTITY;
@@ -238,26 +264,6 @@ void HierarchyWindow::drawFilter() {
         if (ImGui::Button(ICON_FA_TIMES_CIRCLE)) {
             filter.Clear();
         }
-    }
-}
-
-void HierarchyWindow::onDraw() {
-    drawFilter();
-    if (!is_entity(root)) {
-        ImGui::TextColored({1, 0, 0, 1}, "No roots");
-    } else {
-        ImGui::Indent(40.0f);
-        if (filter.IsActive()) {
-            drawEntityFiltered(root, true, true);
-        } else {
-            drawEntityInTree(root, true, true);
-        }
-//        for(auto e3d: ecs::view<Transform3D>()) {
-//            if(ecs::get<NodeName>(e3d).name == "scene 3d") {
-//                drawEntityInTree(e3d, true, true);
-//            }
-//        }
-        ImGui::Unindent(40.0f);
     }
 }
 

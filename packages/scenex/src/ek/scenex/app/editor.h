@@ -9,7 +9,7 @@
 
 #define DRAW_CALLS_MAX 1024
 
-#define EDITOR_LOAD_SETTINGS editor_load()
+#define EDITOR_INIT editor_init()
 #define EDITOR_SETUP editor_setup()
 
 #define EDITOR_RENDER_OVERLAY editor_render_overlay()
@@ -23,7 +23,7 @@
 
 #define DRAW_CALLS_MAX 128
 
-#define EDITOR_LOAD_SETTINGS ((void)0)
+#define EDITOR_INIT ((void)0)
 #define EDITOR_SETUP ((void)0)
 
 #define EDITOR_RENDER_OVERLAY ((void)0)

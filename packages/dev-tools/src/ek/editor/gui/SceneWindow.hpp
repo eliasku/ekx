@@ -1,6 +1,5 @@
 #pragma once
 
-#include "EditorWindow.hpp"
 #include <ekx/app/game_display.h>
 
 struct SceneView2D {
@@ -43,13 +42,10 @@ struct SceneView {
 };
 
 
-struct SceneWindow : public EditorWindow {
-
+struct SceneWindow {
     SceneWindow();
 
-    ~SceneWindow() override = default;
-
-    void onDraw() override;
+    ~SceneWindow();
 
     game_display display = {};
     SceneView view{};
@@ -74,3 +70,6 @@ struct SceneWindow : public EditorWindow {
     void manipulateObject2D();
     void manipulateObject3D();
 };
+
+extern SceneWindow editor_scene_window;
+void draw_scene_window(void);

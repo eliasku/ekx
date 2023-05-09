@@ -1,22 +1,15 @@
 #pragma once
 
-#include "EditorWindow.hpp"
+#include <calo_stream.h>
 
-struct GameWindow : public EditorWindow {
-
-    bool paused = false;
-    float timeScale = 1.0f;
-    bool profiler = false;
-
-    GameWindow() {
-        name = "GameWindow";
-        title = ICON_FA_GAMEPAD " Game###GameWindow";
-        full_frame = true;
-    }
-
-    ~GameWindow() override = default;
-
-    void onDraw() override;
-    void onLoad(const pugi::xml_node& xml) override;
-    void onSave(pugi::xml_node& xml) override;
+struct GameWindow {
+    bool paused;
+    float time_scale;
+    bool profiler;
 };
+
+void game_window_draw(void);
+void game_window_load(calo_reader_t* r);
+void game_window_save(calo_writer_t* w);
+
+extern GameWindow editor_game_window;

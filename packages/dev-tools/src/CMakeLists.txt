@@ -5,6 +5,7 @@ add_library(${PROJECT_NAME} STATIC
         ek/editor/gui/EditorGUI.cpp
         ek/editor/gui/Widgets_impl.hpp
 
+        ek/editor/imgui/cimgui.cpp
         ek/editor/imgui/ekimgui.h
         ek/editor/imgui/ekimgui.cpp
         ek/editor/imgui/imgui.hpp
@@ -45,13 +46,5 @@ target_link_libraries(${PROJECT_NAME}
         PUBLIC scenex
         PUBLIC ekx::std
         PUBLIC imgui
-        PUBLIC pugixml
+        PUBLIC calo
         )
-
-target_compile_definitions(${PROJECT_NAME}
-        PUBLIC PUGIXML_NO_XPATH
-        PUBLIC PUGIXML_NO_STL
-        PUBLIC PUGIXML_NO_EXCEPTIONS)
-
-#set_target_properties(${PROJECT_NAME} PROPERTIES
-#        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../build")

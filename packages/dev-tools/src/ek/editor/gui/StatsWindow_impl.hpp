@@ -15,7 +15,7 @@ static float getterProfilerTrackValue(void* data, int idx) {
     return track->hist[(track->hist_i + idx) % PROFILE_TRACK_CAPACITY];
 }
 
-void StatsWindow::onDraw() {
+void draw_stats_window(void) {
     auto stats = canvas.stats;
     const float drawableArea = ek_app.viewport.width * ek_app.viewport.height;
     ImGui::Text("%ld µs | dc: %u | tri: %u | fill: %d%%",

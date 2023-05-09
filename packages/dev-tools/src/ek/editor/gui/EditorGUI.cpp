@@ -1,6 +1,7 @@
 #include <ek/editor/Editor.hpp>
 
 #include <ek/scenex/app/base_game.h>
+#include <ek/editor/imgui/cimgui.h>
 #include <ek/editor/imgui/imgui.hpp>
 #include <ekx/app/input_state.h>
 
@@ -35,7 +36,7 @@ bool test_window_f;
 
 void editor_draw_gui(void) {
     // TODO: 2d/3d root
-    g_editor.hierarchy.root = game_app_state.root;
+    editor_hierarchy_window.root = game_app_state.root;
 
     bool resetLayout = false;
     if (ImGui::BeginMainMenuBar()) {
@@ -46,7 +47,7 @@ void editor_draw_gui(void) {
         if (ImGui::BeginMenu("Debug")) {
             ImGui::MenuItem("Emulate Touch Input", nullptr, &g_input_state.emulate_touch);
             ///
-            ImGui::Separator();
+            ImGui_Separator();
             ImGui::Text("User Insets Absolute");
             ImGui::DragFloat4("##userInsetsAbsolute",
                               game_app_state.display.info.user_insets_abs.data);
@@ -54,7 +55,7 @@ void editor_draw_gui(void) {
             ImGui::SliderFloat4("##userInsetsRelative",
                                 game_app_state.display.info.user_insets_rel.data, 0.0f, 1.0f);
 
-            ImGui::Separator();
+            ImGui_Separator();
 
             if (ImGui::BeginMenu(ICON_FA_FEATHER_ALT " Sokol")) {
                 ImGui::MenuItem("Capabilities", NULL, &sokol_gfx_gui_state.caps.open);
@@ -85,8 +86,9 @@ void editor_draw_gui(void) {
         }
 
         if (ImGui::BeginMenu("Window")) {
-            for (auto* wnd: g_editor.windows) {
-                wnd->mainMenu();
+            for (int i = 0; i < EDITOR_WINDOWS_NUM; ++i) {
+                editor_wnd_t* wnd = &g_editor.windows[i];
+                g_editor.config.dirty |= ImGui::MenuItem(wnd->title, NULL, &wnd->opened);
             }
             if (ImGui::MenuItem("Reset Layout")) {
                 resetLayout = true;
@@ -100,18 +102,18 @@ void editor_draw_gui(void) {
         ImGui::SameLine((ImGui::GetWindowContentRegionMax().x / 2.0f) -
                         (1.5f * (ImGui::GetFontSize() + ImGui::GetStyle().ItemSpacing.x)));
 
-        if (ImGui::Button(g_editor.game.paused ? ICON_FA_PLAY : ICON_FA_PAUSE)) {
-            g_editor.game.paused = !g_editor.game.paused;
-            g_editor.game.dirty = true;
+        if (ImGui::Button(editor_game_window.paused ? ICON_FA_PLAY : ICON_FA_PAUSE)) {
+            editor_game_window.paused = !editor_game_window.paused;
+            g_editor.config.dirty |= 1;
         }
         ImGui::SameLine();
         ImGui::SetNextItemWidth(100.0f);
-        g_editor.game.dirty |= ImGui::SliderFloat(ICON_FA_CLOCK, &g_editor.game.timeScale, 0.0f, 3.0f, "%.3f", 1.0f);
+        g_editor.config.dirty |= ImGui::SliderFloat(ICON_FA_CLOCK, &editor_game_window.time_scale, 0.0f, 3.0f, "%.3f", 1.0f);
         ImGui::SameLine();
-        g_editor.game.dirty |= ImGui::Checkbox(ICON_FA_STOPWATCH, &g_editor.game.profiler);
+        g_editor.config.dirty |= ImGui::Checkbox(ICON_FA_STOPWATCH, &editor_game_window.profiler);
 
-        s_profile_metrics.enabled = g_editor.game.profiler;
-        g_time_layers[TIME_LAYER_ROOT].scale = g_editor.game.paused ? 0.0f : g_editor.game.timeScale;
+        s_profile_metrics.enabled = editor_game_window.profiler;
+        g_time_layers[TIME_LAYER_ROOT].scale = editor_game_window.paused ? 0.0f : editor_game_window.time_scale;
 
         ImGui::EndMainMenuBar();
     }
@@ -150,12 +152,12 @@ void editor_draw_gui(void) {
         ImGui::DockBuilderDockWindow("###ConsoleWindow", DockingBottomLeftChild);
     }
 
-    for (auto* wnd: g_editor.windows) {
-        wnd->show();
+    for (int i = 0; i < EDITOR_WINDOWS_NUM; ++i) {
+        show_editor_window(&g_editor.windows[i]);
     }
 
-    g_editor.hierarchy.validateSelection();
-    g_editor.inspector.list = g_editor.hierarchy.selection;
+    editor_hierarchy_window.validateSelection();
+    inspector_list = editor_hierarchy_window.selection;
 
 #ifdef EK_DEV_TOOLS_DEBUG
     if (gui_demo_f) ImGui::ShowDemoWindow(&gui_demo_f);

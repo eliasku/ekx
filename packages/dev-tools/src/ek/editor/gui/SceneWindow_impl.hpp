@@ -3,6 +3,8 @@
 #include "SceneWindow.hpp"
 #include <ImGuizmo/ImGuizmo.h>
 
+SceneWindow editor_scene_window;
+
 // matrix 2d utility
 mat3x2_t matrix3Dto2D(const mat4_t m) {
     mat3x2_t result;
@@ -97,8 +99,8 @@ void SceneView::manipulateView() {
     }
 }
 
-void SceneWindow::onDraw() {
-    drawToolbar();
+void draw_scene_window(void) {
+    editor_scene_window.drawToolbar();
 
     const ImVec2 displayPos = ImGui::GetCursorScreenPos();
     const ImVec2 displaySize = ImGui::GetContentRegionAvail();
@@ -111,35 +113,35 @@ void SceneWindow::onDraw() {
     const bool canManipulateView = mouseInView && !ImGuizmo::IsUsing();
     const bool canSelectObjects = mouseInView && !(ImGuizmo::IsUsing() || ImGuizmo::IsOver());
 
-    view.rect = rect(displayPos.x, displayPos.y, displaySize.x, displaySize.y);
+    editor_scene_window.view.rect = rect(displayPos.x, displayPos.y, displaySize.x, displaySize.y);
     if (canManipulateView) {
-        view.manipulateView();
+        editor_scene_window.view.manipulateView();
     }
 
     // update size
-    const float k = display.info.dpi_scale;
-    display.info.dest_viewport = rect(
+    const float k = editor_scene_window.display.info.dpi_scale;
+    editor_scene_window.display.info.dest_viewport = rect(
             k * displayPos.x, k * displayPos.y,
             k * displaySize.x, k * displaySize.y
     );
-    display.info.window.x = displaySize.x;
-    display.info.window.y = displaySize.y;
-    display.info.size.x = k * displaySize.x;
-    display.info.size.y = k * displaySize.y;
-    game_display_update(&display);
+    editor_scene_window.display.info.window.x = displaySize.x;
+    editor_scene_window.display.info.window.y = displaySize.y;
+    editor_scene_window.display.info.size.x = k * displaySize.x;
+    editor_scene_window.display.info.size.y = k * displaySize.y;
+    game_display_update(&editor_scene_window.display);
 
     // add pass to render imgui
-    if (display.color.id && displaySize.x > 0 && displaySize.y > 0) {
-        auto texId = (void*) static_cast<uintptr_t>(display.color.id);
+    if (editor_scene_window.display.color.id && displaySize.x > 0 && displaySize.y > 0) {
+        auto texId = (void*) static_cast<uintptr_t>(editor_scene_window.display.color.id);
 
-        const sg_image_desc info = sg_query_image_desc(display.color);
-        const float texCoordX1 = display.info.size.x / (float) info.width;
-        const float texCoordY1 = display.info.size.y / (float) info.height;
+        const sg_image_desc info = sg_query_image_desc(editor_scene_window.display.color);
+        const float texCoordX1 = editor_scene_window.display.info.size.x / (float) info.width;
+        const float texCoordY1 = editor_scene_window.display.info.size.y / (float) info.height;
 
         ImDrawList* drawList = ImGui::GetWindowDrawList();
         drawList->AddImage(texId, {displayPos.x, displayPos.y},
-                           {displayPos.x + display.info.size.x,
-                            displayPos.y + display.info.size.y},
+                           {displayPos.x + editor_scene_window.display.info.size.x,
+                            displayPos.y + editor_scene_window.display.info.size.y},
                            {0, 0},
                            {texCoordX1, texCoordY1});
     }
@@ -149,36 +151,33 @@ void SceneWindow::onDraw() {
     ImGuizmo::SetDrawlist();
     ImGuizmo::SetRect(displayPos.x, displayPos.y, displaySize.x, displaySize.y);
 
-    if (!view.mode2D) {
-        ImGuizmo::ViewManipulate(view.view3.viewMatrix.data, 100.0f,
+    if (!editor_scene_window.view.mode2D) {
+        ImGuizmo::ViewManipulate(editor_scene_window.view.view3.viewMatrix.data, 100.0f,
                                  ImVec2(displayPos.x + displaySize.x - 128.0f, displayPos.y), ImVec2(100.0f, 100.0f),
                                  0x10101010);
     }
 
-    bool manipulationToolSelected = currentTool >= 2 && currentTool <= 6;
+    bool manipulationToolSelected = editor_scene_window.currentTool >= 2 && editor_scene_window.currentTool <= 6;
     if (manipulationToolSelected) {
-        if (view.mode2D) {
-            manipulateObject2D();
+        if (editor_scene_window.view.mode2D) {
+            editor_scene_window.manipulateObject2D();
         } else {
-            manipulateObject3D();
+            editor_scene_window.manipulateObject3D();
         }
     }
 
-    if (is_entity(root) && canSelectObjects) {
-        const auto wp = view.getMouseWorldPos();
-        entity_t target = hitTest(root, wp);
-        hoverTarget = target;
+    if (is_entity(editor_scene_window.root) && canSelectObjects) {
+        const auto wp = editor_scene_window.view.getMouseWorldPos();
+        entity_t target = editor_scene_window.hitTest(editor_scene_window.root, wp);
+        editor_scene_window.hoverTarget = target;
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            g_editor.hierarchy.select(target);
-            g_editor.hierarchy.focus(target);
+            editor_hierarchy_window.select(target);
+            editor_hierarchy_window.focus(target);
         }
     }
 }
 
 SceneWindow::SceneWindow() {
-    name = "SceneWindow";
-    title = ICON_FA_GLOBE " Scene###SceneWindow";
-    full_frame = true;
     display.simulated = true;
     display.info.size = {120, 120};
     display.info.window = {120, 120};
@@ -187,6 +186,8 @@ SceneWindow::SceneWindow() {
     view.view3.projectionMatrix = mat4_perspective_rh(to_radians(45.0f), 4.0f / 3.0f, 10.0f, 1000.0f);
     view.view3.viewMatrix = mat4_look_at_rh(vec3(0, 0, 100), {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
 }
+
+SceneWindow::~SceneWindow() = default;
 
 void drawBox2(rect_t rc, mat3x2_t m, color_t color1, color_t color2,
               bool cross = true, color_t fillColor = COLOR_ZERO) {
@@ -254,7 +255,7 @@ void SceneWindow::drawSceneNodeBounds(entity_t e) {
             m = mat3x2_mul(view.view2.matrix, transform->matrix);
         }
         rect_t b = disp->get_bounds ? disp->get_bounds(e) : rect_wh(0,0);
-        if (g_editor.hierarchy.isSelectedInHierarchy(e)) {
+        if (editor_hierarchy_window.isSelectedInHierarchy(e)) {
             drawBox2(b, m, COLOR_WHITE, COLOR_BLACK, true, ARGB(0x77FFFFFF));
         }
         if (hoverTarget.id == e.id) {
@@ -386,7 +387,7 @@ void SceneWindow::drawToolbar() {
 }
 
 void SceneWindow::manipulateObject2D() {
-    auto& selection = g_editor.hierarchy.selection;
+    auto& selection = editor_hierarchy_window.selection;
     if (selection.size() > 0 && is_entity(entity_id(selection[0]))) {
         entity_t sel = entity_id(selection[0]);
         auto worldMatrix2D = get_world_transform2d(sel)->matrix;
@@ -421,7 +422,7 @@ void SceneWindow::manipulateObject2D() {
 }
 
 void SceneWindow::manipulateObject3D() {
-    auto& selection = g_editor.hierarchy.selection;
+    auto& selection = editor_hierarchy_window.selection;
     if (selection.size() > 0 && is_entity(entity_id(selection[0]))) {
         entity_t sel = entity_id(selection[0]);
         auto worldMatrix2D = get_world_transform2d(sel)->matrix;

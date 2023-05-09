@@ -1,13 +1,48 @@
 #pragma once
 
-#include "ConsoleWindow.hpp"
-
 // `system` function
 #include <cstdlib>
+#include <ek/log.h>
 #include <ek/print.h>
+#include <ek/ds/PodArray.hpp>
 
+typedef struct {
+    char text[1024];
+    const char* icon;
+    const char* file;
+    int line;
+    ImU32 color;
+    log_level_t verbosity;
+    uint8_t tick;
+} console_msg_t;
 
-static ConsoleWindow* g_con = nullptr;
+typedef struct {
+    const char* name;
+    const char* icon;
+    ImU32 color;
+    log_level_t verbosity;
+    unsigned count;
+    bool show;
+} verbosity_filter_t;
+
+static struct {
+    console_msg_t messages[1024];
+    uint32_t messages_num;
+    uint32_t messages_cur;
+    PodArray<const char*> commands;
+    PodArray<const char*> candidates;
+    PodArray<char*> history;
+    ImGuiTextFilter text_filter{};
+    verbosity_filter_t infos[6];
+
+    char input[1024];
+
+    // -1: new line, 0..History.Size-1 browsing history
+    int history_pos;
+
+    bool auto_scroll;
+    bool scroll_down_required;
+} console;
 
 // string utilities
 static void trim_right(char* s) {
@@ -19,9 +54,8 @@ static void trim_right(char* s) {
 }
 
 static int on_console_input_command_callback(ImGuiInputTextCallbackData* data) {
-    auto* con = static_cast<ConsoleWindow*>(data->UserData);
-    auto& commands = con->commands;
-    auto& candidates = con->candidates;
+    auto& commands = console.commands;
+    auto& candidates = console.candidates;
     //AddLog("cursor: %d, selection: %d-%d", data->CursorPos, data->SelectionStart, data->SelectionEnd);
     switch (data->EventFlag) {
         case ImGuiInputTextFlags_CallbackCompletion: {
@@ -86,24 +120,24 @@ static int on_console_input_command_callback(ImGuiInputTextCallbackData* data) {
         }
         case ImGuiInputTextFlags_CallbackHistory: {
             // Example of HISTORY
-            const int prev_history_pos = con->history_pos;
+            const int prev_history_pos = console.history_pos;
             if (data->EventKey == ImGuiKey_UpArrow) {
-                if (con->history_pos == -1) {
-                    con->history_pos = static_cast<int>(con->history.size()) - 1;
-                } else if (con->history_pos > 0) {
-                    --con->history_pos;
+                if (console.history_pos == -1) {
+                    console.history_pos = static_cast<int>(console.history.size()) - 1;
+                } else if (console.history_pos > 0) {
+                    --console.history_pos;
                 }
             } else if (data->EventKey == ImGuiKey_DownArrow) {
-                if (con->history_pos != -1) {
-                    if (++con->history_pos >= con->history.size()) {
-                        con->history_pos = -1;
+                if (console.history_pos != -1) {
+                    if (++console.history_pos >= console.history.size()) {
+                        console.history_pos = -1;
                     }
                 }
             }
 
             // A better implementation would preserve the data on the current input line along with cursor position.
-            if (prev_history_pos != con->history_pos) {
-                const char* history_str = (con->history_pos >= 0) ? con->history[con->history_pos] : "";
+            if (prev_history_pos != console.history_pos) {
+                const char* history_str = (console.history_pos >= 0) ? console.history[console.history_pos] : "";
                 data->DeleteChars(0, data->BufTextLen);
                 data->InsertChars(0, history_str);
             }
@@ -113,8 +147,8 @@ static int on_console_input_command_callback(ImGuiInputTextCallbackData* data) {
 }
 
 static void clear_console(void) {
-    g_con->messages_num = 0;
-    g_con->messages_cur = 0;
+    console.messages_num = 0;
+    console.messages_cur = 0;
 }
 
 static void execute_command(const char* cmd) {
@@ -122,47 +156,47 @@ static void execute_command(const char* cmd) {
 
     // Insert into history. First find match and delete it so it can be pushed to the back.
     // This isn't trying to be smart or optimal.
-    g_con->history_pos = -1;
-    for (int i = static_cast<int>(g_con->history.size()) - 1; i >= 0; --i) {
-        if (strcasecmp(g_con->history[i], cmd) == 0) {
-            free(g_con->history[i]);
-            g_con->history.erase_at(i);
+    console.history_pos = -1;
+    for (int i = static_cast<int>(console.history.size()) - 1; i >= 0; --i) {
+        if (strcasecmp(console.history[i], cmd) == 0) {
+            free(console.history[i]);
+            console.history.erase_at(i);
             break;
         }
     }
     size_t cmdLen = strlen(cmd);
     char* cmdCopy = (char*)malloc(cmdLen + 1);
     memcpy(cmdCopy, cmd, cmdLen + 1);
-    g_con->history.push_back(cmdCopy);
+    console.history.push_back(cmdCopy);
     // Process command
     if (strcasecmp(cmd, "CLEAR") == 0) {
         clear_console();
     } else if (strcasecmp(cmd, "HELP") == 0) {
         log_info("Commands:");
-        for (auto* command: g_con->commands) {
+        for (auto* command: console.commands) {
             log_info("- %s", command);
         }
     } else if (strcasecmp(cmd, "HISTORY") == 0) {
-        int first = static_cast<int>(g_con->history.size()) - 10;
-        for (int i = first > 0 ? first : 0; i < g_con->history.size(); ++i) {
-            log_info("%3d: %s", i, g_con->history[i]);
+        int first = static_cast<int>(console.history.size()) - 10;
+        for (int i = first > 0 ? first : 0; i < console.history.size(); ++i) {
+            log_info("%3d: %s", i, console.history[i]);
         }
     } else {
         log_info("Unknown command: %s", cmd);
     }
 
     // scroll to bottom even if `auto_scroll` is false
-    g_con->scroll_down_required = true;
+    console.scroll_down_required = true;
 }
 
-void ConsoleWindow::onDraw() {
+void show_console(void) {
     uint32_t filter_mask = 0;
     char tmpBuffer[64];
     for (int i = 0; i < 5; ++i) {
-        auto* info = &infos[i];
+        verbosity_filter_t* info = &console.infos[i];
         unsigned count = 0;
-        for (int j = (int)messages_cur - (int)MIN(messages_num, 1024); j != messages_cur; ++j) {
-            auto msg = messages[(j < 0 ? (j + 1024) : j) % 1024];
+        for (int j = (int)console.messages_cur - (int)MIN(console.messages_num, 1024); j != console.messages_cur; ++j) {
+            auto msg = console.messages[(j < 0 ? (j + 1024) : j) % 1024];
             if (msg.verbosity == info->verbosity) {
                 ++count;
             }
@@ -191,10 +225,10 @@ void ConsoleWindow::onDraw() {
         clear_console();
     }
     ImGui::SameLine(0, 0);
-    if (ImGui::ToolbarButton(ICON_FA_ANGLE_DOUBLE_DOWN, auto_scroll, "Scroll to End")) {
-        auto_scroll = !auto_scroll;
-        if (auto_scroll) {
-            scroll_down_required = true;
+    if (ImGui::ToolbarButton(ICON_FA_ANGLE_DOUBLE_DOWN, console.auto_scroll, "Scroll to End")) {
+        console.auto_scroll = !console.auto_scroll;
+        if (console.auto_scroll) {
+            console.scroll_down_required = true;
         }
     }
 
@@ -204,24 +238,25 @@ void ConsoleWindow::onDraw() {
 
     ImGui::TextUnformatted(ICON_FA_SEARCH);
     ImGui::SameLine();
-    text_filter.Draw("##logs_filter", 100.0f);
-    if (text_filter.IsActive()) {
+    console.text_filter.Draw("##logs_filter", 100.0f);
+    if (console.text_filter.IsActive()) {
         ImGui::SameLine(0, 0);
         if (ImGui::ToolbarButton(ICON_FA_TIMES_CIRCLE, false, "Clear Filter")) {
-            text_filter.Clear();
+            console.text_filter.Clear();
         }
     }
 
     auto logListSize = ImGui::GetContentRegionAvail();
     logListSize.y -= 30;
     ImGui::BeginChild("log_lines", logListSize);
-    for (int j = (int)messages_cur - (int)MIN(messages_num, 1024); j != messages_cur; ++j) {
-        ConsoleMsg* msg = &messages[(j < 0 ? (j + 1024) : j) % 1024];
+    for (int j = (int)console.messages_cur - (int)MIN(console.messages_num, 1024); j != console.messages_cur; ++j) {
+        console_msg_t* msg = &console.messages[(j < 0 ? (j + 1024) : j) % 1024];
         const char* text = msg->text;
-        if (text_filter.IsActive() && !text_filter.PassFilter(text)) {
+        if (console.text_filter.IsActive() && 
+        !console.text_filter.PassFilter(text)) {
             continue;
         }
-        if (!!((1 << (int)msg->verbosity) & filter_mask) && text_filter.PassFilter(text)) {
+        if (!!((1 << (int)msg->verbosity) & filter_mask) && console.text_filter.PassFilter(text)) {
             ImGui::PushStyleColor(ImGuiCol_Text, msg->color);
             ImGui::PushID(msg);
             if (ImGui::Selectable(msg->icon)) {
@@ -240,41 +275,41 @@ void ConsoleWindow::onDraw() {
             ImGui::TextUnformatted(text);
         }
     }
-    if (scroll_down_required || (auto_scroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())) {
+    if (console.scroll_down_required || (console.auto_scroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())) {
         ImGui::SetScrollHereY(1.0f);
-        scroll_down_required = false;
+        console.scroll_down_required = false;
     }
     ImGui::EndChild();
 
-    ImGui::Separator();
+    ImGui_Separator();
     int flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
     ImGui::TextUnformatted(ICON_FA_TERMINAL);
     ImGui::SameLine();
-    bool reclaimFocus = false;
-    if (ImGui::InputText("###WindowConsole_InputText", input, 1024, flags, on_console_input_command_callback, this)) {
-        trim_right(input);
-        if (input[0] != '\0') {
-            execute_command(input);
+    bool reclaim_focus = false;
+    if (ImGui::InputText("###WindowConsole_InputText", console.input, 1024, flags, on_console_input_command_callback, NULL)) {
+        trim_right(console.input);
+        if (console.input[0]) {
+            execute_command(console.input);
         }
-        input[0] = '\0';
-        reclaimFocus = true;
+        console.input[0] = '\0';
+        reclaim_focus = true;
     }
     // Auto-focus on window apparition
     ImGui::SetItemDefaultFocus();
-    if (reclaimFocus) {
+    if (reclaim_focus) {
         // Auto focus previous widget
         ImGui::SetKeyboardFocusHere(-1);
     }
 }
 
 static void log_message_to_console(log_msg_t msg) {
-    if (!g_con && msg.text == nullptr || msg.text[0] == '\0') {
+    if (!msg.text || !msg.text[0]) {
         return;
     }
 
-    const VerbosityFilterInfo* info = g_con->infos + MIN(msg.level, 5);
+    const verbosity_filter_t* info = console.infos + MIN(msg.level, 5);
 
-    ConsoleMsg cmsg = INIT_ZERO;
+    console_msg_t cmsg = INIT_ZERO;
     cmsg.verbosity = (log_level_t)msg.level;
     cmsg.file = msg.file;
     cmsg.line = msg.line;
@@ -283,60 +318,56 @@ static void log_message_to_console(log_msg_t msg) {
     cmsg.color = info->color;
 
     strncat(cmsg.text, msg.text, sizeof cmsg.text);
-    g_con->messages[g_con->messages_cur++] = cmsg;
-    g_con->messages_cur %= 1024;
-    ++g_con->messages_num;
+    console.messages[console.messages_cur++] = cmsg;
+    console.messages_cur %= 1024;
+    ++console.messages_num;
 
-    if (g_con->auto_scroll) {
-        g_con->scroll_down_required = true;
+    if (console.auto_scroll) {
+        console.scroll_down_required = true;
     }
 }
 
-ConsoleWindow::ConsoleWindow() {
+void init_console(void) {
 
-    name = "ConsoleWindow";
-    title = ICON_FA_LAPTOP_CODE " Console###ConsoleWindow";
-
-    g_con = this;
     log_add_sink(log_message_to_console);
 
-    infos[0].verbosity = LOG_LEVEL_TRACE;
-    infos[0].icon = ICON_FA_GLASSES;
-    infos[0].name = "Trace";
-    infos[0].color = 0xFF999999;
-    infos[0].show = true;
+    console.infos[0].verbosity = LOG_LEVEL_TRACE;
+    console.infos[0].icon = ICON_FA_GLASSES;
+    console.infos[0].name = "Trace";
+    console.infos[0].color = 0xFF999999;
+    console.infos[0].show = true;
 
-    infos[1].verbosity = LOG_LEVEL_DEBUG;
-    infos[1].icon = ICON_FA_BUG;
-    infos[1].name = "Debug";
-    infos[1].color = 0xFFAAAA00;
-    infos[1].show = true;
+    console.infos[1].verbosity = LOG_LEVEL_DEBUG;
+    console.infos[1].icon = ICON_FA_BUG;
+    console.infos[1].name = "Debug";
+    console.infos[1].color = 0xFFAAAA00;
+    console.infos[1].show = true;
 
-    infos[2].verbosity = LOG_LEVEL_INFO;
-    infos[2].icon = ICON_FA_INFO_CIRCLE;
-    infos[2].name = "Info";
-    infos[2].color = 0xFFFFFFFF;
-    infos[2].show = true;
+    console.infos[2].verbosity = LOG_LEVEL_INFO;
+    console.infos[2].icon = ICON_FA_INFO_CIRCLE;
+    console.infos[2].name = "Info";
+    console.infos[2].color = 0xFFFFFFFF;
+    console.infos[2].show = true;
 
-    infos[3].verbosity = LOG_LEVEL_WARN;
-    infos[3].icon = ICON_FA_EXCLAMATION_TRIANGLE;
-    infos[3].name = "Warning";
-    infos[3].color = 0xFF44BBFF;
-    infos[3].show = true;
+    console.infos[3].verbosity = LOG_LEVEL_WARN;
+    console.infos[3].icon = ICON_FA_EXCLAMATION_TRIANGLE;
+    console.infos[3].name = "Warning";
+    console.infos[3].color = 0xFF44BBFF;
+    console.infos[3].show = true;
 
-    infos[4].verbosity = LOG_LEVEL_ERROR;
-    infos[4].icon = ICON_FA_BAN;
-    infos[4].name = "Error";
-    infos[4].color = 0xFF4444DD;
-    infos[4].show = true;
+    console.infos[4].verbosity = LOG_LEVEL_ERROR;
+    console.infos[4].icon = ICON_FA_BAN;
+    console.infos[4].name = "Error";
+    console.infos[4].color = 0xFF4444DD;
+    console.infos[4].show = true;
 
-    infos[5].verbosity = LOG_LEVEL_FATAL;
-    infos[5].icon = ICON_FA_BOMB;
-    infos[5].name = "Fatal";
-    infos[5].color = 0xFF4444FF;
-    infos[5].show = true;
+    console.infos[5].verbosity = LOG_LEVEL_FATAL;
+    console.infos[5].icon = ICON_FA_BOMB;
+    console.infos[5].name = "Fatal";
+    console.infos[5].color = 0xFF4444FF;
+    console.infos[5].show = true;
 
-    commands.push_back("CLEAR");
-    commands.push_back("HELP");
-    commands.push_back("HISTORY");
+    console.commands.push_back("CLEAR");
+    console.commands.push_back("HELP");
+    console.commands.push_back("HISTORY");
 }

@@ -2,12 +2,14 @@
 
 #include "GameWindow.hpp"
 
-void GameWindow::onDraw() {
+GameWindow editor_game_window;
+
+void game_window_draw(void) {
     game_display* display = &game_app_state.display;
     const ImVec2 displayPos = ImGui::GetCursorScreenPos();
     const ImVec2 displaySize = ImGui::GetContentRegionAvail();
     if (display->color.id && displaySize.x > 0 && displaySize.y > 0) {
-        auto texId = (void*) static_cast<uintptr_t>(display->color.id);
+        auto texId = (void*)static_cast<uintptr_t>(display->color.id);
 
         const float scale = fmin(displaySize.x / display->info.size.x, displaySize.y / display->info.size.y);
 
@@ -25,7 +27,7 @@ void GameWindow::onDraw() {
         {
             // update size;
             const float k = display->info.dpi_scale;
-            display->info.dest_viewport = rect_scale_f(rect(displayPos.x, displayPos.y,displaySize.x, displaySize.y), k);
+            display->info.dest_viewport = rect_scale_f(rect(displayPos.x, displayPos.y, displaySize.x, displaySize.y), k);
             display->info.window = vec2(displaySize.x, displaySize.y);
             display->info.size = scale_vec2(vec2(displaySize.x, displaySize.y), k);
         }
@@ -33,14 +35,18 @@ void GameWindow::onDraw() {
     g_input_state.hovered_by_editor_gui = !ImGui::IsWindowHovered(0);
 }
 
-void GameWindow::onLoad(const pugi::xml_node& xml) {
-    paused = xml.attribute("paused").as_bool(false);
-    timeScale = xml.attribute("timeScale").as_float(1.0f);
-    profiler = xml.attribute("profile").as_bool(false);
+void game_window_load(calo_reader_t* r) {
+    if (r) {
+        editor_game_window.time_scale = read_f32(r);
+        editor_game_window.paused = read_u32(r) != 0;
+        editor_game_window.profiler = read_u32(r) != 0;
+    } else {
+        editor_game_window.time_scale = 1.0;
+    }
 }
 
-void GameWindow::onSave(pugi::xml_node& xml) {
-    xml.append_attribute("paused").set_value(paused);
-    xml.append_attribute("timeScale").set_value(timeScale);
-    xml.append_attribute("profiler").set_value(profiler);
+void game_window_save(calo_writer_t* w) {
+    write_f32(w, editor_game_window.time_scale);
+    write_u32(w, editor_game_window.paused ? 1 : 0);
+    write_u32(w, editor_game_window.profiler ? 1 : 0);
 }
