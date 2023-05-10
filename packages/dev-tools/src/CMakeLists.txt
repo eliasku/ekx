@@ -2,8 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 
 add_library(${PROJECT_NAME} STATIC
 
-        ek/editor/gui/EditorGUI.cpp
-        ek/editor/gui/Widgets_impl.hpp
+        ek/editor/gui/gui.cpp
 
         ek/editor/imgui/cimgui.cpp
         ek/editor/imgui/ekimgui.h

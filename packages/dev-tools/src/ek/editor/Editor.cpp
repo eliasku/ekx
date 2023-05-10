@@ -3,8 +3,14 @@
 
 #include <calo.h>
 #include <ek/editor/imgui/cimgui.h>
+#include <ek/editor/imgui/ekimgui.h>
+#include <ek/editor/imgui/imgui.hpp>
 #include <ek/log.h>
 #include <ek/scenex/app/base_game.h>
+#include <fonts/IconsFontAwesome5.h>
+#include "gui/SceneWindow.hpp"
+#include "gui/HierarchyWindow.hpp"
+#include "gui/InspectorWindow.hpp"
 
 void show_editor_window(editor_wnd_t* wnd) {
     if (!wnd->opened) {

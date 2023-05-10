@@ -10,10 +10,6 @@
 
 /// assets
 
-void draw_sprite_info(void* asset) {
-    guiSprite((const sprite_t*)asset);
-}
-
 void draw_font_info(void* asset) {
     guiFont((const font_t*)asset);
 }
@@ -154,7 +150,7 @@ void draw_resources_window(void) {
     if (ImGui::BeginTabBar("res_by_type", 0)) {
         draw_rr_items("image", &res_image.rr, 0);
         draw_rr_items("shader", &res_shader.rr, 0);
-        draw_rr_items("sprite", &res_sprite.rr, draw_sprite_info);
+        draw_rr_items("sprite", &res_sprite.rr, (void(*)(void*))guiSprite);
         draw_rr_items("particle", &res_particle.rr, 0);
         draw_rr_items("audio", &res_audio.rr, 0);
         draw_rr_items("font", &res_font.rr, draw_font_info);

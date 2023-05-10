@@ -1,8 +1,6 @@
 #pragma once
 
-#include "GameWindow.hpp"
-
-GameWindow editor_game_window;
+#include "../Editor.hpp"
 
 void game_window_draw(void) {
     game_display* display = &game_app_state.display;
@@ -37,16 +35,16 @@ void game_window_draw(void) {
 
 void game_window_load(calo_reader_t* r) {
     if (r) {
-        editor_game_window.time_scale = read_f32(r);
-        editor_game_window.paused = read_u32(r) != 0;
-        editor_game_window.profiler = read_u32(r) != 0;
+        g_editor.game.time_scale = read_f32(r);
+        g_editor.game.paused = read_u32(r) != 0;
+        g_editor.game.profiler = read_u32(r) != 0;
     } else {
-        editor_game_window.time_scale = 1.0;
+        g_editor.game.time_scale = 1.0f;
     }
 }
 
 void game_window_save(calo_writer_t* w) {
-    write_f32(w, editor_game_window.time_scale);
-    write_u32(w, editor_game_window.paused ? 1 : 0);
-    write_u32(w, editor_game_window.profiler ? 1 : 0);
+    write_f32(w, g_editor.game.time_scale);
+    write_u32(w, g_editor.game.paused ? 1 : 0);
+    write_u32(w, g_editor.game.profiler ? 1 : 0);
 }

@@ -1,6 +1,7 @@
 #include <ek/editor/Editor.hpp>
 
 #include <ek/scenex/app/base_game.h>
+#include <ek/editor/imgui/ekimgui.h>
 #include <ek/editor/imgui/cimgui.h>
 #include <ek/editor/imgui/imgui.hpp>
 #include <ekx/app/input_state.h>
@@ -12,7 +13,7 @@
 #include "InspectorWindow_impl.hpp"
 #include "MemoryProfiler_impl.hpp"
 #include "SceneWindow_impl.hpp"
-#include "ConsoleWindow_impl.hpp"
+#include "console.cpp.h"
 #include "ResourcesWindow_impl.hpp"
 #include "Widgets_impl.hpp"
 
@@ -102,18 +103,18 @@ void editor_draw_gui(void) {
         ImGui::SameLine((ImGui::GetWindowContentRegionMax().x / 2.0f) -
                         (1.5f * (ImGui::GetFontSize() + ImGui::GetStyle().ItemSpacing.x)));
 
-        if (ImGui::Button(editor_game_window.paused ? ICON_FA_PLAY : ICON_FA_PAUSE)) {
-            editor_game_window.paused = !editor_game_window.paused;
+        if (ImGui::Button(g_editor.game.paused ? ICON_FA_PLAY : ICON_FA_PAUSE)) {
+            g_editor.game.paused = !g_editor.game.paused;
             g_editor.config.dirty |= 1;
         }
         ImGui::SameLine();
         ImGui::SetNextItemWidth(100.0f);
-        g_editor.config.dirty |= ImGui::SliderFloat(ICON_FA_CLOCK, &editor_game_window.time_scale, 0.0f, 3.0f, "%.3f", 1.0f);
+        g_editor.config.dirty |= ImGui::SliderFloat(ICON_FA_CLOCK, &g_editor.game.time_scale, 0.0f, 3.0f, "%.3f", 1.0f);
         ImGui::SameLine();
-        g_editor.config.dirty |= ImGui::Checkbox(ICON_FA_STOPWATCH, &editor_game_window.profiler);
+        g_editor.config.dirty |= ImGui::Checkbox(ICON_FA_STOPWATCH, &g_editor.game.profiler);
 
-        s_profile_metrics.enabled = editor_game_window.profiler;
-        g_time_layers[TIME_LAYER_ROOT].scale = editor_game_window.paused ? 0.0f : editor_game_window.time_scale;
+        s_profile_metrics.enabled = g_editor.game.profiler;
+        g_time_layers[TIME_LAYER_ROOT].scale = g_editor.game.paused ? 0.0f : g_editor.game.time_scale;
 
         ImGui::EndMainMenuBar();
     }

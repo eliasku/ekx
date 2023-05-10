@@ -1,18 +1,15 @@
 #pragma once
 
-// TODO: move includes to implementation
-#include "gui/GameWindow.hpp"
-#include "gui/HierarchyWindow.hpp"
-#include "gui/InspectorWindow.hpp"
-#include "gui/SceneWindow.hpp"
-#include "imgui/ekimgui.h"
+#include <calo_stream.h>
 
-typedef struct {
-    int dirty;
-    int width;
-    int height;
-    bool hidden;
-} editor_config_t;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void game_window_draw(void);
+void game_window_load(calo_reader_t* r);
+void game_window_save(calo_writer_t* w);
+
 
 enum {
     EDITOR_SCENE = 0,
@@ -37,9 +34,21 @@ typedef struct {
 } editor_wnd_t;
 
 typedef struct {
-    editor_config_t config;
     editor_wnd_t windows[EDITOR_WINDOWS_NUM];
+    struct {
+        float time_scale;
+        bool paused;
+        bool profiler;
+    } game;
+    struct {
+        int dirty;
+        int width;
+        int height;
+        bool hidden;
+    } config;
 } editor_t;
+
+
 
 void editor_draw_gui(void);
 
@@ -52,3 +61,6 @@ void draw_memory_profiler(void);
 void init_console(void);
 void show_console(void);
 
+#ifdef __cplusplus
+}
+#endif

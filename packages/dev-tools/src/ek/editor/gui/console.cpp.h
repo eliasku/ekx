@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Editor.hpp"
+
 // `system` function
 #include <cstdlib>
 #include <ek/log.h>

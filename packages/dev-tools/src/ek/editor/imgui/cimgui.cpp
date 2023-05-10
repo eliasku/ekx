@@ -2,7 +2,7 @@
 #include <ek/editor/imgui/imgui.hpp>
 
 bool ImGui_Begin(const char* name, bool* p_open, ImGuiWindowFlags flags) {
-    ImGui::Begin(name, p_open, flags);
+    return ImGui::Begin(name, p_open, flags);
 }
 
 void ImGui_End(void) {
@@ -10,7 +10,7 @@ void ImGui_End(void) {
 }
 
 bool ImGui_Button(const char* name) {
-    ImGui::Button(name);
+    return ImGui::Button(name);
 }
 
 void ImGui_PopStyleVar(int count) {
@@ -46,5 +46,5 @@ void ImGui_PopID(void) {
 }
 
 void ImGui_Separator(void) {
-    ImGui_Separator();
+    ImGui::Separator();
 }
