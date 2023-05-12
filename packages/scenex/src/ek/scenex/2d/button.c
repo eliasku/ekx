@@ -5,8 +5,8 @@
 
 #include <ekx/app/audio_manager.h>
 
-#include <ek/scenex/2d/transform2d.h>
 #include <ek/scenex/2d/movieclip.h>
+#include <ek/scenex/2d/transform2d.h>
 #include <ek/scenex/base/interactive.h>
 #include <ek/scenex/base/node_events.h>
 
@@ -15,45 +15,40 @@ button_skin_t button_skin_default;
 ECX_DEFINE_TYPE(button_t);
 #define Button ECX_ID(button_t)
 
-static
-void button_ctor(component_handle_t handle) {
-    ((button_t*) Button.data[0])[handle] = button();
+static void button_ctor(component_handle_t handle) {
+    ((button_t*)Button.data[0])[handle] = button();
 }
 
 void setup_button(void) {
-    ECX_TYPE( button_t, 16);
+    ECX_TYPE(button_t, 16);
     Button.ctor = button_ctor;
 
-    button_skin_default = (button_skin_t) {
-            .sfx_over = H("sfx/btn_over"),
-            .sfx_down = H("sfx/btn_down"),
-            .sfx_click = H("sfx/btn_click"),
-            .sfx_out = H("sfx/btn_out"),
-            .sfx_cancel = H("sfx/btn_cancel"),
+    button_skin_default = (button_skin_t){
+        .sfx_over = H("sfx/btn_over"),
+        .sfx_down = H("sfx/btn_down"),
+        .sfx_click = H("sfx/btn_click"),
+        .sfx_out = H("sfx/btn_out"),
+        .sfx_cancel = H("sfx/btn_cancel"),
 
-            .over_speed_forward = 8.0f,
-            .over_speed_backward = 8.0f,
-            .push_speed_forward = 8.0f,
-            .push_speed_backward = 8.0f,
+        .over_speed_forward = 8.0f,
+        .over_speed_backward = 8.0f,
+        .push_speed_forward = 8.0f,
+        .push_speed_backward = 8.0f,
     };
 }
 
 button_t button(void) {
-    return (button_t) {
-            .skin = &button_skin_default,
-
-            .time_over = 0.0f,
-            .time_push = 0.0f,
-            .time_post = 0.0f,
-
-            .base_skew = vec2(0, 0),
-            .base_scale = vec2(1, 1),
-            .base_color = color2_identity(),
-
-            .time = TIME_LAYER_UI,
-
-            .initialized = false,
-            .pushed = false,
+    return (button_t){
+        .skin = &button_skin_default,
+        .time_over = 0.0f,
+        .time_push = 0.0f,
+        .time_post = 0.0f,
+        .base_skew = vec2(0, 0),
+        .base_scale = vec2(1, 1),
+        .base_color = color2_identity(),
+        .time = TIME_LAYER_UI,
+        .initialized = false,
+        .pushed = false,
     };
 }
 
@@ -73,7 +68,7 @@ static void initialize_base_transform(button_t* btn, const transform2d_t* transf
 
 static void apply_skin(const button_skin_t* skin, const button_t* btn, transform2d_t* transform) {
     // TODO: skin params?
-    (void) skin;
+    (void)skin;
 
     const float over = btn->time_over;
     const float push = btn->time_push;
@@ -102,12 +97,11 @@ static void update_movie_frame(entity_t entity, const interactive_t* interactive
                 frame = 2;
             }
         }
-        goto_and_stop(entity, (float) frame);
+        goto_and_stop(entity, (float)frame);
     }
 }
 
-void
-update_button_events(interactive_t* interactive, button_t* button, entity_t e, entity_t* queue, uint32_t* queue_num) {
+void update_button_events(interactive_t* interactive, button_t* button, entity_t e, entity_t* queue, uint32_t* queue_num) {
     if (interactive->ev_over) {
         play_button_sound(button->skin->sfx_over);
     }
@@ -139,7 +133,7 @@ void update_buttons(void) {
     uint32_t tap_events_num = 0;
     for (uint32_t i = 1; i < Button.size; ++i) {
         const entity_t e = get_entity(&Button, i);
-        button_t* btn = (button_t*) Button.data[0] + i;
+        button_t* btn = (button_t*)Button.data[0] + i;
         interactive_t* interactive = get_interactive(e);
         transform2d_t* transform = get_transform2d(e);
         if (interactive && transform) {

@@ -4,6 +4,7 @@
 
 // `system` function
 #include <cstdlib>
+#include <cctype>
 #include <ek/log.h>
 #include <ek/print.h>
 #include <ek/ds/PodArray.hpp>

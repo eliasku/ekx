@@ -1,11 +1,11 @@
 #include "atlas.h"
 
-#include <ek/string.h>
-#include <ek/log.h>
-#include <ek/local_res.h>
-#include <ek/gfx.h>
 #include <ek/buf.h>
+#include <ek/gfx.h>
+#include <ek/local_res.h>
+#include <ek/log.h>
 #include <ek/print.h>
+#include <ek/string.h>
 #include <gen_sg.h>
 
 struct res_atlas res_atlas;
@@ -51,7 +51,7 @@ static void load_atlas_meta(atlas_t* atlas, ek_local_res* lr) {
     read_calo(&reader);
     atlas_info_t atlas_info = read_stream_atlas_info(&reader);
 
-    arr_for (p_loader, atlas->loaders) {
+    arr_for(p_loader, atlas->loaders) {
         ek_texture_loader_destroy(*p_loader);
     }
     arr_reset(atlas->loaders);
@@ -86,7 +86,7 @@ static void load_atlas_meta(atlas_t* atlas, ek_local_res* lr) {
         const char* page_image_path = page->image_path;
         log_debug("Load atlas page %s/%s", str_get(atlas->base_path), page_image_path);
 
-        const uint32_t index = (uint32_t) (page - atlas_info.pages);
+        const uint32_t index = (uint32_t)(page - atlas_info.pages);
         ek_texture_loader* loader = atlas->loaders[index];
         loader->formatMask = atlas->format_mask;
         ek_texture_loader_set_path(&loader->basePath, str_get(atlas->base_path));
@@ -97,7 +97,7 @@ static void load_atlas_meta(atlas_t* atlas, ek_local_res* lr) {
 }
 
 static void on_atlas_res_loaded(ek_local_res* lr) {
-    atlas_t* atlas = (atlas_t*) lr->userdata;
+    atlas_t* atlas = (atlas_t*)lr->userdata;
     atlas->state_flags |= 1;
     if (ek_local_res_success(lr)) {
         load_atlas_meta(atlas, lr);
@@ -140,7 +140,7 @@ static void atlas_poll_loading(atlas_t* atlas) {
             }
         }
         if (images_loading == 0) {
-            arr_for (p_loader, atlas->loaders) {
+            arr_for(p_loader, atlas->loaders) {
                 if (*p_loader) {
                     ek_texture_loader_destroy(*p_loader);
                 }
@@ -154,7 +154,7 @@ static void atlas_poll_loading(atlas_t* atlas) {
 void atlas_clear(atlas_t* atlas) {
     // TODO: idea with ref counting and when we can unload - just delete all unreferenced resources
 
-    arr_for (page, atlas->pages) {
+    arr_for(page, atlas->pages) {
         sg_image* image = &REF_RESOLVE(res_image, *page);
         if (image->id) {
             sg_destroy_image(*image);
@@ -162,7 +162,7 @@ void atlas_clear(atlas_t* atlas) {
         }
     }
 
-    arr_for (ref, atlas->sprites) {
+    arr_for(ref, atlas->sprites) {
         sprite_t* spr = &REF_RESOLVE(res_sprite, *ref);
         spr->image_id = 0;
         spr->state = 0;
@@ -175,4 +175,3 @@ void atlas_clear(atlas_t* atlas) {
 
     atlas->state_flags = 0;
 }
-

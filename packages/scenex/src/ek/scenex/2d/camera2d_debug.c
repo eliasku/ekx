@@ -1,18 +1,16 @@
 #include <ek/canvas.h>
 #include <ek/scenex/interaction_system.h>
 
+#include "camera2d.h"
+#include "display2d.h"
+#include "transform2d.h"
+#include "viewport.h"
 #include <ek/scenex/base/node.h>
 #include <ekx/app/time_layers.h>
-#include "camera2d.h"
-#include "viewport.h"
-#include "transform2d.h"
-#include "display2d.h"
 
 static void debug_draw_pointer(camera2d_t* camera) {
-    const vec2_t v = vec2_transform(
-            g_interaction_system.pointerScreenPosition_,
-            camera->screenToWorldMatrix
-    );
+    const vec2_t v = vec2_transform(g_interaction_system.pointerScreenPosition_,
+                                    camera->screenToWorldMatrix);
     const float t = g_time_layers[TIME_LAYER_ROOT].total;
     canvas_set_empty_image();
     if (g_interaction_system.pointerDown_) {
@@ -48,13 +46,13 @@ debug_draw_box(const rect_t rc, const mat3x2_t m, color_t color1, color_t color2
 }
 
 static void debug_draw_hit_target(camera2d_t* camera) {
-    (void) camera;
+    (void)camera;
     entity_t target = g_interaction_system.hitTarget_;
     if (!is_entity(target)) {
         return;
     }
     mat3x2_t matrix = mat3x2_identity();
-    transform2d_t* worldTransform = (transform2d_t*) find_component_in_parent(&ECX_ID(transform2d_t), target, 0);
+    transform2d_t* worldTransform = (transform2d_t*)find_component_in_parent(&ECX_ID(transform2d_t), target, 0);
     if (worldTransform) {
         matrix = worldTransform->matrix;
     }
@@ -74,9 +72,9 @@ static void debug_draw_hit_target(camera2d_t* camera) {
 }
 
 static void traverse_visible_nodes(entity_t e,
-                                 const world_transform2d_t* parentTransform,
-                                 void(* callback)(entity_t e, void* component, const world_transform2d_t* transform),
-                                 ecx_component_type* component_type) {
+                                   const world_transform2d_t* parentTransform,
+                                   void (*callback)(entity_t e, void* component, const world_transform2d_t* transform),
+                                   ecx_component_type* component_type) {
     if (!is_visible(e)) {
         return;
     }
@@ -102,7 +100,7 @@ static void traverse_visible_nodes(entity_t e,
 }
 
 static void on_debug_node_display_bounds(entity_t e, void* component, const world_transform2d_t* transform) {
-    display2d_t* display = (display2d_t*) component;
+    display2d_t* display = (display2d_t*)component;
     if (display->get_bounds) {
         const rect_t rc = display->get_bounds(e);
         canvas_fill_rect(rc, ARGB(0x33FFFFFF));
@@ -117,7 +115,7 @@ static void on_debug_node_display_bounds(entity_t e, void* component, const worl
 
 static void on_debug_node_bounds(entity_t e, void* data, const world_transform2d_t* transform) {
     UNUSED(e);
-    bounds2d_t* bounds = (bounds2d_t*) data;
+    bounds2d_t* bounds = (bounds2d_t*)data;
     if (bounds->flags & BOUNDS_2D_SCISSORS) {
         debug_draw_box(bounds->rect, transform->matrix, ARGB(0xFFFFFF00), COLOR_WHITE, true,
                        ARGB(0x55FFFF00));
@@ -146,7 +144,7 @@ static rect_t ctx_occlusion_camera_rect;
 static void on_debug_node_occlusion_bounds(entity_t e, void* data,
                                            const world_transform2d_t* transform) {
     UNUSED(e);
-    bounds2d_t* bounds = (bounds2d_t*) data;
+    bounds2d_t* bounds = (bounds2d_t*)data;
     const rect_t worldRect = rect_transform(bounds->rect, transform->matrix);
     const bool occluded = !rect_overlaps(worldRect, ctx_occlusion_camera_rect);
     const color_t worldColor = occluded ? ARGB(0x77FF0000) : ARGB(0x7700FF00);
@@ -184,9 +182,8 @@ static void debug_camera_gizmo(camera2d_t* camera) {
         }
     }
     const vec2_t v = vec2_transform(
-            add_vec2(camera->screenRect.position, mul_vec2(camera->relativeOrigin, camera->screenRect.size)),
-            camera->screenToWorldMatrix
-    );
+        add_vec2(camera->screenRect.position, mul_vec2(camera->relativeOrigin, camera->screenRect.size)),
+        camera->screenToWorldMatrix);
     canvas_fill_circle(vec3_v(v, 10.0f), ARGB(0x00FFFFFF), ARGB(0x44FFFFFF), 7);
     canvas_line_ex(sub_vec2(v, vec2(20, 0)), add_vec2(v, vec2(20, 0)), COLOR_BLACK, COLOR_WHITE, 1, 3);
     canvas_line_ex(sub_vec2(v, vec2(0, 20)), add_vec2(v, vec2(0, 20)), COLOR_BLACK, COLOR_WHITE, 3, 1);
