@@ -223,6 +223,9 @@ component_handle_t ecx_create_component(ecx_component_type* type, entity_idx_t e
 #define ECX_TYPE_2(T,T2,InitialCount) init_component_type(&ECX_ID(T),ECX_TYPE_DECL_2(T,InitialCount,T,T2))
 #define ECX_TYPE(T,InitialCount) ECX_TYPE_1(T,InitialCount)
 
+#define ECX_FOR__(T, I) for (int I = 1; I < ECX_ID(T).size; ++I)
+#define ECX_FOR_DRAFT(T) ECX_FOR__(T,h_##T)
+
 #ifdef __cplusplus
 }
 #endif

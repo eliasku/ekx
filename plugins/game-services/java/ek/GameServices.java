@@ -144,25 +144,27 @@ public class GameServices extends EkPlugin {
 
     @Keep
     public static void leader_board_show(String leaderboard_id) {
-        if (_instance._leaderboards != null) {
-            Log.d(TAG, "load leaderboard");
-            _instance._leaderboards
-                    .getLeaderboardIntent(leaderboard_id)
-                    .addOnSuccessListener(intent -> {
-                        Log.d(TAG, "start leaderboard");
-                        _instance._activity.startActivityForResult(intent, RC_LEADERBOARD_UI);
-                    });
-        } else {
-            Log.d(TAG, "[leaderboard_show] not ready");
-            if (!_instance._isConnecting && !_instance._isConnected) {
-                _instance.signIn();
+        if (_instance != null) {
+            if (_instance._leaderboards != null) {
+                Log.d(TAG, "load leaderboard");
+                _instance._leaderboards
+                        .getLeaderboardIntent(leaderboard_id)
+                        .addOnSuccessListener(intent -> {
+                            Log.d(TAG, "start leaderboard");
+                            _instance._activity.startActivityForResult(intent, RC_LEADERBOARD_UI);
+                        });
+            } else {
+                Log.d(TAG, "[leaderboard_show] not ready");
+                if (!_instance._isConnecting && !_instance._isConnected) {
+                    _instance.signIn();
+                }
             }
         }
     }
 
     @Keep
     public static void leader_board_submit(final String leaderboard_id, final int score) {
-        if (_instance._leaderboards != null) {
+        if (_instance != null && _instance._leaderboards != null) {
             Log.d(TAG, "submit leaderboard: " + leaderboard_id + " " + score);
             _instance._leaderboards.submitScore(leaderboard_id, score);
         } else {
@@ -172,34 +174,37 @@ public class GameServices extends EkPlugin {
 
     @Keep
     public static void achievement_update(final String achievement_id, final int increment) {
-        if (_instance._achievements == null) {
-            Log.d(TAG, "[achievement_update] not ready");
-            return;
-        }
         if (achievement_id == null) {
             return;
         }
-        if (increment > 0) {
-            Log.d(TAG, "increment achievement");
-            _instance._achievements.increment(achievement_id, increment);
-        } else {
-            Log.d(TAG, "unlock achievement");
-            _instance._achievements.unlock(achievement_id);
+        if (_instance != null && _instance._achievements != null) {
+            if (increment > 0) {
+                Log.d(TAG, "increment achievement");
+                _instance._achievements.increment(achievement_id, increment);
+            } else {
+                Log.d(TAG, "unlock achievement");
+                _instance._achievements.unlock(achievement_id);
+            }
+        }
+        else {
+            Log.d(TAG, "[achievement_update] not ready");
         }
     }
 
     @Keep
     public static void achievement_show() {
-        if (_instance._achievements != null) {
-            Log.d(TAG, "load achievements");
-            _instance._achievements.getAchievementsIntent().addOnSuccessListener(intent -> {
-                Log.d(TAG, "show achievements");
-                _instance._activity.startActivityForResult(intent, RC_ACHIEVEMENTS_UI);
-            });
-        } else {
-            Log.d(TAG, "[achievement_show] not ready");
-            if (!_instance._isConnecting && !_instance._isConnected) {
-                _instance.signIn();
+        if (_instance != null) {
+            if (_instance._achievements != null) {
+                Log.d(TAG, "load achievements");
+                _instance._achievements.getAchievementsIntent().addOnSuccessListener(intent -> {
+                    Log.d(TAG, "show achievements");
+                    _instance._activity.startActivityForResult(intent, RC_ACHIEVEMENTS_UI);
+                });
+            } else {
+                Log.d(TAG, "[achievement_show] not ready");
+                if (!_instance._isConnecting && !_instance._isConnected) {
+                    _instance.signIn();
+                }
             }
         }
     }

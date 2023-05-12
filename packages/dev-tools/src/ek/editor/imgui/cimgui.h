@@ -55,12 +55,31 @@ void ImGui_PushStyleVar(int var, float v);
 void ImGui_PushStyleVar_f2(int var, vec2_t v);
 
 bool ImGui_TreeNode(const void* ptr_id, const char* fmt, ...);
+bool ImGui_TreeNodeEx(const void* ptr_id, int flags, const char* fmt, ...);
 void ImGui_TreePop(void);
 
-void ImGui_PushID(int id);
+void ImGui_BeginGroup(void);
+void ImGui_EndGroup(void);
+
+void ImGui_PushID(uintptr_t id);
 void ImGui_PopID(void);
 
 void ImGui_Separator(void);
+
+void ImGui_TextUnformatted(const char* text, const char* text_end);
+void ImGui_Text(const char* fmt, ...);
+void ImGui_TextColored(vec4_t color, const char* fmt, ...);
+void ImGui_TextDisabled(const char* fmt, ...);
+#define ImGui_TextError(...) ImGui_TextColored(vec4(1,0,0,1),__VA_ARGS__)
+
+bool ImGui_BeginTabBar(const char* str_id, int flags);
+void ImGui_EndTabBar(void);
+
+bool ImGui_BeginTabItem(const char* label, bool* p_open, int flags);
+void ImGui_EndTabItem(void);
+
+void ImGui_BeginDisabled(bool disabled);
+void ImGui_EndDisabled(void);
 
 #ifdef __cplusplus
 }

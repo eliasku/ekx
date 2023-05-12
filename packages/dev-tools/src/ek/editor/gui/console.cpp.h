@@ -223,11 +223,11 @@ void show_console(void) {
     ImGui::SameLine();
     ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
     ImGui::SameLine();
-    if (ImGui::ToolbarButton(ICON_FA_TRASH, false, "Clear All")) {
+    if (ImGui_ToolbarButton(ICON_FA_TRASH, false, "Clear All")) {
         clear_console();
     }
     ImGui::SameLine(0, 0);
-    if (ImGui::ToolbarButton(ICON_FA_ANGLE_DOUBLE_DOWN, console.auto_scroll, "Scroll to End")) {
+    if (ImGui_ToolbarButton(ICON_FA_ANGLE_DOUBLE_DOWN, console.auto_scroll, "Scroll to End")) {
         console.auto_scroll = !console.auto_scroll;
         if (console.auto_scroll) {
             console.scroll_down_required = true;
@@ -238,12 +238,12 @@ void show_console(void) {
     ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
     ImGui::SameLine();
 
-    ImGui::TextUnformatted(ICON_FA_SEARCH);
+    ImGui_TextUnformatted(ICON_FA_SEARCH, 0);
     ImGui::SameLine();
     console.text_filter.Draw("##logs_filter", 100.0f);
     if (console.text_filter.IsActive()) {
         ImGui::SameLine(0, 0);
-        if (ImGui::ToolbarButton(ICON_FA_TIMES_CIRCLE, false, "Clear Filter")) {
+        if (ImGui_ToolbarButton(ICON_FA_TIMES_CIRCLE, false, "Clear Filter")) {
             console.text_filter.Clear();
         }
     }
@@ -260,21 +260,21 @@ void show_console(void) {
         }
         if (!!((1 << (int)msg->verbosity) & filter_mask) && console.text_filter.PassFilter(text)) {
             ImGui::PushStyleColor(ImGuiCol_Text, msg->color);
-            ImGui::PushID(msg);
+            ImGui_PushID((uintptr_t)msg);
             if (ImGui::Selectable(msg->icon)) {
                 char buf[512];
                 ek_snprintf(buf, sizeof buf, "code --goto %s:%d", msg->file, msg->line);
                 log_trace("editor: %s", buf);
                 system(buf);
             }
-            ImGui::PopID();
+            ImGui_PopID();
             ImGui::PopStyleColor();
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("%s:%u", msg->file, msg->line);
             }
 
             ImGui::SameLine(0, 10);
-            ImGui::TextUnformatted(text);
+            ImGui_TextUnformatted(text, 0);
         }
     }
     if (console.scroll_down_required || (console.auto_scroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())) {
@@ -285,7 +285,7 @@ void show_console(void) {
 
     ImGui_Separator();
     int flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
-    ImGui::TextUnformatted(ICON_FA_TERMINAL);
+    ImGui_TextUnformatted(ICON_FA_TERMINAL, 0);
     ImGui::SameLine();
     bool reclaim_focus = false;
     if (ImGui::InputText("###WindowConsole_InputText", console.input, 1024, flags, on_console_input_command_callback, NULL)) {

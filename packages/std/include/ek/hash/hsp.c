@@ -78,7 +78,8 @@ string_hash_t hsp_hash_debug(const char* str, bool literal) {
         log_error("got string length %d (maximum length is %d)", str_buf_size, max_length);
         EK_ASSERT(0);
     }
-    strcpy(hsp.table[new_id], str);
+    hsp.table[new_id][0] = 0;
+    strncat(hsp.table[new_id], str, max_length);
     hsp_insert(hv, new_id);
     return hv;
 }

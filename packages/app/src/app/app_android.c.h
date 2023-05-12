@@ -23,7 +23,7 @@ static struct {
 } android_app;
 
 static void jni_thread_destructor(void* value) {
-    JNIEnv* env = (JNIEnv*) value;
+    JNIEnv* env = (JNIEnv*)value;
     JavaVM* jvm = android_app.jvm;
     if (env && jvm && *jvm) {
         (*jvm)->DetachCurrentThread(jvm);
@@ -80,30 +80,28 @@ static void activity_exit(int code) {
 JNIEXPORT void JNICALL Java_ek_EkPlatform_sendEvent(JNIEnv* env_, jclass cls_, jint eventType) {
     (void)sizeof(env_);
     (void)sizeof(cls_);
-    ek_app__process_event((ek_app_event) {.type= (ek_app_event_type) eventType});
+    ek_app__process_event((ek_app_event){.type = (ek_app_event_type)eventType});
 }
 
 JNIEXPORT void JNICALL
 Java_ek_EkPlatform_sendTouch(JNIEnv* env_, jclass cls_, jint type, jint id, jfloat x, jfloat y) {
     (void)sizeof(env_);
     (void)sizeof(cls_);
-    ek_app__process_event((ek_app_event) {.touch= {
-            .type =    (ek_app_event_type) type,
-            .id =   (uint64_t) id,
-            .x = x,
-            .y = y
-    }});
+    ek_app__process_event((ek_app_event){.touch = {
+                                                 .type = (ek_app_event_type)type,
+                                                 .id = (uint64_t)id,
+                                                 .x = x,
+                                                 .y = y}});
 }
 
 JNIEXPORT void JNICALL
 Java_ek_EkPlatform_sendKeyEvent(JNIEnv* env_, jclass cls_, jint type, jint code, jint modifiers) {
     (void)sizeof(env_);
     (void)sizeof(cls_);
-    ek_app__process_event((ek_app_event) {.key = {
-            .type = (ek_app_event_type) type,
-            .code = (ek_key_code) code,
-            .modifiers = (ek_key_mod) modifiers
-    }});
+    ek_app__process_event((ek_app_event){.key = {
+                                                 .type = (ek_app_event_type)type,
+                                                 .code = (ek_key_code)code,
+                                                 .modifiers = (ek_key_mod)modifiers}});
 }
 
 int ek_app_open_url(const char* url) {
@@ -123,7 +121,7 @@ static void ek_app__init_lang(void) {
     JNIEnv* env = ek_android_jni();
     jclass cls = (*env)->FindClass(env, "ek/EkDevice");
     jmethodID method = (*env)->GetStaticMethodID(env, cls, "getLanguage", "()Ljava/lang/String;");
-    jstring rv = (jstring) (*env)->CallStaticObjectMethod(env, cls, method);
+    jstring rv = (jstring)(*env)->CallStaticObjectMethod(env, cls, method);
     const char* temp = (*env)->GetStringUTFChars(env, rv, NULL);
     ek_app.lang[0] = '\0';
     strncat(ek_app.lang, temp, 7);
@@ -155,7 +153,7 @@ JNIEXPORT void JNICALL
 Java_ek_EkPlatform_sendResize(JNIEnv* env, jclass cls_, jfloatArray values) {
     (void)sizeof(cls_);
     const jfloat* floatValues = (*env)->GetFloatArrayElements(env, values, NULL);
-    ek_app__update_viewport((ek_app_viewport) {
+    ek_app__update_viewport((ek_app_viewport){
             .width = floatValues[0],
             .height = floatValues[1],
             .scale = floatValues[2],
@@ -183,7 +181,7 @@ JNIEXPORT int JNICALL Java_ek_EkPlatform_main(JNIEnv* env_, jclass cls_, jobject
         activity_exit(ek_app.exit_code);
     }
 
-// return configuration flags
+    // return configuration flags
     return ek_app.config.need_depth ? 1 : 0;
 }
 
@@ -212,7 +210,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* _) {
     log_debug("JNI_OnLoad BEGIN");
 
     android_app.jvm = vm;
-    if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK) {
+    if ((*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_6) != JNI_OK) {
         log_debug("Failed to get the environment using GetEnv()");
         return -1;
     }
@@ -232,7 +230,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* _) {
     }
 
     /* Create a global reference for our Activity class */
-    android_app.cls = (jclass) (*env)->NewGlobalRef(env, cls);
+    android_app.cls = (jclass)(*env)->NewGlobalRef(env, cls);
 
     /* Retrieve the getContext() method id */
     android_app.getContext = (*env)->GetStaticMethodID(env,

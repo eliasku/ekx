@@ -10,7 +10,6 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <imgui_stdlib.h>
 #include <implot.h>
 
 #ifdef __cplusplus

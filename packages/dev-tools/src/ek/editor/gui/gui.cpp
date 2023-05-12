@@ -49,10 +49,10 @@ void editor_draw_gui(void) {
             ImGui::MenuItem("Emulate Touch Input", nullptr, &g_input_state.emulate_touch);
             ///
             ImGui_Separator();
-            ImGui::Text("User Insets Absolute");
+            ImGui_Text("User Insets Absolute");
             ImGui::DragFloat4("##userInsetsAbsolute",
                               game_app_state.display.info.user_insets_abs.data);
-            ImGui::Text("User Insets Relative");
+            ImGui_Text("User Insets Relative");
             ImGui::SliderFloat4("##userInsetsRelative",
                                 game_app_state.display.info.user_insets_rel.data, 0.0f, 1.0f);
 

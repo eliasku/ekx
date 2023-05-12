@@ -5,7 +5,7 @@
 
 #ifdef EK_DEV_TOOLS
 
-#include <ek/editor/editor_api.h>
+#include <ek/editor_api.h>
 
 #define DRAW_CALLS_MAX 1024
 

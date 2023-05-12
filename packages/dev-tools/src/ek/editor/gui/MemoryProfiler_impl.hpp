@@ -17,29 +17,29 @@ void draw_buffer_chain_stats(const char* name, ek_canvas_buffers* buffers) {
                 ++c;
             }
         }
-        ImGui::Text("%s[%d] count %d", name, line, c);
+        ImGui_Text("%s[%d] count %d", name, line, c);
     }
 }
 
 void draw_canvas_stats() {
-    ImGui::Text("size: %lu", sizeof canvas);
-    ImGui::Text("vb chain size: %lu", sizeof canvas.vbs);
-    ImGui::Text("ib chain size: %lu", sizeof canvas.ibs);
-    ImGui::Text("vb mem size: %lu", sizeof canvas.vertex);
-    ImGui::Text("ib mem size: %lu", sizeof canvas.index);
+    ImGui_Text("size: %lu", sizeof canvas);
+    ImGui_Text("vb chain size: %lu", sizeof canvas.vbs);
+    ImGui_Text("ib chain size: %lu", sizeof canvas.ibs);
+    ImGui_Text("vb mem size: %lu", sizeof canvas.vertex);
+    ImGui_Text("ib mem size: %lu", sizeof canvas.index);
     draw_buffer_chain_stats("VB", &canvas.vbs);
     draw_buffer_chain_stats("IB", &canvas.ibs);
 
     ImGui_Separator();
 
-    ImGui::Text("C++ Arrays: %d", ek_core_dbg_get(EK_CORE_DBG_ARRAY));
-    ImGui::Text("Pod Arrays: %d", ek_core_dbg_get(EK_CORE_DBG_POD_ARRAY));
-    ImGui::Text("Signals: %d", ek_core_dbg_get(EK_CORE_DBG_SIGNAL));
-    ImGui::Text("Hashes: %d", ek_core_dbg_get(EK_CORE_DBG_HASH));
-    ImGui::Text("Strings: %d", ek_core_dbg_get(EK_CORE_DBG_STRING));
+    ImGui_Text("C++ Arrays: %d", ek_core_dbg_get(EK_CORE_DBG_ARRAY));
+    ImGui_Text("Pod Arrays: %d", ek_core_dbg_get(EK_CORE_DBG_POD_ARRAY));
+    ImGui_Text("Signals: %d", ek_core_dbg_get(EK_CORE_DBG_SIGNAL));
+    ImGui_Text("Hashes: %d", ek_core_dbg_get(EK_CORE_DBG_HASH));
+    ImGui_Text("Strings: %d", ek_core_dbg_get(EK_CORE_DBG_STRING));
 
-    ImGui::Text("EK_CORE_DBG_INTERACTIVE: %d", ek_core_dbg_get(EK_CORE_DBG_INTERACTIVE));
-    ImGui::Text("EK_CORE_DBG_VD: %d", ek_core_dbg_get(EK_CORE_DBG_VD));
+    ImGui_Text("EK_CORE_DBG_INTERACTIVE: %d", ek_core_dbg_get(EK_CORE_DBG_INTERACTIVE));
+    ImGui_Text("EK_CORE_DBG_VD: %d", ek_core_dbg_get(EK_CORE_DBG_VD));
 
     ImGui_Separator();
 }
@@ -59,7 +59,7 @@ void drawAllocationsList() {
     //    const auto count = allocator.getAllocationsInfo(10000, data);
     //    for (uint32_t i = 0; i < count; ++i) {
     //        auto& info = data[i];
-    //        ImGui::Text("%0.2lf %0.2lf", toKB(info.sizeTotal), toKB(info.sizeUsed));
+    //        ImGui_Text("%0.2lf %0.2lf", toKB(info.sizeTotal), toKB(info.sizeUsed));
     //        for(unsigned j = 0; j < AllocationInfo::MaxStackDepth; ++j) {
     //            if(info.stack[j]) {
     //                ImGui::BulletText("[%u] %s", j, info.stack[j]);
@@ -120,17 +120,17 @@ void drawAllocatorMemorySpan() {
     //        }
     //        if (occupied > 0) {
     //            if (skipped > 0) {
-    //                ImGui::Text("-/- Skipped %0.2f MB -/-", (float) (skipped * NumKilosPerLine) / 1024.0f);
+    //                ImGui_Text("-/- Skipped %0.2f MB -/-", (float) (skipped * NumKilosPerLine) / 1024.0f);
     //            }
     //            skipped = 0;
-    //            ImGui::TextUnformatted(BB + i, BB + i + txtLen);
+    //            ImGui_TextUnformatted(BB + i, BB + i + txtLen);
     //        } else {
     //            ++skipped;
     //        }
     //        i += txtLen;
     //    }
     //    if (skipped > 0) {
-    //        ImGui::Text("-/- Skipped %0.2f MB -/-", (float) (skipped * NumKilosPerLine) / 1024.0f);
+    //        ImGui_Text("-/- Skipped %0.2f MB -/-", (float) (skipped * NumKilosPerLine) / 1024.0f);
     //    }
     //    ImGui::PopFont();
 }
@@ -162,13 +162,13 @@ void DrawMemoryBlock() {
     //        for (int i = 0; i < 3; ++i) {
     //            ImGui::TableNextRow();
     //            ImGui::TableSetColumnIndex(0);
-    //            ImGui::TextUnformatted(STATS_MODES[i]);
+    //            ImGui_TextUnformatted(STATS_MODES[i], 0);
     //            ImGui::TableSetColumnIndex(1);
-    //            ImGui::Text("%u", stats->allocations[i]);
+    //            ImGui_Text("%u", stats->allocations[i]);
     //            ImGui::TableSetColumnIndex(2);
-    //            ImGui::Text("%0.2lf", toMB(stats->memoryEffective[i]));
+    //            ImGui_Text("%0.2lf", toMB(stats->memoryEffective[i]));
     //            ImGui::TableSetColumnIndex(3);
-    //            ImGui::Text("%0.2lf", toMB(stats->memoryAllocated[i]));
+    //            ImGui_Text("%0.2lf", toMB(stats->memoryAllocated[i]));
     //        }
     //        ImGui::EndTable();
     //    }
@@ -194,13 +194,13 @@ void DrawAllocatorsTree() {
     //            ImGui::TreePop();
     //        }
     //    } else {
-    //        ImGui::Text("Allocator is not debuggable");
+    //        ImGui_Text("Allocator is not debuggable");
     //    }
     //    ImGui::PopID();
 }
 
 void drawECSMemoryStats() {
-    ImGui::Text("ECS World Struct Size: %lu", sizeof ecx);
+    ImGui_Text("ECS World Struct Size: %lu", sizeof ecx);
     uint32_t totalUsed = 0;
     uint32_t totalReserved = 0;
     uint32_t totalLookup = 0;
@@ -236,28 +236,28 @@ void drawECSMemoryStats() {
 
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                ImGui::Text("%u", i);
+                ImGui_Text("%u", i);
                 ImGui::TableSetColumnIndex(1);
-                ImGui::TextUnformatted(label ? label : "?");
+                ImGui_TextUnformatted(label ? label : "?", 0);
 
                 ImGui::TableSetColumnIndex(2);
-                ImGui::Text("%u", len);
+                ImGui_Text("%u", len);
 
                 ImGui::TableSetColumnIndex(3);
-                ImGui::Text("%u", cap);
+                ImGui_Text("%u", cap);
 
                 ImGui::TableSetColumnIndex(4);
-                ImGui::Text("%0.2lf / %0.2lf", toKB(controlSizeUsed), toKB(controlSizeReserved));
+                ImGui_Text("%0.2lf / %0.2lf", toKB(controlSizeUsed), toKB(controlSizeReserved));
 
                 ImGui::TableSetColumnIndex(5);
-                ImGui::Text("%0.2lf / %0.2lf", toKB(dataSizeUsed), toKB(dataSizeReserved));
+                ImGui_Text("%0.2lf / %0.2lf", toKB(dataSizeUsed), toKB(dataSizeReserved));
             }
         }
         ImGui::EndTable();
     }
-    ImGui::Text("ECX lookups: %0.2lf KB", toKB(totalLookup));
-    ImGui::Text("ECX used: %0.2lf MB", toMB(totalUsed));
-    ImGui::Text("ECX reserved: %0.2lf MB", toMB(totalReserved));
+    ImGui_Text("ECX lookups: %0.2lf KB", toKB(totalLookup));
+    ImGui_Text("ECX used: %0.2lf MB", toMB(totalUsed));
+    ImGui_Text("ECX reserved: %0.2lf MB", toMB(totalReserved));
 }
 
 void draw_memory_profiler(void) {
@@ -266,7 +266,7 @@ void draw_memory_profiler(void) {
     if (ImGui::BeginTabBar("Memory Stats")) {
         if (ImGui::BeginTabItem("Allocators")) {
             // TODO:
-            ImGui::Text("TODO");
+            ImGui_Text("TODO");
             //DrawAllocatorsTree(memory::systemAllocator);
             ImGui::EndTabItem();
         }

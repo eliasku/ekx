@@ -2,6 +2,7 @@
 
 
 #include "HierarchyWindow.hpp"
+#include <ek/print.h>
 #include <ek/editor/imgui/imgui.hpp>
 #include <ek/scenex/base/node.h>
 #include <ek/scenex/2d/text2d.h>
@@ -14,12 +15,13 @@
 #include <ek/scenex/2d/camera2d.h>
 #include <ek/scenex/3d/scene3d.h>
 
+
 HierarchyWindow editor_hierarchy_window;
 
 void draw_hierarchy_window(void) {
     editor_hierarchy_window.drawFilter();
     if (!is_entity(editor_hierarchy_window.root)) {
-        ImGui::TextColored({1, 0, 0, 1}, "No roots");
+        ImGui_TextError("no roots");
     } else {
         ImGui::Indent(40.0f);
         if (editor_hierarchy_window.filter.IsActive()) {
@@ -67,7 +69,7 @@ const char* HierarchyWindow::getEntityIcon(entity_t e) {
 }
 
 void getEntityTitle(entity_t e, char buffer[64]) {
-    auto tag = get_tag(e);
+    string_hash_t tag = get_tag(e);
     if (tag) {
         const char* str = hsp_get(tag);
         if (*str) {
@@ -96,7 +98,7 @@ bool HierarchyWindow::hasChildren(entity_t e) {
 
 bool HierarchyWindow::hoverIconButton(const char* str_id, const char* icon) {
     (void)str_id;
-    ImGui::TextUnformatted(icon);
+    ImGui_TextUnformatted(icon, 0);
     return ImGui::IsItemClicked();
 }
 
@@ -131,12 +133,12 @@ void HierarchyWindow::drawVisibleTouchControls(node_t* node, bool parentedVisibl
 
 void HierarchyWindow::drawEntityInTree(entity_t e, bool parentedVisible, bool parentedTouchable) {
     if (!is_entity(e)) {
-        ImGui::Text("INVALID ENTITY");
+        ImGui_Text("INVALID ENTITY");
         return;
     }
 
-    ImGui::PushID(e.id);
-//        ImGui::BeginGroup();
+    ImGui_PushID((uintptr_t)e.id);
+//        ImGui_TextDisabled();
 
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow
                                | ImGuiTreeNodeFlags_OpenOnDoubleClick
@@ -194,13 +196,13 @@ void HierarchyWindow::drawEntityInTree(entity_t e, bool parentedVisible, bool pa
         ImGui::TreePop();
     }
 
-//        ImGui::EndGroup();
-    ImGui::PopID();
+//        ImGui_EndGroup();
+    ImGui_PopID();
 }
 
 void HierarchyWindow::drawEntityFiltered(entity_t e, bool parentedVisible, bool parentedTouchable) {
     if (!is_entity(e)) {
-        ImGui::Text("INVALID ENTITY");
+        ImGui_Text("INVALID ENTITY");
         return;
     }
     auto* node = get_node(e);
@@ -213,8 +215,8 @@ void HierarchyWindow::drawEntityFiltered(entity_t e, bool parentedVisible, bool 
     }
 
     if (name && *name && filter.PassFilter(name)) {
-        ImGui::PushID(e.id);
-        ImGui::BeginGroup();
+        ImGui_PushID((uintptr_t)e.id);
+        ImGui_BeginGroup();
 
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow
                                    | ImGuiTreeNodeFlags_OpenOnDoubleClick
@@ -230,7 +232,7 @@ void HierarchyWindow::drawEntityFiltered(entity_t e, bool parentedVisible, bool 
         ImGui::PushStyleColor(ImGuiCol_Text, nodeVisible ? 0xFFFFFFFF : 0x77FFFFFF);
         char buffer[64];
         getEntityTitle(e, buffer);
-        const bool opened = ImGui::TreeNodeEx("hierarchy_node", flags, "%s%s", getEntityIcon(e), buffer);
+        const bool opened = ImGui_TreeNodeEx("hierarchy_node", flags, "%s%s", getEntityIcon(e), buffer);
         ImGui::PopStyleColor();
 
         if (ImGui::IsItemClicked()) {
@@ -241,11 +243,11 @@ void HierarchyWindow::drawEntityFiltered(entity_t e, bool parentedVisible, bool 
         drawVisibleTouchControls(node, parentedVisible, parentedTouchable);
 
         if (opened) {
-            ImGui::TreePop();
+            ImGui_TreePop();
         }
 
-        ImGui::EndGroup();
-        ImGui::PopID();
+        ImGui_EndGroup();
+        ImGui_PopID();
     }
 
     if (node) {

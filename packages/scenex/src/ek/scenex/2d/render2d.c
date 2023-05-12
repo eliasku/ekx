@@ -36,11 +36,6 @@ void render2d_draw(entity_t e, const world_transform2d_t* world_transform) {
             canvas.color[0] = world_transform->color;
             display->draw(e);
         }
-        if(UNLIKELY(display->callback)) {
-            canvas.matrix[0] = world_transform->matrix;
-            canvas.color[0] = world_transform->color;
-            display->callback(e);
-        }
     }
 
     entity_t it = get_first_child(e);
@@ -94,9 +89,6 @@ void render2d_draw_stack(entity_t e) {
         }
         if (display->draw) {
             display->draw(e);
-        }
-        if (display->callback) {
-            display->callback(e);
         }
     }
 

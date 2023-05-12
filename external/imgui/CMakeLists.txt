@@ -11,8 +11,6 @@ add_library(${PROJECT_NAME} STATIC
         src/imgui_widgets.cpp
         src/imgui_tables.cpp
         src/imstb_textedit.h
-        src/imgui_stdlib.h
-        src/imgui_stdlib.cpp
         src/misc/freetype/imgui_freetype.cpp
         src/misc/freetype/imgui_freetype.h
 

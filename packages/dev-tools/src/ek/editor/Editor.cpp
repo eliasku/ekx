@@ -1,5 +1,5 @@
 #include "Editor.hpp"
-#include "editor_api.h"
+#include <ek/editor_api.h>
 
 #include <calo.h>
 #include <ek/editor/imgui/cimgui.h>

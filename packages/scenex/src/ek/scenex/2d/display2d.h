@@ -33,9 +33,6 @@ typedef struct {
 
     void (* draw)(entity_t e);
 
-    // TODO: rename as post draw
-    void (* callback)(entity_t e);
-
     bool (* hit_test)(entity_t e, vec2_t local_pos);
 
     rect_t (* get_bounds)(entity_t e);

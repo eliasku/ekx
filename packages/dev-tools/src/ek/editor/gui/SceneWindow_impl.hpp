@@ -232,9 +232,6 @@ void SceneWindow::drawSceneNode(entity_t e) {
         if (disp->draw) {
             disp->draw(e);
         }
-        if (disp->callback) {
-            disp->callback(e);
-        }
     }
     foreach_child(e, drawSceneNode);
 }
@@ -342,45 +339,45 @@ void SceneWindow::drawToolbar() {
         ImGui::OpenPopup("###scene_camera_menu");
     }
     ImGui::SameLine();
-    if (ImGui::ToolbarButton("2D", view.mode2D, "Toggle 2D/3D")) {
+    if (ImGui_ToolbarButton("2D", view.mode2D, "Toggle 2D/3D")) {
         view.mode2D = !view.mode2D;
     }
     ImGui::SameLine();
-    if (ImGui::ToolbarButton(ICON_FA_MOUSE_POINTER, currentTool == 0, "Select")) {
+    if (ImGui_ToolbarButton(ICON_FA_MOUSE_POINTER, currentTool == 0, "Select")) {
         currentTool = 0;
     }
     ImGui::SameLine();
-    if (ImGui::ToolbarButton(ICON_FA_HAND_PAPER, currentTool == 1, "Pan")) {
+    if (ImGui_ToolbarButton(ICON_FA_HAND_PAPER, currentTool == 1, "Pan")) {
         currentTool = 1;
     }
     ImGui::SameLine();
-    if (ImGui::ToolbarButton(ICON_FA_ARROWS_ALT, currentTool == 2, "Translate")) {
+    if (ImGui_ToolbarButton(ICON_FA_ARROWS_ALT, currentTool == 2, "Translate")) {
         currentTool = 2;
     }
     ImGui::SameLine();
-    if (ImGui::ToolbarButton(ICON_FA_CIRCLE, currentTool == 3, "Rotate")) {
+    if (ImGui_ToolbarButton(ICON_FA_CIRCLE, currentTool == 3, "Rotate")) {
         currentTool = 3;
     }
     ImGui::SameLine();
-    if (ImGui::ToolbarButton(ICON_FA_EXPAND, currentTool == 4, "Scale")) {
+    if (ImGui_ToolbarButton(ICON_FA_EXPAND, currentTool == 4, "Scale")) {
         currentTool = 4;
     }
     ImGui::SameLine();
-    if (ImGui::ToolbarButton(ICON_FA_ADJUST, currentTool == 5, "Manipulate")) {
+    if (ImGui_ToolbarButton(ICON_FA_ADJUST, currentTool == 5, "Manipulate")) {
         currentTool = 5;
     }
     ImGui::SameLine();
-    if (ImGui::ToolbarButton(ICON_FA_VECTOR_SQUARE, currentTool == 6, "Bounds")) {
+    if (ImGui_ToolbarButton(ICON_FA_VECTOR_SQUARE, currentTool == 6, "Bounds")) {
         currentTool = 6;
     }
 
     if (currentTool != 4) {
         ImGui::SameLine();
-        if (ImGui::ToolbarButton(ICON_FA_OBJECT_GROUP, localGlobal == 0, "Object Space")) {
+        if (ImGui_ToolbarButton(ICON_FA_OBJECT_GROUP, localGlobal == 0, "Object Space")) {
             localGlobal = 0;
         }
         ImGui::SameLine();
-        if (ImGui::ToolbarButton(ICON_FA_OBJECT_UNGROUP, localGlobal == 1, "World Space")) {
+        if (ImGui_ToolbarButton(ICON_FA_OBJECT_UNGROUP, localGlobal == 1, "World Space")) {
             localGlobal = 1;
         }
     }

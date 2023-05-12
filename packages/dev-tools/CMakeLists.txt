@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.19)
 project(dev-tools)
+
 add_subdirectory(src)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 add_library(ekx::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 

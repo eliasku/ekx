@@ -1,6 +1,6 @@
 #include "display2d.h"
 #include "sprite.h"
-#include "ek/canvas.h"
+#include <ek/canvas.h>
 
 ECX_DEFINE_TYPE(bounds2d_t);
 ECX_DEFINE_TYPE(display2d_t);

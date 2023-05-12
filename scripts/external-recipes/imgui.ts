@@ -29,10 +29,6 @@ async function fetch() {
             "misc/freetype/imgui_freetype.cpp",
             "misc/freetype/imgui_freetype.h"
         ],
-        fileMap: {
-            "misc/cpp/imgui_stdlib.h": "imgui_stdlib.h",
-            "misc/cpp/imgui_stdlib.cpp": "imgui_stdlib.cpp",
-        }
     });
 
     const imgui_config = `

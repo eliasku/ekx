@@ -48,9 +48,9 @@ inline void select_ref_asset(const char* label, rr_man_t* man, res_id* sid) {
 
 inline void guiEntityRef(const char* label, entity_t e) {
     if (e.id == 0) {
-        ImGui::TextDisabled("%s: null", label);
+        ImGui_TextDisabled("%s: null", label);
     } else if (!is_entity(e)) {
-        ImGui::TextColored({1, 0, 0, 1}, "%s: invalid", label);
+        ImGui_TextError("%s: invalid", label);
     } else {
         auto tag = get_tag(e);
         ImGui::LabelText(label, "%s [%08X]", hsp_get(tag), tag);
@@ -59,11 +59,11 @@ inline void guiEntityRef(const char* label, entity_t e) {
 
 inline void guiComponentPanel(const char* name, void* data, void (*fn)(void* data)) {
     if (data && ImGui::CollapsingHeader(name)) {
-        ImGui::PushID(&data);
+        ImGui_PushID((uintptr_t)data);
         ImGui::Indent();
         fn(data);
         ImGui::Unindent();
-        ImGui::PopID();
+        ImGui_PopID();
     }
 }
 
@@ -109,7 +109,7 @@ inline void guiTransform2D(void* comp) {
 
 inline void guiViewport(void* comp) {
     viewport_t* vp = (viewport_t*)comp;
-    ImGui::EditRect("Viewport", vp->options.viewport.data);
+    ImGui_EditRect("Viewport", &vp->options.viewport);
     ImGui::DragFloat2("Alignment", vp->options.alignment.data);
     ImGui::DragFloat2("Base Resolution", vp->options.baseResolution.data);
     ImGui::DragFloat2("Pixel Ratio", vp->options.pixelRatio.data);
@@ -117,9 +117,9 @@ inline void guiViewport(void* comp) {
     ImGui::Checkbox("Scale To Resolution", &vp->options.scaleToResolution);
     if (ImGui::CollapsingHeader("Debug Output")) {
         ImGui::Indent();
-        ImGui::EditRect("Screen Rect", vp->output.screenRect.data);
-        ImGui::EditRect("Full Rect", vp->output.fullRect.data);
-        ImGui::EditRect("Safe Rect", vp->output.safeRect.data);
+        ImGui_EditRect("Screen Rect", &vp->output.screenRect);
+        ImGui_EditRect("Full Rect", &vp->output.fullRect);
+        ImGui_EditRect("Safe Rect", &vp->output.safeRect);
         ImGui::InputFloat2("Offset", vp->output.offset.data);
         ImGui::InputFloat("Scale", &vp->output.scale);
         ImGui::Unindent();
@@ -186,11 +186,11 @@ inline void guiMeshRenderer(void* comp) {
 inline void guiLight3D(void* comp) {
     light3d_t* light = (light3d_t*)comp;
     if (light->type == LIGHT_DIRECTIONAL) {
-        ImGui::Text("Directional Light");
+        ImGui_Text("Directional Light");
     } else if (light->type == LIGHT_POINT) {
-        ImGui::Text("Point Light");
+        ImGui_Text("Point Light");
     } else if (light->type == LIGHT_SPOT) {
-        ImGui::Text("Spot Light");
+        ImGui_Text("Spot Light");
     }
     ImGui::ColorEdit3("Ambient", light->ambient.data);
     ImGui::ColorEdit3("Diffuse", light->diffuse.data);
@@ -202,7 +202,7 @@ inline void guiLight3D(void* comp) {
 
 inline void guiBounds2D(void* comp) {
     bounds2d_t* bounds = (bounds2d_t*)comp;
-    ImGui::EditRect("Rect", bounds->rect.data);
+    ImGui_EditRect("Rect", &bounds->rect);
     ImGui::CheckboxFlags("Hit Area", &bounds->flags, BOUNDS_2D_HIT_AREA);
     ImGui::CheckboxFlags("Scissors", &bounds->flags, BOUNDS_2D_SCISSORS);
     ImGui::CheckboxFlags("Cull Box", &bounds->flags, BOUNDS_2D_CULL);
@@ -225,7 +225,7 @@ inline void spriteRefInfo(R(sprite_t) ref) {
     ImGui::LabelText("Image", "ref: %u", spr.image_id);
     ImGui::LabelText("Loaded", "%u", !!(spr.state & SPRITE_LOADED));
     ImGui::LabelText("Rotated", "%u", !!(spr.state & SPRITE_ROTATED));
-    ImGui::TextDisabled("TODO: select sprite res %u", ref);
+    ImGui_TextDisabled("TODO: select sprite res %u", ref);
 }
 
 inline void editDisplaySprite(void* comp) {
@@ -244,11 +244,11 @@ inline void editDisplayNinePatch(void* comp) {
 
 inline void editDisplayRectangle(void* comp) {
     quad2d_t* quad = (quad2d_t*)comp;
-    ImGui::EditRect("Bounds", quad->rect.data);
-    ImGui::Color32Edit("Color LT", &quad->colors[0]);
-    ImGui::Color32Edit("Color RT", &quad->colors[1]);
-    ImGui::Color32Edit("Color RB", &quad->colors[2]);
-    ImGui::Color32Edit("Color LB", &quad->colors[3]);
+    ImGui_EditRect("Bounds", &quad->rect);
+    ImGui_Color32Edit("Color LT", &quad->colors[0]);
+    ImGui_Color32Edit("Color RT", &quad->colors[1]);
+    ImGui_Color32Edit("Color RB", &quad->colors[2]);
+    ImGui_Color32Edit("Color LB", &quad->colors[3]);
 }
 
 inline void editDisplayArc(void* comp) {
@@ -258,8 +258,8 @@ inline void editDisplayArc(void* comp) {
     ImGui::DragFloat("Radius", &arc->radius);
     ImGui::DragFloat("Line Width", &arc->line_width);
     ImGui::DragInt("Segments", &arc->segments);
-    ImGui::Color32Edit("Color Inner", &arc->color_inner);
-    ImGui::Color32Edit("Color Outer", &arc->color_outer);
+    ImGui_Color32Edit("Color Inner", &arc->color_inner);
+    ImGui_Color32Edit("Color Outer", &arc->color_outer);
 }
 
 inline void editParticleRenderer2D(void* comp) {
@@ -298,9 +298,9 @@ inline void editDisplayText(void* comp) {
     // TODO:
     //ImGui::InputTextMultiline("Text", &tf.str_buf);
     ImGui::LabelText("Text", "%s", text2d__c_str(tf));
-    ImGui::EditRect("Bounds", tf->rect.data);
-    ImGui::Color32Edit("Border Color", &tf->borderColor);
-    ImGui::Color32Edit("Fill Color", &tf->fillColor);
+    ImGui_EditRect("Bounds", &tf->rect);
+    ImGui_Color32Edit("Border Color", &tf->borderColor);
+    ImGui_Color32Edit("Fill Color", &tf->fillColor);
     ImGui::Checkbox("Hit Text Bounds", &tf->hitTextBounds);
     ImGui::Checkbox("Show Text Bounds", &tf->showTextBounds);
     guiTextFormat(&tf->format);
@@ -313,25 +313,25 @@ inline void guiLayout(void* comp) {
     ImGui::Checkbox("Align X", &layout->align_x);
     ImGui::Checkbox("Align Y", &layout->align_y);
     ImGui::Checkbox("Use Safe Insets", &layout->doSafeInsets);
-    ImGui::EditRect("Extra Fill", layout->fill_extra.data);
+    ImGui_EditRect("Extra Fill", &layout->fill_extra);
     ImGui::DragFloat2("Align X (rel, abs)", layout->x.data);
     ImGui::DragFloat2("Align Y (rel, abs)", layout->y.data);
 
-    ImGui::EditRect("Rect", layout->rect.data);
-    ImGui::EditRect("Safe Rect", layout->safeRect.data);
+    ImGui_EditRect("Rect", &layout->rect);
+    ImGui_EditRect("Safe Rect", &layout->safeRect);
 }
 
 inline void guiParticleEmitter2D(void* comp) {
     particle_emitter2d_t* emitter = (particle_emitter2d_t*)comp;
     ImGui::Checkbox("Enabled", &emitter->enabled);
-    ImGui::Text("_Time: %f", emitter->time);
+    ImGui_Text("_Time: %f", emitter->time);
     guiEntityRef("Layer", emitter->layer);
     ImGui::LabelText("Particle", "SID: %u ( %s )", emitter->particle, hsp_get(res_particle.names[emitter->particle]));
     ImGui::DragFloat2("Offset", emitter->position.data);
     ImGui_Separator();
 
     // data
-    ImGui::EditRect("Rect", emitter->data.rect.data);
+    ImGui_EditRect("Rect", &emitter->data.rect);
     ImGui::DragFloat2("Offset", emitter->data.offset.data);
     ImGui::DragInt("Burst", &emitter->data.burst);
     ImGui::DragFloat("Interval", &emitter->data.interval);
@@ -350,7 +350,7 @@ inline void guiParticleLayer2D(void* comp) {
 }
 
 static void gui_inspector(entity_t e) {
-    ImGui::PushID(e.id);
+    ImGui_PushID((uintptr_t)e.id);
     ImGui::LabelText("ID", "#%02X_%04X", e.gen, e.idx);
 
     const node_t* node = get_node(e);
@@ -399,5 +399,5 @@ static void gui_inspector(entity_t e) {
 
     guiComponentPanel("Movie Clip", get_movieclip(e), guiMovieClip);
 
-    ImGui::PopID();
+    ImGui_PopID();
 }
