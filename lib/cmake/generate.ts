@@ -8,7 +8,8 @@ export interface CMakeGenerateTarget {
     linkOptions: string[];
     compileOptions: string[];
     compileDefinitions: string[];
-    sourceFileCompileFlags?: {files:string[], flags:string}[];
+    sourceFileCompileFlags?: { files: string[], flags: string }[];
+    compileAsCpp?: boolean;
 }
 
 export interface CMakeGenerateProject {
@@ -60,6 +61,10 @@ export const cmakeLists = (project: CMakeGenerateProject): string => {
             CXX_EXTENSIONS NO
         )`);
 
+        if (target.compileAsCpp) {
+            lines.push(`set_target_properties(${target.name} PROPERTIES LINKER_LANGUAGE CXX)`);
+        }
+
         if (target.linkLibraries.length > 0) {
             lines.push(`target_link_libraries(${target.name}`);
             for (const lib of target.linkLibraries) {
@@ -84,9 +89,9 @@ export const cmakeLists = (project: CMakeGenerateProject): string => {
             lines.push(`)`);
         }
 
-        if(target.sourceFileCompileFlags && target.sourceFileCompileFlags.length > 0) {
-            for(const srcCFlags of target.sourceFileCompileFlags) {
-                for(const src of srcCFlags.files) {
+        if (target.sourceFileCompileFlags && target.sourceFileCompileFlags.length > 0) {
+            for (const srcCFlags of target.sourceFileCompileFlags) {
+                for (const src of srcCFlags.files) {
                     lines.push(`\t\tset_source_files_properties("${src}" PROPERTIES COMPILE_FLAGS "${srcCFlags.flags}")`);
                 }
             }

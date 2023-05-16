@@ -17,7 +17,7 @@ public class EkSurfaceView extends GLSurfaceView {
     public EkSurfaceView(Context context, boolean needDepth) {
         super(context);
 
-        setEGLContextClientVersion(2);
+        setEGLContextClientVersion(3);
         setEGLConfigChooser(needDepth);
         setPreserveEGLContextOnPause(true);
 

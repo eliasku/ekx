@@ -3,14 +3,10 @@
 
 #if defined(__ANDROID__)
 
-//#define SOKOL_GLES3
+#define SOKOL_GLES3
 
 //#include <GLES3/gl3.h>
 //#include <GLES3/gl3ext.h>
-
-#define SOKOL_GLES2
-
-//#include <EGL/egl.h>
 
 #ifndef GL_EXT_PROTOTYPES
 #define GL_GLEXT_PROTOTYPES
@@ -24,11 +20,7 @@
 
 #elif defined(__EMSCRIPTEN__)
 
-//#define SOKOL_GLES3
-
-//#include <GLES3/gl3.h>
-
-#define SOKOL_GLES2
+#define SOKOL_GLES3
 
 #ifndef GL_EXT_PROTOTYPES
 #define GL_GLEXT_PROTOTYPES

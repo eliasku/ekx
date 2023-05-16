@@ -37,7 +37,7 @@ export class AndroidManifest {
     constructor() {
         this.features.push({
             key: "android:glEsVersion",
-            value: "0x00020000",
+            value: "0x00030000",
             required: true
         });
         this.features.push({

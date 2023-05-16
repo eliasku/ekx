@@ -160,7 +160,9 @@ function createCMakeLists(dir: string, ctx: Project) {
             //"-Wstrict-null-sentinel"
         ],
         compileDefinitions: cpp_define,
-        sourceFileCompileFlags: cpp_flags
+        sourceFileCompileFlags: cpp_flags,
+        // because Android's Oboe is still C++ 
+        compileAsCpp: true,
     };
 
     // -fno-exceptions

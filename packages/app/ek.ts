@@ -6,7 +6,7 @@ export async function setup(project: Project) {
         cpp: "src",
         cpp_include: "include",
         android: {
-            cpp_lib: ["log", "android", "GLESv2"],
+            cpp_lib: ["log", "android", "GLESv3"],
             android_java: "java",
             android_dependency: [
                 `implementation 'androidx.appcompat:appcompat:1.6.1'`
@@ -32,7 +32,7 @@ export async function setup(project: Project) {
         web: {
             js: "js/lib",
             js_pre: "js/pre",
-            cpp_lib: ["GLESv2", "GL"]
+            cpp_lib: ["GL"]
         },
     });
     await project.import(

@@ -209,20 +209,13 @@ export const AppLib = {
         canvas.addEventListener("touchmove", onTouch, nonPassiveOpt);
         canvas.addEventListener("touchcancel", onTouch, nonPassiveOpt);
 
-        const webgl_list = ["webgl", "experimental-webgl"]; // 'webgl2'
         const webgl_attributes: EmscriptenGLAttributes = {
             alpha: false,
             depth: !!(flags & 1),
             stencil: false,
             antialias: false,
         };
-        let gl: WebGLRenderingContext | undefined | null;
-        for (let i = 0; i < webgl_list.length; ++i) {
-            gl = canvas.getContext(webgl_list[i] as "webgl", webgl_attributes);
-            if (gl) {
-                break;
-            }
-        }
+        const gl = canvas.getContext("webgl2", webgl_attributes);
         if (!gl) {
             console.error("Failed to create WebGL context");
             return false;
@@ -232,9 +225,10 @@ export const AppLib = {
             e.preventDefault();
         }, false);
 
-        webgl_attributes.majorVersion = 1;
+        webgl_attributes.majorVersion = 2;
+        webgl_attributes.minorVersion = 0;
         // extensions required for sokol by default
-        webgl_attributes.enableExtensionsByDefault = true;
+        // webgl_attributes.enableExtensionsByDefault = true;
         const handle = GL.registerContext(gl, webgl_attributes);
         if (!GL.makeContextCurrent(handle)) {
             console.error("Failed to set current WebGL context");

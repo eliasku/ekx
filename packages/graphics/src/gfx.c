@@ -12,7 +12,6 @@ static void ek_gfx_log_backend(void) {
 #ifndef NDEBUG
     static const char* backend_strings[] = {
         "SG_BACKEND_GLCORE33",
-        "SG_BACKEND_GLES2",
         "SG_BACKEND_GLES3",
         "SG_BACKEND_D3D11",
         "SG_BACKEND_METAL_IOS",

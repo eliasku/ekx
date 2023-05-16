@@ -114,7 +114,6 @@ function renderCMakeFile(ctx: Project, buildType: string): string {
 
         //MINIMAL_RUNTIME_STREAMING_WASM_COMPILATION: 1,
         // { try ES6
-        // TODO: ABORT is not defined (nbnet) for MINIMAL_RUNTIME
         MINIMAL_RUNTIME: 1,
         MODULARIZE: 1,
         EXPORT_ES6: 1,
@@ -134,6 +133,9 @@ function renderCMakeFile(ctx: Project, buildType: string): string {
 
         ALLOW_MEMORY_GROWTH: 1,
         // INITIAL_MEMORY: "128MB",
+
+        MIN_WEBGL_VERSION: 2,
+        MAX_WEBGL_VERSION: 2,
 
         FILESYSTEM: 0,
         INLINING_LIMIT: 1,

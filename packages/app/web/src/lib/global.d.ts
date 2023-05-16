@@ -17,17 +17,18 @@ declare global {
     function stringToUTF8(str: string, pDest: number, maxLength: number): number;
 
     interface EmscriptenGLContext {
-        readonly GLctx: WebGLRenderingContext;
+        readonly GLctx: WebGL2RenderingContext;
     }
 
     interface EmscriptenGLAttributes extends WebGLContextAttributes {
+        minorVersion?: number;
         majorVersion?: number;
         enableExtensionsByDefault?: boolean;
     }
 
     interface EmscriptenGL {
         readonly currentContext: EmscriptenGLContext;
-        registerContext: (gl: WebGLRenderingContext, attributes: EmscriptenGLAttributes) => number;
+        registerContext: (gl: WebGL2RenderingContext, attributes: EmscriptenGLAttributes) => number;
         makeContextCurrent: (handle: number) => boolean;
     }
 

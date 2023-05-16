@@ -37,7 +37,7 @@ export async function shdc(options: ShdcOptions) {
         cmd: [
             exePath,
             "-i", options.input, "-o", options.output,
-            "-l", "glsl330:glsl300es:glsl100:hlsl5:metal_ios:metal_sim:metal_macos",
+            "-l", "glsl330:glsl300es:hlsl5:metal_ios:metal_sim:metal_macos",
             "--ifdef"
         ],
         cwd: options.cwd,

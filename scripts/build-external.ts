@@ -1,4 +1,5 @@
 import box2d from "./external-recipes/box2d.js";
+import chipmunk2d from "./external-recipes/chipmunk2d.js";
 import cairo from "./external-recipes/cairo.js";
 import freetype from "./external-recipes/freetype/freetype.js";
 import headers from "./external-recipes/headers.js";
@@ -21,6 +22,7 @@ interface Lib {
 
 const libs: { [key: string]: Lib } = {
     headers,
+    chipmunk2d,
     box2d,
     cairo,
     freetype,
