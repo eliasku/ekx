@@ -1,11 +1,11 @@
 #include "fireworks.h"
 
 #include <ek/buf.h>
-#include <ekx/app/time_layers.h>
-#include <ek/scenex/particles/particle_system.h>
-#include <ekx/app/audio_manager.h>
 #include <ek/scenex/2d/layout_rect.h>
 #include <ek/scenex/base/node.h>
+#include <ek/scenex/particles/particle_system.h>
+#include <ekx/app/audio_manager.h>
+#include <ekx/app/time_layers.h>
 
 struct {
     entity_t layer;
@@ -28,7 +28,7 @@ void start_fireworks(entity_t e) {
     set_touchable(e, false);
 }
 
-void update_fireworks() {
+void update_fireworks(void) {
     entity_t e = fireworks.layer;
     if (!is_entity(e) || !fireworks.enabled) {
         return;
@@ -71,7 +71,7 @@ void update_fireworks() {
         particles_burst(e, random_range_i(60, 80), vec2(0, 0));
 
         fireworks.timer_ = random_range_f(0.1f, 1.0f);
-//            _timer = random_range_f(0.01f, 0.1f);
+        //            _timer = random_range_f(0.01f, 0.1f);
     }
 }
 

@@ -1,11 +1,11 @@
 #include "interaction_system.h"
 
 #include <ecx/ecx.h>
+#include <ek/scenex/2d/camera2d.h>
 #include <ek/scenex/base/interactive.h>
+#include <ek/scenex/base/node.h>
 #include <ek/scenex/base/node_events.h>
 #include <ek/scenex/systems/hit_test.h>
-#include <ek/scenex/2d/camera2d.h>
-#include <ek/scenex/base/node.h>
 
 struct interaction_system g_interaction_system;
 
@@ -95,7 +95,7 @@ void fire_interaction(string_hash_t event, bool prev, bool onlyIfChanged) {
 }
 
 entity_t global_hit_test(vec2_t* worldSpacePointer, entity_t* capturedCamera) {
-    for (int i = (int) active_cameras_num - 1; i >= 0; --i) {
+    for (int i = (int)active_cameras_num - 1; i >= 0; --i) {
         const entity_t e = active_cameras[i];
         if (is_entity(e)) {
             const camera2d_t* camera = get_camera2d(e);
@@ -118,7 +118,7 @@ entity_t global_hit_test(vec2_t* worldSpacePointer, entity_t* capturedCamera) {
 ek_mouse_cursor search_interactive_targets(entity_t list[32]) {
     vec2_t pointer = vec2(0, 0);
     entity_t it;
-    entity_t camera;
+    entity_t camera = NULL_ENTITY;
     entity_t drag_entity = g_interaction_system.dragEntity_;
     if (is_entity(drag_entity)) {
         it = drag_entity;
@@ -245,4 +245,3 @@ void interaction_system_send_back_button(void) {
 void interaction_system_drag(entity_t e) {
     g_interaction_system.dragEntity_ = e;
 }
-

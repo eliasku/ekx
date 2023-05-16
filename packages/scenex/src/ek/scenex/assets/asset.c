@@ -308,9 +308,7 @@ static void pack_poll(asset_t* base) {
     }
 
     if (!is_time_budget_allow_start_next_job(timer)) {
-        uint64_t since = timer;
-        double elapsed = ek_ticks_to_sec(ek_ticks(&since));
-        log_debug("Assets loading jobs spend %d ms", (int) (elapsed * 1000));
+        log_debug("Assets loading jobs spend %d ms", (int) (1000 * ek_ticks_to_sec(ek_ticks(&timer))));
     }
 
     pack->assets_loaded = loaded_assets_num;

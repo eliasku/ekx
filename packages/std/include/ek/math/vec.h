@@ -202,6 +202,8 @@ bool almost_eq_vec4(vec4_t a, vec4_t b, float eps);
 }
 #endif
 
+#ifdef __cplusplus
 #include "vec.hpp"
+#endif
 
 #endif // EK_MATH_VEC_H

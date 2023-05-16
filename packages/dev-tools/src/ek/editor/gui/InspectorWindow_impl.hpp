@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Widgets.hpp"
-#include <ecx/ecx.hpp>
+#include "widgets.h"
+#include <ecx/ecx.h>
 #include <ek/editor/imgui/imgui.hpp>
 #include <ek/scenex/2d/camera2d.h>
 #include <ek/scenex/2d/layout_rect.h>
@@ -288,7 +288,7 @@ inline void guiTextFormat(text_format_t* format) {
     ImGui::Indent();
     for (int i = 0; i < format->layersCount; ++i) {
         text_layer_effect_t* layer = &format->layers[i];
-        guiTextLayerEffect(layer);
+        gui_text_layer_effect(layer);
     }
     ImGui::Unindent();
 }
@@ -296,8 +296,19 @@ inline void guiTextFormat(text_format_t* format) {
 inline void editDisplayText(void* comp) {
     text2d_t* tf = (text2d_t*)comp;
     // TODO:
-    //ImGui::InputTextMultiline("Text", &tf.str_buf);
     ImGui::LabelText("Text", "%s", text2d__c_str(tf));
+    switch (tf->flags & TEXT2D_STR_MASK) {
+        case TEXT2D_C_STR:
+            ImGui::LabelText("Buffer Mode", "c-string");
+            break;
+        case TEXT2D_INPLACE:
+            ImGui::LabelText("Buffer Mode", "in-place");
+            break;
+        case TEXT2D_STR_BUF:
+            ImGui::LabelText("Buffer Mode", "dynamic");
+            ImGui_InputTextMultiline("Text", &tf->str_obj, vec2(0,0), 0, NULL, NULL);
+            break;
+    }
     ImGui_EditRect("Bounds", &tf->rect);
     ImGui_Color32Edit("Border Color", &tf->borderColor);
     ImGui_Color32Edit("Fill Color", &tf->fillColor);

@@ -119,7 +119,7 @@ static void appbox_on_remove_ads(const node_event_t* event) {
 
 static void appbox_on_ads_removed(signal_slot_t* slot, void* event) {
     UNUSED(event);
-    entity_t btn = entity_id(slot->context.u64);
+    entity_t btn = entity_id(slot->context.u32);
     if (is_entity(btn)) {
         set_visible(btn, false);
     }
@@ -158,7 +158,7 @@ void appbox_init_default_controls(entity_t e) {
                 set_visible(btn, false);
             } else {
                 signal_slot_t* slot = sig_connect(&g_ads.on_removed, appbox_on_ads_removed, 0);
-                slot->context.u64 = btn.id;
+                slot->context.u32 = btn.id;
                 slot->once = true;
                 add_node_event_listener(btn, BUTTON_EVENT_CLICK, appbox_on_remove_ads);
             }

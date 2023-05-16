@@ -22,6 +22,7 @@ typedef struct signal_slot_ {
         void* ptr;
         uint64_t u64;
         int64_t i64;
+        uint32_t u32;
     } context;
 } signal_slot_t;
 

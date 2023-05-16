@@ -11,7 +11,7 @@
 /// assets
 
 void draw_font_info(void* asset) {
-    guiFont((const font_t*)asset);
+    gui_font((const font_t*)asset);
 }
 
 void draw_sg_info(void* asset) {
@@ -88,7 +88,7 @@ void draw_atlas_info(void* asset) {
         const sprite_t* sprite = &REF_RESOLVE(res_sprite, spr);
         ImGui_Text("%s (GID: %u)", hsp_get(res_sprite.names[spr]), spr);
         if (sprite->state & SPRITE_LOADED) {
-            guiSprite(sprite);
+            gui_sprite(sprite);
         } else {
             ImGui_TextDisabled("Unloaded");
         }
@@ -165,7 +165,7 @@ void draw_resources_window(void) {
     if (ImGui_BeginTabBar("res_by_type", 0)) {
         draw_rr_items("image", &res_image.rr, draw_image_info);
         draw_rr_items("shader", &res_shader.rr, 0);
-        draw_rr_items("sprite", &res_sprite.rr, (void (*)(void*))guiSprite);
+        draw_rr_items("sprite", &res_sprite.rr, (void (*)(void*))gui_sprite);
         draw_rr_items("particle", &res_particle.rr, 0);
         draw_rr_items("audio", &res_audio.rr, 0);
         draw_rr_items("font", &res_font.rr, draw_font_info);

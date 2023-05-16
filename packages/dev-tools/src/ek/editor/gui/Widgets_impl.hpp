@@ -1,5 +1,7 @@
-#include "Widgets.hpp"
 #include "../imgui/imgui.hpp"
+#include "widgets.h"
+#include <ek/scenex/2d/sprite.h>
+#include <ek/scenex/text/font.h>
 
 struct InputTextCallback_UserData {
     void** Str;
@@ -8,16 +10,16 @@ struct InputTextCallback_UserData {
 };
 
 static int InputTextCallback_ek_String(ImGuiInputTextCallbackData* data) {
-    InputTextCallback_UserData* user_data = (InputTextCallback_UserData*) data->UserData;
+    InputTextCallback_UserData* user_data = (InputTextCallback_UserData*)data->UserData;
     if (data->EventFlag == ImGuiInputTextFlags_CallbackResize) {
         // Resize string callback
         // If for some reason we refuse the new length (BufTextLen) and/or capacity (BufSize) we need to set them back to what we want.
         void** p_str = user_data->Str;
         IM_ASSERT(data->Buf == str_get(*p_str));
-        if(arr_capacity(*p_str) < data->BufTextLen) {
+        if (arr_capacity(*p_str) < data->BufTextLen) {
             arr_grow(p_str, data->BufTextLen, 1);
         }
-        data->Buf = (char*) str_get(*p_str);
+        data->Buf = (char*)str_get(*p_str);
     } else if (user_data->ChainCallback) {
         // Forward to user callback, if any
         data->UserData = user_data->ChainCallbackUserData;
@@ -26,26 +28,24 @@ static int InputTextCallback_ek_String(ImGuiInputTextCallbackData* data) {
     return 0;
 }
 
-bool ImGui_InputText(const char* label, void** p_str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback,
-               void* user_data) {
+bool ImGui_InputText(const char* label, void** p_str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* userdata) {
     IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
     flags |= ImGuiInputTextFlags_CallbackResize;
-    InputTextCallback_UserData cb_user_data;
-    cb_user_data.Str = p_str;
-    cb_user_data.ChainCallback = callback;
-    cb_user_data.ChainCallbackUserData = user_data;
-    return ImGui::InputText(label, (char*)str_get(*p_str), arr_capacity(*p_str) + 1, flags, InputTextCallback_ek_String, &cb_user_data);
+    InputTextCallback_UserData cb_userdata;
+    cb_userdata.Str = p_str;
+    cb_userdata.ChainCallback = callback;
+    cb_userdata.ChainCallbackUserData = userdata;
+    return ImGui::InputText(label, (char*)str_get(*p_str), arr_capacity(*p_str) + 1, flags, InputTextCallback_ek_String, &cb_userdata);
 }
 
-bool ImGui_InputTextMultiline(const char* label, void** p_str, const ImVec2& size, ImGuiInputTextFlags flags,
-                        ImGuiInputTextCallback callback, void* user_data) {
+bool ImGui_InputTextMultiline(const char* label, void** p_str, vec2_t size, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* userdata) {
     IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
     flags |= ImGuiInputTextFlags_CallbackResize;
-    InputTextCallback_UserData cb_user_data;
-    cb_user_data.Str = p_str;
-    cb_user_data.ChainCallback = callback;
-    cb_user_data.ChainCallbackUserData = user_data;
-    return ImGui::InputTextMultiline(label, (char*)str_get(*p_str), arr_capacity(*p_str) + 1, size, flags, InputTextCallback_ek_String, &cb_user_data);
+    InputTextCallback_UserData cb_userdata;
+    cb_userdata.Str = p_str;
+    cb_userdata.ChainCallback = callback;
+    cb_userdata.ChainCallbackUserData = userdata;
+    return ImGui::InputTextMultiline(label, (char*)str_get(*p_str), arr_capacity(*p_str) + 1, *(ImVec2*)&size, flags, InputTextCallback_ek_String, &cb_userdata);
 }
 
 void ImGui_HelpMarker(const char* desc) {
@@ -111,18 +111,16 @@ void get_debug_node_path(entity_t e, char buffer[1024]) {
     buffer[len] = '\0';
 }
 
-static
-const char* get_text_layer_type_name(text_layer_type type) {
+static const char* get_text_layer_type_name(text_layer_type type) {
     const char* names[4] = {
-            "Text",
-            "Stroke1",
-            "Stroke2",
-            "Shadow"
-    };
+        "Text",
+        "Stroke1",
+        "Stroke2",
+        "Shadow"};
     return names[type];
 }
 
-void guiTextLayerEffect(text_layer_effect_t* layer) {
+void gui_text_layer_effect(text_layer_effect_t* layer) {
     ImGui_PushID((uintptr_t)layer);
 
     if (ImGui::CollapsingHeader(get_text_layer_type_name(layer->type))) {
@@ -143,7 +141,7 @@ void guiTextLayerEffect(text_layer_effect_t* layer) {
     ImGui_PopID();
 }
 
-void guiSprite(const sprite_t* sprite) {
+void gui_sprite(const sprite_t* sprite) {
     if (!sprite) {
         ImGui_TextError("ERROR: sprite resource slot could not be null");
         return;
@@ -160,7 +158,7 @@ void guiSprite(const sprite_t* sprite) {
     auto rc = sprite->rect;
     auto uv0 = sprite->tex.position;
     auto uv1 = rect_rb(sprite->tex);
-    void* tex_id = (void*) (uintptr_t) sprite_image.id;
+    void* tex_id = (void*)(uintptr_t)sprite_image.id;
     if (sprite->state & SPRITE_ROTATED) {
         ImGui::BeginChild("s", ImVec2{rc.w, rc.h});
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
@@ -178,15 +176,14 @@ void guiSprite(const sprite_t* sprite) {
         ImGui::EndChild();
     } else {
         ImGui::Image(
-                tex_id,
-                ImVec2{rc.w, rc.h},
-                ImVec2{uv0.x, uv0.y},
-                ImVec2{uv1.x, uv1.y}
-        );
+            tex_id,
+            ImVec2{rc.w, rc.h},
+            ImVec2{uv0.x, uv0.y},
+            ImVec2{uv1.x, uv1.y});
     }
 }
 
-void guiFont(const font_t* font) {
+void gui_font(const font_t* font) {
     if (!font) {
         ImGui_TextError("ERROR: font resource slot could not be null");
         return;
@@ -202,4 +199,3 @@ void guiFont(const font_t* font) {
     ImGui_Text("Type: %s", font_type_names[font->font_type]);
     ImGui_Text("Glyphs: %u", arr_size(font->map.entries));
 }
-

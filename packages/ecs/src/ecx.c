@@ -1,8 +1,8 @@
 #include <ecx/ecx.h>
-#include <ek/buf.h>
-#include <ek/sparse_array.h>
-#include <ek/log.h>
 #include <ek/assert.h>
+#include <ek/buf.h>
+#include <ek/log.h>
+#include <ek/sparse_array.h>
 #include <string.h>
 
 // forward
@@ -19,7 +19,7 @@ ecx_component_type* ecx_components[ECX_COMPONENTS_MAX_COUNT];
 
 on_entity_destroy ecx_on_entity_destroy[ECX_LISTENERS_MAX_COUNT];
 
-static void ecx_reset_entity_pool() {
+static void ecx_reset_entity_pool(void) {
     // reset pool ids
     entity_t* it = ecx_pool;
 #pragma nounroll
@@ -74,9 +74,8 @@ entity_t entity_at(entity_idx_t idx) {
 //}
 
 entity_t entity_id(entity_id_t id) {
-    return (entity_t) {
-            .id = id
-    };
+    return (entity_t){
+        .id = id};
 }
 
 bool is_entity(entity_t e) {
@@ -91,8 +90,8 @@ void init_component_type(ecx_component_type* type, ecx_component_type_decl decl)
     type->label = decl.label;
 
     type->entity_to_handle = ek_sparse_array_create(ECX_ENTITIES_MAX_COUNT);
-    ek_buf_set_size((void**) &type->handle_to_entity, sizeof(entity_t), 1, decl.capacity);
-    ek_buf_set_size((void**) &type->component_next, sizeof(ecx_component_list_t), 1, decl.capacity);
+    ek_buf_set_size((void**)&type->handle_to_entity, sizeof(entity_t), 1, decl.capacity);
+    ek_buf_set_size((void**)&type->component_next, sizeof(ecx_component_list_t), 1, decl.capacity);
     type->size = 1;
 
     type->data_num = decl.data_num;
@@ -101,7 +100,7 @@ void init_component_type(ecx_component_type* type, ecx_component_type_decl decl)
 #pragma nounroll
     for (uint32_t i = 0; i < decl.data_num; ++i) {
         type->data_stride[i] = decl.data_stride[i];
-        ek_buf_set_size((void**) &type->data[i], decl.data_stride[i], 1, decl.capacity);
+        ek_buf_set_size((void**)&type->data[i], decl.data_stride[i], 1, decl.capacity);
     }
 }
 
@@ -109,7 +108,7 @@ void init_component_type(ecx_component_type* type, ecx_component_type_decl decl)
 
 entity_t create_entity(void) {
     EK_ASSERT(ecx.size < ECX_ENTITIES_MAX_COUNT);
-    const entity_idx_t next = (entity_idx_t) ecx.next;
+    const entity_idx_t next = (entity_idx_t)ecx.next;
     ecx.next = ecx_pool[next].idx;
     ecx_pool[next].idx = next;
     ++ecx.size;
@@ -160,12 +159,12 @@ component_handle_t ecx_create_component(ecx_component_type* type, entity_idx_t e
     const component_handle_t handle = type->size++;
     ek_sparse_array_insert(type->entity_to_handle, entity_idx, handle);
 
-    arr_maybe_grow((void**) &type->handle_to_entity, sizeof(entity_t));
+    arr_maybe_grow((void**)&type->handle_to_entity, sizeof(entity_t));
     ek_buf_header(type->handle_to_entity)->length++;
     type->handle_to_entity[handle] = entity_idx;
 
     // link component
-    arr_maybe_grow((void**) &type->component_next, sizeof(component_type_id));
+    arr_maybe_grow((void**)&type->component_next, sizeof(component_type_id));
     ek_buf_header(type->component_next)->length++;
     component_type_id next = ecx_component_head[entity_idx];
     ecx_component_head[entity_idx] = type->index;
@@ -195,8 +194,7 @@ void unlink_component(ecx_component_type* type, entity_idx_t entity_idx) {
             if (!prev) {
                 ecx_component_head[entity_idx] = i_type->component_next[handle];
             } else {
-                ecx_components[prev]->component_next[get_component_handle_by_index(ecx_components[prev], entity_idx)]
-                        = i_type->component_next[handle];
+                ecx_components[prev]->component_next[get_component_handle_by_index(ecx_components[prev], entity_idx)] = i_type->component_next[handle];
             };
             // maybe we could not zero
             i_type->component_next[handle] = 0;
@@ -224,7 +222,7 @@ component_handle_t ecx__erase_data(ecx_component_type* type, entity_idx_t entity
             void* arr = type->data[i];
             uint16_t stride = type->data_stride[i];
             // [removed_handle] <-- [last]
-            memcpy((char*) arr + handle * stride, (char*) arr + last * stride, stride);
+            memcpy((char*)arr + handle * stride, (char*)arr + last * stride, stride);
         }
         type->handle_to_entity[handle] = back_entity_idx;
         type->component_next[handle] = type->component_next[last];
@@ -246,7 +244,7 @@ component_handle_t ecx__erase_data(ecx_component_type* type, entity_idx_t entity
     return handle;
 }
 
-void foreach_entity(void(* callback)(entity_t)) {
+void foreach_entity(void (*callback)(entity_t)) {
     const uint32_t count = ecx.size;
     for (uint32_t idx = 1, processed = 1; processed < count; ++idx) {
         const entity_t e = ecx_pool[idx];
@@ -257,10 +255,10 @@ void foreach_entity(void(* callback)(entity_t)) {
     }
 }
 
-void foreach_type(ecx_component_type* type, void(* callback)(component_handle_t)) {
+void foreach_type(ecx_component_type* type, void (*callback)(component_handle_t)) {
     const uint16_t count = type->size;
     for (uint16_t i = 1; i < count; ++i) {
-        callback((component_handle_t) i);
+        callback((component_handle_t)i);
     }
 }
 
@@ -303,7 +301,7 @@ void* get_component_data(ecx_component_type* type, component_handle_t handle, ui
     if (LIKELY(data)) {
         return data + handle * type->data_stride[data_index];
     }
-    return (void*) (uintptr_t) handle;
+    return (void*)(uintptr_t)handle;
 }
 
 void* get_component(ecx_component_type* type, entity_t entity) {
@@ -351,9 +349,9 @@ void* add_component(ecx_component_type* type, entity_t entity) {
 }
 
 static int compare_ecs_types_(const void* a, const void* b) {
-    const uint16_t size1 = (*(const ecx_component_type**) a)->size;
-    const uint16_t size2 = (*(const ecx_component_type**) b)->size;
-    return (int) size1 - (int) size2;
+    const uint16_t size1 = (*(const ecx_component_type**)a)->size;
+    const uint16_t size2 = (*(const ecx_component_type**)b)->size;
+    return (int)size1 - (int)size2;
 }
 
 void ecx_sort_component_type_table(ecx_component_type** types_table, uint32_t count) {

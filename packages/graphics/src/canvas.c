@@ -43,10 +43,10 @@ sg_buffer ek_canvas_buffers_get(ek_canvas_buffers* buffers, uint32_t required_si
     sg_buffer buf = line[index];
     if (buf.id == 0) {
         sg_buffer_desc desc = (sg_buffer_desc){
-                .size = buffers->cap[bucket],
-                .type = buffers->type,
-                .usage = SG_USAGE_STREAM,
-                .label = buffers->type == SG_BUFFERTYPE_VERTEXBUFFER ? "canvas-vbs" : "canvas-ibs"};
+            .size = buffers->cap[bucket],
+            .type = buffers->type,
+            .usage = SG_USAGE_STREAM,
+            .label = buffers->type == SG_BUFFERTYPE_VERTEXBUFFER ? "canvas-vbs" : "canvas-ibs"};
         buf = sg_make_buffer(&desc);
         line[index] = buf;
     }
@@ -599,10 +599,10 @@ void canvas_triangles(uint32_t vertex_count, uint32_t index_count) {
         }
         if (canvas.state & EK_CANVAS_CHECK_SCISSORS) {
             canvas_set_next_scissors((i16rect_t){{
-                    (int16_t)canvas.scissors[0].x,
-                    (int16_t)canvas.scissors[0].y,
-                    (int16_t)canvas.scissors[0].w,
-                    (int16_t)canvas.scissors[0].h,
+                (int16_t)canvas.scissors[0].x,
+                (int16_t)canvas.scissors[0].y,
+                (int16_t)canvas.scissors[0].w,
+                (int16_t)canvas.scissors[0].h,
             }});
             canvas.state ^= EK_CANVAS_CHECK_SCISSORS;
         }
@@ -739,10 +739,10 @@ void canvas_begin_ex(const rect_t viewport, const mat3x2_t view, sg_image render
     canvas.next.shader = canvas.shader[0];
     canvas.next.image = canvas.image[0];
     canvas.next.scissors = (i16rect_t){{
-            (int16_t)viewport.x,
-            (int16_t)viewport.y,
-            (int16_t)viewport.w,
-            (int16_t)viewport.h,
+        (int16_t)viewport.x,
+        (int16_t)viewport.y,
+        (int16_t)viewport.w,
+        (int16_t)viewport.h,
     }};
     canvas.pipeline.id = SG_INVALID_ID;
 

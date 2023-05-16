@@ -17,7 +17,7 @@ enum sprite_flags_t {
     SPRITE_LOADED = 2,
 };
 
-typedef struct sprite_t {
+typedef struct sprite_ {
     uint32_t state;
     R(sg_image) image_id;
     rect_t rect;

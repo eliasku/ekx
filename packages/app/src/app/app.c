@@ -76,7 +76,7 @@ void ek_app__process_frame(void) {
     }
 }
 
-void ek_app__notify_ready() {
+void ek_app__notify_ready(void) {
     log_debug("ekapp ready");
     EK_ASSERT((ek_app.state & EK_APP_STATE_READY) == 0);
     ek_app.state |= EK_APP_STATE_READY;

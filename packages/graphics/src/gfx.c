@@ -8,19 +8,19 @@
 #define SOKOL_LOG(msg) log_debug("sg: %s", msg);
 #include <sokol/sokol_gfx.h>
 
-static void ek_gfx_log_backend() {
+static void ek_gfx_log_backend(void) {
 #ifndef NDEBUG
     static const char* backend_strings[] = {
-            "SG_BACKEND_GLCORE33",
-            "SG_BACKEND_GLES2",
-            "SG_BACKEND_GLES3",
-            "SG_BACKEND_D3D11",
-            "SG_BACKEND_METAL_IOS",
-            "SG_BACKEND_METAL_MACOS",
-            "SG_BACKEND_METAL_SIMULATOR",
-            "SG_BACKEND_WGPU",
-            "SG_BACKEND_DUMMY",
-            0};
+        "SG_BACKEND_GLCORE33",
+        "SG_BACKEND_GLES2",
+        "SG_BACKEND_GLES3",
+        "SG_BACKEND_D3D11",
+        "SG_BACKEND_METAL_IOS",
+        "SG_BACKEND_METAL_MACOS",
+        "SG_BACKEND_METAL_SIMULATOR",
+        "SG_BACKEND_WGPU",
+        "SG_BACKEND_DUMMY",
+        0};
     const int backend = sg_query_backend();
     EK_ASSERT(backend >= 0);
     EK_ASSERT(backend < (int)(sizeof(backend_strings) / sizeof(backend_strings[0])));
@@ -80,14 +80,14 @@ bool ek_gfx_read_pixels(sg_image image, void* pixels) {
             id<MTLBlitCommandEncoder> blitcmd = [cmdbuffer blitCommandEncoder];
 
             [blitcmd copyFromTexture:tex
-                          sourceSlice:0
-                          sourceLevel:0
-                         sourceOrigin:MTLOriginMake(0, 0, 0)
-                           sourceSize:MTLSizeMake(width, height, 1)
-                            toTexture:temp_texture
-                     destinationSlice:0
-                     destinationLevel:0
-                    destinationOrigin:MTLOriginMake(0, 0, 0)];
+                         sourceSlice:0
+                         sourceLevel:0
+                        sourceOrigin:MTLOriginMake(0, 0, 0)
+                          sourceSize:MTLSizeMake(width, height, 1)
+                           toTexture:temp_texture
+                    destinationSlice:0
+                    destinationLevel:0
+                   destinationOrigin:MTLOriginMake(0, 0, 0)];
 
             [blitcmd synchronizeTexture:temp_texture slice:0 level:0];
             [blitcmd endEncoding];
@@ -110,12 +110,12 @@ bool ek_gfx_read_pixels(sg_image image, void* pixels) {
 
 sg_image ek_gfx_make_color_image(int width, int height, uint32_t color) {
     sg_image_desc desc = (sg_image_desc){
-            // defaults:
-            //.type = SG_IMAGETYPE_2D,
-            //.usage = SG_USAGE_IMMUTABLE,
-            .width = width,
-            .height = height,
-            .pixel_format = SG_PIXELFORMAT_RGBA8,
+        // defaults:
+        //.type = SG_IMAGETYPE_2D,
+        //.usage = SG_USAGE_IMMUTABLE,
+        .width = width,
+        .height = height,
+        .pixel_format = SG_PIXELFORMAT_RGBA8,
     };
     int count = width * height;
     uint32_t* buffer = (uint32_t*)malloc(count * 4);
@@ -131,20 +131,20 @@ sg_image ek_gfx_make_color_image(int width, int height, uint32_t color) {
 
 sg_image ek_gfx_make_render_target(int width, int height, const char* label) {
     sg_image_desc desc = (sg_image_desc){
-            // defaults:
-            //.type = SG_IMAGETYPE_2D,
-            //.usage = SG_USAGE_IMMUTABLE,
+        // defaults:
+        //.type = SG_IMAGETYPE_2D,
+        //.usage = SG_USAGE_IMMUTABLE,
 
-            .label = label,
-            .render_target = true,
-            .width = width,
-            .height = height,
+        .label = label,
+        .render_target = true,
+        .width = width,
+        .height = height,
 
-            //.pixel_format = SG_PIXELFORMAT_RGBA8,
-            .min_filter = SG_FILTER_LINEAR,
-            .mag_filter = SG_FILTER_LINEAR,
-            .wrap_u = SG_WRAP_CLAMP_TO_EDGE,
-            .wrap_v = SG_WRAP_CLAMP_TO_EDGE,
+        //.pixel_format = SG_PIXELFORMAT_RGBA8,
+        .min_filter = SG_FILTER_LINEAR,
+        .mag_filter = SG_FILTER_LINEAR,
+        .wrap_u = SG_WRAP_CLAMP_TO_EDGE,
+        .wrap_v = SG_WRAP_CLAMP_TO_EDGE,
     };
     return sg_make_image(&desc);
 }
@@ -158,8 +158,8 @@ void ek_gfx_update_image_0(sg_image image, void* data, size_t size) {
 
 ek_shader ek_shader_make(const sg_shader_desc* desc) {
     return (ek_shader){
-            .shader = sg_make_shader(desc),
-            .images_num = desc->fs.images[0].name ? 1 : 0};
+        .shader = sg_make_shader(desc),
+        .images_num = desc->fs.images[0].name ? 1 : 0};
 }
 
 // region Global references for `image` and `shader`

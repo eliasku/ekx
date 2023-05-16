@@ -107,8 +107,7 @@ bool page_add_bitmap(dynamic_atlas_page_t * page, int spriteWidth, int spriteHei
 }
 
 dynamic_atlas_sprite_t dynamic_atlas_add_bitmap(dynamic_atlas_t * atlas, int width, int height, const uint8_t* pixels, size_t pixels_size) {
-    int bpp = atlas->alphaMap ? 1 : 4;
-    EK_ASSERT(pixels_size >= ((size_t)width * height * bpp));
+    EK_ASSERT(pixels_size >= ((size_t)width * height * (atlas->alphaMap ? 1 : 4)));
     EK_ASSERT(width < atlas->pageWidth && height < atlas->pageHeight);
 
     dynamic_atlas_sprite_t sprite;

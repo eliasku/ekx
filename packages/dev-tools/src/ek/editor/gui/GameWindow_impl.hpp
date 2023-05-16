@@ -7,7 +7,7 @@ void game_window_draw(void) {
     const ImVec2 displayPos = ImGui::GetCursorScreenPos();
     const ImVec2 displaySize = ImGui::GetContentRegionAvail();
     if (display->color.id && displaySize.x > 0 && displaySize.y > 0) {
-        auto texId = (void*)static_cast<uintptr_t>(display->color.id);
+        void* texId = (void*)(uintptr_t)display->color.id;
 
         const float scale = fmin(displaySize.x / display->info.size.x, displaySize.y / display->info.size.y);
 
