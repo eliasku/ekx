@@ -44,7 +44,7 @@
     "colors": "^1.4.0",
     "decompress": "^4.2.1",
     "esbuild": "^0.17.19",
-    "gettext-parser": "^6.0.0",
+    "gettext-parser": "^7.0.0",
     "glob": "^10.2.1",
     "mustache": "^4.2.0",
     "plist": "^3.0.6",
