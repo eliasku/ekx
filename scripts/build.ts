@@ -6,7 +6,6 @@ import {logger} from "../lib/cli/logger.js";
 import "../packages/app/web/build.js";
 import "../packages/audio/web/build.js";
 import "../packages/graphics/build.js";
-import "../packages/scenex/build.js";
 import "../plugins/firebase/build.js";
 
 UtilityConfig.verbose = true;

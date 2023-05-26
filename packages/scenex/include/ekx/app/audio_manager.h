@@ -16,10 +16,10 @@ enum {
 
 typedef struct audio_manager_t {
     uint32_t prefs;
-    R(auph_buffer) music_;
-    auph_voice musicVoice_;
-    float musicVolume_;
-    float musicPitch_;
+    res_id /* auph_buffer */ music_res;
+    auph_voice music_voice;
+    float music_volume;
+    float music_pitch;
 } audio_manager_t;
 
 void play_music(string_hash_t name);

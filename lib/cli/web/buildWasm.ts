@@ -76,13 +76,11 @@ function renderCMakeFile(ctx: Project, buildType: string): string {
         // const releaseExpFlags = [];
         cmakeTarget.linkOptions.push("-Oz", "-flto", ...releaseExpFlags);
         cmakeTarget.compileOptions.push("-Oz", "-flto", ...releaseExpFlags);
+        cmakeTarget.linkOptions.push("-g0");
+        cmakeTarget.compileOptions.push("-g0");
         if (1) {
-            cmakeTarget.linkOptions.push("-g0");
-            cmakeTarget.compileOptions.push("-g0");
-        } else {
-            cmakeTarget.linkOptions.push("-g");
-            //cmakeTarget.linkOptions.push("-gsource-map");
-            cmakeTarget.compileOptions.push("-g");
+            cmakeTarget.linkOptions.push("--profiling-funcs");
+            cmakeTarget.compileOptions.push("--profiling-funcs");
         }
         cmakeTarget.compileDefinitions.push("NDEBUG");
     }

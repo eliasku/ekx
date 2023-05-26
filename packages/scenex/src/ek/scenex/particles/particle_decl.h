@@ -1,7 +1,7 @@
 #ifndef SCENEX_PARTICLE_DECL_H
 #define SCENEX_PARTICLE_DECL_H
 
-#include <ek/scenex/2d/sprite.h>
+#include <sce/sprite.h>
 #include <ek/rnd.h>
 #include <ek/rr.h>
 

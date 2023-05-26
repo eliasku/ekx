@@ -1,7 +1,7 @@
 #include "../imgui/imgui.hpp"
 #include "widgets.h"
-#include <ek/scenex/2d/sprite.h>
-#include <ek/scenex/text/font.h>
+#include <sce/sprite.h>
+#include <sce/font.h>
 
 struct InputTextCallback_UserData {
     void** Str;

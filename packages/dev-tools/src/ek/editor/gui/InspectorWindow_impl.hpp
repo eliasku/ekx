@@ -9,12 +9,11 @@
 #include <ek/scenex/2d/text2d.h>
 #include <ek/scenex/2d/transform2d.h>
 #include <ek/scenex/2d/viewport.h>
-#include <ek/scenex/3d/scene3d.h>
 #include <ek/scenex/base/interactive.h>
 #include <ek/scenex/base/node.h>
 #include <ek/scenex/base/node_events.h>
 #include <ek/scenex/particles/particle_system.h>
-#include <ek/scenex/text/font.h>
+#include <sce/font.h>
 
 PodArray<entity_id_t> inspector_list = {};
 
@@ -150,55 +149,55 @@ inline void guiCamera2D(void* comp) {
     ImGui::DragFloat("Debug Scale", &camera->debugDrawScale);
 }
 
-inline void guiTransform3D(void* comp) {
-    transform3d_t* transform = (transform3d_t*)comp;
-    ImGui::DragFloat3("Position", transform->position.data, 1.0f, 0.0f, 0.0f, "%.1f");
-    ImGui::DragFloat3("Scale", transform->scale.data, 0.1f, 0.0f, 0.0f, "%.2f");
-    vec3_t euler_angles = scale_vec3(transform->rotation, 180.0f / MATH_PI);
-    if (ImGui::DragFloat3("Rotation", euler_angles.data, 0.1f, 0.0f, 0.0f, "%.2f")) {
-        transform->rotation = scale_vec3(euler_angles, MATH_PI / 180.0f);
-    }
-}
+// inline void guiTransform3D(void* comp) {
+//     transform3d_t* transform = (transform3d_t*)comp;
+//     ImGui::DragFloat3("Position", transform->position.data, 1.0f, 0.0f, 0.0f, "%.1f");
+//     ImGui::DragFloat3("Scale", transform->scale.data, 0.1f, 0.0f, 0.0f, "%.2f");
+//     vec3_t euler_angles = scale_vec3(transform->rotation, 180.0f / MATH_PI);
+//     if (ImGui::DragFloat3("Rotation", euler_angles.data, 0.1f, 0.0f, 0.0f, "%.2f")) {
+//         transform->rotation = scale_vec3(euler_angles, MATH_PI / 180.0f);
+//     }
+// }
 
-inline void guiCamera3D(void* comp) {
-    camera3d_t* camera = (camera3d_t*)comp;
-    ImGui::DragFloatRange2("Clip Plane", &camera->z_near, &camera->z_far, 1.0f, 0.0f, 0.0f, "%.1f");
-    float fov_degree = to_degrees(camera->fov);
-    if (ImGui::DragFloat("FOV", &fov_degree, 1.0f, 0.0f, 0.0f, "%.1f")) {
-        camera->fov = to_radians(fov_degree);
-    }
+// inline void guiCamera3D(void* comp) {
+//     camera3d_t* camera = (camera3d_t*)comp;
+//     ImGui::DragFloatRange2("Clip Plane", &camera->z_near, &camera->z_far, 1.0f, 0.0f, 0.0f, "%.1f");
+//     float fov_degree = to_degrees(camera->fov);
+//     if (ImGui::DragFloat("FOV", &fov_degree, 1.0f, 0.0f, 0.0f, "%.1f")) {
+//         camera->fov = to_radians(fov_degree);
+//     }
 
-    ImGui::Checkbox("Orthogonal", &camera->orthogonal);
-    ImGui::DragFloat("Ortho Size", &camera->orthogonal_size, 1.0f, 0.0f, 0.0f, "%.1f");
+//     ImGui::Checkbox("Orthogonal", &camera->orthogonal);
+//     ImGui::DragFloat("Ortho Size", &camera->orthogonal_size, 1.0f, 0.0f, 0.0f, "%.1f");
 
-    ImGui::Checkbox("Clear Color Enabled", &camera->clear_color_enabled);
-    ImGui::ColorEdit4("Clear Color", camera->clear_color.data);
-    ImGui::Checkbox("Clear Depth Enabled", &camera->clear_depth_enabled);
-    ImGui::DragFloat("Clear Depth", &camera->clear_depth, 1.0f, 0.0f, 0.0f, "%.1f");
-}
+//     ImGui::Checkbox("Clear Color Enabled", &camera->clear_color_enabled);
+//     ImGui::ColorEdit4("Clear Color", camera->clear_color.data);
+//     ImGui::Checkbox("Clear Depth Enabled", &camera->clear_depth_enabled);
+//     ImGui::DragFloat("Clear Depth", &camera->clear_depth, 1.0f, 0.0f, 0.0f, "%.1f");
+// }
 
-inline void guiMeshRenderer(void* comp) {
-    mesh_renderer_t* renderer = (mesh_renderer_t*)comp;
-    ImGui::Checkbox("Cast Shadows", &renderer->cast_shadows);
-    ImGui::Checkbox("Receive Shadows", &renderer->receive_shadows);
-}
+// inline void guiMeshRenderer(void* comp) {
+//     mesh_renderer_t* renderer = (mesh_renderer_t*)comp;
+//     ImGui::Checkbox("Cast Shadows", &renderer->cast_shadows);
+//     ImGui::Checkbox("Receive Shadows", &renderer->receive_shadows);
+// }
 
-inline void guiLight3D(void* comp) {
-    light3d_t* light = (light3d_t*)comp;
-    if (light->type == LIGHT_DIRECTIONAL) {
-        ImGui_Text("Directional Light");
-    } else if (light->type == LIGHT_POINT) {
-        ImGui_Text("Point Light");
-    } else if (light->type == LIGHT_SPOT) {
-        ImGui_Text("Spot Light");
-    }
-    ImGui::ColorEdit3("Ambient", light->ambient.data);
-    ImGui::ColorEdit3("Diffuse", light->diffuse.data);
-    ImGui::ColorEdit3("Specular", light->specular.data);
+// inline void guiLight3D(void* comp) {
+//     light3d_t* light = (light3d_t*)comp;
+//     if (light->type == LIGHT_DIRECTIONAL) {
+//         ImGui_Text("Directional Light");
+//     } else if (light->type == LIGHT_POINT) {
+//         ImGui_Text("Point Light");
+//     } else if (light->type == LIGHT_SPOT) {
+//         ImGui_Text("Spot Light");
+//     }
+//     ImGui::ColorEdit3("Ambient", light->ambient.data);
+//     ImGui::ColorEdit3("Diffuse", light->diffuse.data);
+//     ImGui::ColorEdit3("Specular", light->specular.data);
 
-    ImGui::DragFloat("Radius", &light->radius, 1.0f, 0.0f, 0.0f, "%.1f");
-    ImGui::DragFloat("Falloff", &light->falloff, 0.1f, 0.0f, 0.0f, "%.1f");
-}
+//     ImGui::DragFloat("Radius", &light->radius, 1.0f, 0.0f, 0.0f, "%.1f");
+//     ImGui::DragFloat("Falloff", &light->falloff, 0.1f, 0.0f, 0.0f, "%.1f");
+// }
 
 inline void guiBounds2D(void* comp) {
     bounds2d_t* bounds = (bounds2d_t*)comp;
@@ -385,12 +384,12 @@ static void gui_inspector(entity_t e) {
     guiComponentPanel("Camera2D", get_camera2d(e), guiCamera2D);
     guiComponentPanel("Bounds2D", get_bounds2d(e), guiBounds2D);
 
-    if (Transform3D.index) {
-        guiComponentPanel("Transform 3D", get_transform3d(e), guiTransform3D);
-        guiComponentPanel("Camera 3D", get_camera3d(e), guiCamera3D);
-        guiComponentPanel("Light 3D", get_light3d(e), guiLight3D);
-        guiComponentPanel("Mesh Renderer", get_mesh_renderer(e), guiMeshRenderer);
-    }
+    // if (Transform3D.index) {
+    //     guiComponentPanel("Transform 3D", get_transform3d(e), guiTransform3D);
+    //     guiComponentPanel("Camera 3D", get_camera3d(e), guiCamera3D);
+    //     guiComponentPanel("Light 3D", get_light3d(e), guiLight3D);
+    //     guiComponentPanel("Mesh Renderer", get_mesh_renderer(e), guiMeshRenderer);
+    // }
 
     guiComponentPanel("Interactive", get_interactive(e), gui_interactive);
 

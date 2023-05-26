@@ -16,8 +16,8 @@
 #include <ek/scenex/2d/movieclip.h>
 #include <ek/scenex/base/tween.h>
 #include <ek/goodies/game_screen.h>
-#include <ek/scenex/2d/dynamic_atlas.h>
-#include <ek/scenex/2d/atlas.h>
+#include <sce/dynamic_atlas.h>
+#include <sce/atlas.h>
 
 void scene_pre_update(entity_t root, float dt) {
     (void)root;

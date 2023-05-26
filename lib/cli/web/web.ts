@@ -2,16 +2,16 @@ import * as fs from "fs";
 import * as path from "path";
 import Mustache from "mustache";
 import * as esbuild from "esbuild";
-import {replaceInFile} from "../utils.js";
-import {buildAssetPackAsync} from "../assets.js";
-import {Project} from "../project.js";
-import {BuildResult} from "../../cmake/mod.js";
-import {serve} from "./serve.js";
-import {logger} from "../logger.js";
-import {buildWasm} from "./buildWasm.js";
-import {deployFirebaseHosting} from "./deployFirebaseHosting.js";
-import {buildAppIconAsync} from "../appicon/appicon.js";
-import {collectSourceRootsAll} from "../collectSources.js";
+import { execute2, replaceInFile } from "../utils.js";
+import { buildAssetPackAsync } from "../assets.js";
+import { Project } from "../project.js";
+import { BuildResult } from "../../cmake/mod.js";
+import { serve } from "./serve.js";
+import { logger } from "../logger.js";
+import { buildWasm } from "./buildWasm.js";
+import { deployFirebaseHosting } from "./deployFirebaseHosting.js";
+import { buildAppIconAsync } from "../appicon/appicon.js";
+import { collectSourceRootsAll } from "../collectSources.js";
 import {
     ensureDirSync,
     expandGlobSync,
@@ -19,6 +19,15 @@ import {
     readTextFileSync, writeJSONFileSync,
     writeTextFileSync
 } from "../../utils/utils.js";
+
+
+function getWasmOpt(): string | undefined {
+    const v = process.env.EMSDK;
+    if (!v) {
+        return undefined;
+    }
+    return path.join(v, "upstream/bin/wasm-opt");
+}
 
 /*** HTML ***/
 export async function export_web(ctx: Project): Promise<void> {
@@ -150,7 +159,20 @@ export async function export_web(ctx: Project): Promise<void> {
     }
 
     if (ctx.args.indexOf("--debug") < 0) {
-        await esbuild.build({
+        const optTasks: Promise<any>[] = [];
+        const wasmopt = getWasmOpt();
+        if (wasmopt) {
+            logger.info("Web export: optimize wasm size " + wasmopt);
+            const src = path.join(outputDir, ctx.name + ".wasm");
+            optTasks.push(
+                execute2(wasmopt, ["-Os", "-o", path.join(outputDir, ctx.name + "-Os.wasm"), src]),
+                execute2(wasmopt, ["-Oz", "-o", path.join(outputDir, ctx.name + "-Oz.wasm"), src]),
+                execute2(wasmopt, ["-O", "-o", path.join(outputDir, ctx.name + "-O.wasm"), src]),
+                execute2(wasmopt, ["-O3", "-o", path.join(outputDir, ctx.name + "-O3.wasm"), src]),
+            );
+        }
+
+        optTasks.push(esbuild.build({
             entryPoints: [path.join(outputDir, ctx.name + ".js")],
             target: ["chrome58", "firefox57", "safari11", "edge16"],
             platform: "browser",
@@ -159,7 +181,31 @@ export async function export_web(ctx: Project): Promise<void> {
             bundle: true,
             outfile: path.join(outputDir, ctx.name + ".js"),
             allowOverwrite: true
-        });
+        }));
+
+        await Promise.all(optTasks);
+
+        // search minimal size
+        if (wasmopt) {
+            let minSize = 0x7FFFFFFF;
+            let file: string | undefined;
+            for (const w of [
+                path.join(outputDir, ctx.name + "-Os.wasm"),
+                path.join(outputDir, ctx.name + "-Oz.wasm"),
+                path.join(outputDir, ctx.name + "-O.wasm"),
+                path.join(outputDir, ctx.name + "-O3.wasm"),
+            ]) {
+                const size = fs.statSync(w).size;
+                if (size < minSize) {
+                    minSize = size;
+                    file = w;
+                }
+            }
+            if (file) {
+                fs.copyFileSync(file, path.join(outputDir, ctx.name + ".wasm"));
+                logger.info("WASM SIZE: " + minSize + " bytes");
+            }
+        }
     }
 
     const js_scripts = collectSourceRootsAll(ctx, "js_script", ["web"], ".");

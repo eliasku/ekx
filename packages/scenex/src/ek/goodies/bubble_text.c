@@ -5,7 +5,7 @@
 #include <ek/scenex/base/destroy_timer.h>
 #include <ek/scenex/2d/transform2d.h>
 #include <ek/scenex/scene_factory.h>
-#include <ek/scenex/text/text_format.h>
+#include <sce/text/text_format.h>
 #include <ek/scenex/2d/text2d.h>
 
 #include <ek/rnd.h>

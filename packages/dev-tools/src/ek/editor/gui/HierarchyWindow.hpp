@@ -11,7 +11,6 @@
 #include <ek/scenex/base/interactive.h>
 #include <ek/scenex/2d/movieclip.h>
 #include <ek/scenex/2d/button.h>
-#include <ek/scenex/3d/scene3d.h>
 #include <ek/scenex/2d/viewport.h>
 #include <ek/scenex/2d/camera2d.h>
 

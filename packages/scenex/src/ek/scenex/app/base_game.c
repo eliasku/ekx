@@ -10,22 +10,25 @@
 #include <ek/gfx.h>
 #include <ek/canvas.h>
 
-#include <ek/scenex/assets/asset_manager.h>
+#include <sce/assets/asset_manager.h>
+#include <sce/sg.h>
+#include <sce/font.h>
+#include <sce/dynamic_atlas.h>
+#include <sce/atlas.h>
+
 #include <ekx/app/profiler.h>
-#include <ek/scenex/text/text_engine.h>
+#include <sce/text/text_engine.h>
 
 #include <ekx/ng/updater.h>
 #include <ekx/app/input_state.h>
 /** resource managers include **/
 #include <ek/scenex/particles/particle_decl.h>
 #include <ek/scenex/scene_factory.h>
-#include <ek/scenex/text/font.h>
-#include <ek/scenex/2d/dynamic_atlas.h>
-#include <ek/scenex/2d/atlas.h>
+
 
 /** systems **/
-#include "ek/scenex/base/node_events.h"
-#include "ekx/app/uitest.h"
+#include <ek/scenex/base/node_events.h>
+#include <ekx/app/uitest.h>
 #include <ek/scenex/2d/viewport.h>
 #include <ek/scenex/2d/layout_rect.h>
 #include <ek/scenex/interaction_system.h>

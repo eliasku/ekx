@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.19)
 
 target_sources(${PROJECT_NAME} PUBLIC
-
-        3d/render_system.c.h
-
         ekx_app.c
 
         base/node.h
@@ -13,10 +10,6 @@ target_sources(${PROJECT_NAME} PUBLIC
         base/node_events.c
         base/tween.h
         base/destroy_timer.h
-
-        2d/atlas.c
-        2d/sprite.c
-        2d/dynamic_atlas.c
 
         2d/transform2d.c
         2d/display2d.c
@@ -35,10 +28,6 @@ target_sources(${PROJECT_NAME} PUBLIC
         2d/movieclip.h
         2d/movieclip.c
 
-        text/font.c
-        text/text_engine.c
-        text/text_format.c
-
         interaction_system.c
         interaction_system.h
 
@@ -54,9 +43,6 @@ target_sources(${PROJECT_NAME} PUBLIC
         systems/hit_test.c
         systems/main_flow.h
         systems/main_flow.c
-
-        assets/asset.c
-        assets/asset_manager.c
 
         scene_factory.h
         scene_factory.c

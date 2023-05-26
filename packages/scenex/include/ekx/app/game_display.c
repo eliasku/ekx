@@ -91,20 +91,19 @@ void game_display_dev_end(game_display* display) {
 }
 
 sg_image game_display_create_image(int w, int h, bool is_color, const char* label) {
-    sg_image_desc desc = {0};
-    desc.type = SG_IMAGETYPE_2D;
-    desc.render_target = true;
-    desc.width = w;
-    desc.height = h;
-    desc.usage = SG_USAGE_IMMUTABLE;
-    if (!is_color) {
-        desc.pixel_format = SG_PIXELFORMAT_DEPTH_STENCIL;
-    }
-    desc.min_filter = SG_FILTER_NEAREST;
-    desc.mag_filter = SG_FILTER_NEAREST;
-    desc.wrap_u = SG_WRAP_CLAMP_TO_EDGE;
-    desc.wrap_v = SG_WRAP_CLAMP_TO_EDGE;
-    desc.label = label;
+    const sg_image_desc desc = {
+        .type = SG_IMAGETYPE_2D,
+        .render_target = true,
+        .width = w,
+        .height = h,
+        .usage = SG_USAGE_IMMUTABLE,
+        .pixel_format = is_color ? 0 : SG_PIXELFORMAT_DEPTH_STENCIL,
+        .min_filter = SG_FILTER_NEAREST,
+        .mag_filter = SG_FILTER_NEAREST,
+        .wrap_u = SG_WRAP_CLAMP_TO_EDGE,
+        .wrap_v = SG_WRAP_CLAMP_TO_EDGE,
+        .label = label,
+    };
     return sg_make_image(&desc);
 }
 

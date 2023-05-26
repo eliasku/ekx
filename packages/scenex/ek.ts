@@ -10,10 +10,6 @@ export async function setup(project: Project) {
         },
     });
     await project.import(
-        "../calo/ek.ts",
-        "../graphics/ek.ts",
-        "../audio/ek.ts",
-        "../app/ek.ts",
-        "../ecs/ek.ts",
+        "../sce/ek.ts",
     );
 }

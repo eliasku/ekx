@@ -1,11 +1,10 @@
 #pragma once
 
 #include <ek/audio.h>
-#include <ek/scenex/2d/atlas.h>
-#include <ek/scenex/2d/dynamic_atlas.h>
-#include <ek/scenex/3d/scene3d.h>
-#include <ek/scenex/scene_factory.h>
-#include <ek/scenex/text/font.h>
+#include <sce/atlas.h>
+#include <sce/dynamic_atlas.h>
+#include <sce/sg.h>
+#include <sce/font.h>
 #include <gen_sg.h>
 
 /// assets
@@ -124,20 +123,20 @@ void draw_dynamic_atlas_info(void* asset) {
     }
 }
 
-void draw_material3d_info(void* asset) {
-    material3d_t* m = (material3d_t*)asset;
-    ImGui::ColorEdit3("Ambient", m->ambient.data);
-    ImGui::ColorEdit3("Diffuse", m->diffuse.data);
-    ImGui::ColorEdit3("Specular", m->specular.data);
-    ImGui::ColorEdit3("Emission", m->emission.data);
-    ImGui::DragFloat("Shininess", &m->shininess, 0.1f, 1.0f, 128.0f);
-    ImGui::DragFloat("Roughness", &m->roughness, 0.01f, 0.001f, 1.0f);
-}
+// void draw_material3d_info(void* asset) {
+//     material3d_t* m = (material3d_t*)asset;
+//     ImGui::ColorEdit3("Ambient", m->ambient.data);
+//     ImGui::ColorEdit3("Diffuse", m->diffuse.data);
+//     ImGui::ColorEdit3("Specular", m->specular.data);
+//     ImGui::ColorEdit3("Emission", m->emission.data);
+//     ImGui::DragFloat("Shininess", &m->shininess, 0.1f, 1.0f, 128.0f);
+//     ImGui::DragFloat("Roughness", &m->roughness, 0.01f, 0.001f, 1.0f);
+// }
 
-void draw_mesh3d_info(void* asset) {
-    static_mesh_t* m = (static_mesh_t*)asset;
-    ImGui_Text("Indices: %i", m->indices_count);
-}
+// void draw_mesh3d_info(void* asset) {
+//     static_mesh_t* m = (static_mesh_t*)asset;
+//     ImGui_Text("Indices: %i", m->indices_count);
+// }
 
 void draw_rr_items(const char* type_name, rr_man_t* rr, void (*fn)(void* item)) {
     char buff[128];
@@ -172,8 +171,8 @@ void draw_resources_window(void) {
         draw_rr_items("sg", &res_sg.rr, draw_sg_info);
         draw_rr_items("atlas", &res_atlas.rr, draw_atlas_info);
         draw_rr_items("dynamic_atlas", &res_dynamic_atlas.rr, draw_dynamic_atlas_info);
-        draw_rr_items("material3d", &res_material3d.rr, draw_material3d_info);
-        draw_rr_items("mesh3d", &res_mesh3d.rr, draw_mesh3d_info);
+        //draw_rr_items("material3d", &res_material3d.rr, draw_material3d_info);
+        //draw_rr_items("mesh3d", &res_mesh3d.rr, draw_mesh3d_info);
 
         ImGui_EndTabBar();
     }

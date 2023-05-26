@@ -42,3 +42,13 @@ It's recommended to re-encode all foreign MP3 audio files to fix `Safari` issues
 ```shell
 ffmpeg -i broken.mp3 -c:a copy -c:v copy fixed.mp3
 ```
+
+Redecode with lower bitrate (64k) and strip all metadata:
+```shell
+ffmpeg -i original.mp3 -codec:a libmp3lame -b:a 64k -map 0:a -map_metadata -1 music.mp3
+```
+
+Show current info:
+```shell
+ffmpeg -i input.mp3
+```

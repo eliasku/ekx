@@ -1,7 +1,6 @@
 // implementations
 #include <ekx/app/game_display.c>
 #include <ekx/app/frame_timer.c>
-#include <ekx/app/localization.c.h>
 #include <ekx/app/time_layers.c>
 
 #include <ekx/app/input_state.c>
@@ -12,6 +11,3 @@
 
 #include "base/destroy_timer.c.h"
 #include "base/tween.c.h"
-
-#include "3d/scene3d.c.h"
-#include "3d/render_system.c.h"

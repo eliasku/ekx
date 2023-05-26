@@ -719,11 +719,12 @@ void canvas_new_frame(void) {
 }
 
 void canvas_begin(float w, float h) {
-    canvas_begin_ex(rect_wh(w, h), mat3x2_identity(), (sg_image){0}, (sg_image){0});
+    const rect_t rc = rect_wh(w, h);
+    canvas_begin_ex( rc, mat3x2_identity(), (sg_image){0}, (sg_image){0});
 }
 
-void canvas_begin_ex(const rect_t viewport, const mat3x2_t view, sg_image renderTarget,
-                     sg_image depthStencilTarget) {
+void canvas_begin_ex(const rect_t viewport, const mat3x2_t view, sg_image render_target,
+                     sg_image depth_stencil_target) {
     EK_ASSERT(!(canvas.state & EK_CANVAS_PASS_ACTIVE));
     // reset all bits and set Active mode / dirty state flag
     canvas.state = EK_CANVAS_PASS_ACTIVE | EK_CANVAS_STATE_CHANGED;
@@ -746,8 +747,8 @@ void canvas_begin_ex(const rect_t viewport, const mat3x2_t view, sg_image render
     }};
     canvas.pipeline.id = SG_INVALID_ID;
 
-    canvas.render_target_color = renderTarget;
-    canvas.render_target_depth = depthStencilTarget;
+    canvas.render_target_color = render_target;
+    canvas.render_target_depth = depth_stencil_target;
 
     float proj_y = viewport.y;
     float proj_h = viewport.h;

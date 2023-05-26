@@ -1,6 +1,6 @@
 #include "profiler.h"
 
-#include <ek/scenex/text/text_engine.h>
+#include <sce/text/text_engine.h>
 #include <ek/canvas.h>
 
 // TODO: EK_DEV_BUILD

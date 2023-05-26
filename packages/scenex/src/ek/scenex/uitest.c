@@ -5,7 +5,7 @@
 #include <ek/assert.h>
 #include <ek/scenex/app/base_game.h>
 #include <ek/log.h>
-#include <ekx/app/localization.h>
+#include <sce/localization.h>
 #include <ek/scenex/2d/button.h>
 #include <ek/scenex/base/node_events.h>
 #include <stdlib.h>

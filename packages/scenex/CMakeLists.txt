@@ -28,6 +28,7 @@ target_link_libraries(${PROJECT_NAME}
         PUBLIC ekx::app
         PUBLIC ekx::ecs
         PUBLIC calo
+        PUBLIC ekx::sce
         )
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

@@ -12,7 +12,7 @@
 #include <ek/scenex/base/node.h>
 #include <ek/scenex/base/node_events.h>
 #include <ekx/app/audio_manager.h>
-#include <ekx/app/localization.h>
+#include <sce/localization.h>
 
 appbox_config_t appbox_config_default(void) {
     appbox_config_t config = {0};

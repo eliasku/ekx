@@ -13,8 +13,6 @@
 #include <ek/scenex/2d/button.h>
 #include <ek/scenex/2d/viewport.h>
 #include <ek/scenex/2d/camera2d.h>
-#include <ek/scenex/3d/scene3d.h>
-
 
 HierarchyWindow editor_hierarchy_window;
 
@@ -62,8 +60,6 @@ const char* HierarchyWindow::getEntityIcon(entity_t e) {
     if (get_display2d(e)) return ICON_FA_PAINT_BRUSH;
     if (get_transform2d(e)) return ICON_FA_DICE_D6;
     if (get_node(e)) return ICON_FA_BOX;
-
-    if (Transform3D.index && get_transform3d(e)) return ICON_FA_DICE_D20;
 
     return ICON_FA_BORDER_STYLE;
 }

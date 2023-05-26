@@ -2,8 +2,8 @@
 
 #include "display2d.h"
 #include <ek/canvas.h>
-#include <ek/scenex/text/text_engine.h>
-#include <ekx/app/localization.h>
+#include <sce/text/text_engine.h>
+#include <sce/localization.h>
 #include <ek/print.h>
 #include <ek/buf.h>
 #include <ek/string.h>

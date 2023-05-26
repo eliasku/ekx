@@ -3,7 +3,7 @@
 #include <ek/scenex/2d/display2d.h>
 #include <ek/scenex/2d/transform2d.h>
 #include <ek/canvas.h>
-#include <ek/scenex/2d/sprite.h>
+#include <sce/sprite.h>
 
 ECX_DEFINE_TYPE(trail2d_t);
 ECX_DEFINE_TYPE(trail_renderer2d_t);

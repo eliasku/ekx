@@ -1,7 +1,7 @@
 #ifndef SCENEX_TEXT2D_H
 #define SCENEX_TEXT2D_H
 
-#include <ek/scenex/text/text_format.h>
+#include <sce/text/text_format.h>
 #include <ecx/ecx.h>
 
 #ifdef __cplusplus
