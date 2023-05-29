@@ -16,6 +16,7 @@
 #include <sce/dynamic_atlas.h>
 #include <sce/atlas.h>
 
+#include <sce/util/frame_timer.h>
 #include <ekx/app/profiler.h>
 #include <sce/text/text_engine.h>
 
@@ -213,8 +214,8 @@ static void game_app_frame(void) {
     vec2_t d_size = display->info.size;
 
     /** base app BEGIN **/
-
-    const float dt = fminf((float) update_frame_timer(&game_app_state.frame_timer), 0.3f);
+    update_frame_timer();
+    const float dt = fminf((float)frame_timer.dt, 0.3f);
     // fixed for GIF recorder
     //dt = 1.0f / 60.0f;
     game_app_update_frame(dt);
@@ -309,7 +310,7 @@ static void game_app_frame(void) {
     profiler_add_time(PROFILE_END, (float) (elapsed * 1000));
     profiler_add_time(PROFILE_FRAME, (float) (elapsed * 1000));
 
-    profiler_update((float) game_app_state.frame_timer.dt);
+    profiler_update((float) frame_timer.dt);
 }
 
 static void game_app_event(const ek_app_event event) {

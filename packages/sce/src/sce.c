@@ -12,3 +12,6 @@
 
 #include "sce/sg.c.h"
 
+#include "sce/util/time_layers.c.h"
+#include "sce/util/frame_timer.c.h"
+

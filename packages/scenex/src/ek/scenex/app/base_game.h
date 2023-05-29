@@ -2,7 +2,6 @@
 #define SCENEX_BASIC_APPLICATION_H
 
 #include <ecx/ecx.h>
-#include <ekx/app/frame_timer.h>
 #include <ekx/app/game_display.h>
 #include <ek/app.h>
 
@@ -31,7 +30,6 @@ typedef struct {
 
 typedef struct {
     game_display display;
-    frame_timer_t frame_timer;
     float scale_factor;
     entity_t root;
     game_delegate_t delegate;

@@ -7,6 +7,7 @@
 #include <ek/editor/imgui/imgui.hpp>
 #include <ek/log.h>
 #include <ek/scenex/app/base_game.h>
+#include <sce/util/frame_timer.h>
 #include <fonts/IconsFontAwesome5.h>
 #include "gui/SceneWindow.hpp"
 #include "gui/HierarchyWindow.hpp"
@@ -107,7 +108,7 @@ void editor_render_overlay(void) {
 
 void editor_update(void) {
     //project.update_scale_factor(app_->scale_factor, settings.notifyAssetsOnScaleFactorChanged);
-    ekimgui_begin_frame((float)game_app_state.frame_timer.dt);
+    ekimgui_begin_frame((float)frame_timer.dt);
     if (!g_editor.config.hidden) {
         editor_draw_gui();
     }

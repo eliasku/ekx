@@ -1,5 +1,5 @@
-#ifndef EKX_APP_TIME_LAYERS_H
-#define EKX_APP_TIME_LAYERS_H
+#ifndef SCE_TIME_LAYERS_H
+#define SCE_TIME_LAYERS_H
 
 #include <stdint.h>
 
@@ -34,4 +34,4 @@ void update_time_layers(float raw_dt);
 }
 #endif
 
-#endif // EKX_APP_TIME_LAYERS_H
+#endif // SCE_TIME_LAYERS_H

@@ -1,5 +1,5 @@
-#ifndef EKX_APP_FRAME_TIMER_H
-#define EKX_APP_FRAME_TIMER_H
+#ifndef SCE_FRAME_TIMER_H
+#define SCE_FRAME_TIMER_H
 
 #include <stdint.h>
 
@@ -17,10 +17,12 @@ typedef struct frame_timer_t {
     uint64_t stopwatch;
 } frame_timer_t;
 
-double update_frame_timer(frame_timer_t* timer);
+void update_frame_timer(void);
+
+extern frame_timer_t frame_timer;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // EKX_APP_FRAME_TIMER_H
+#endif // SCE_FRAME_TIMER_H

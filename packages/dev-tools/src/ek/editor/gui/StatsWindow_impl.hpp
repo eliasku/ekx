@@ -9,6 +9,7 @@
 
 #include <ek/editor/imgui/imgui.hpp>
 #include <ekx/app/profiler.h>
+#include <sce/util/frame_timer.h>
 
 static float getterProfilerTrackValue(void* data, int idx) {
     struct profiler_track* track = (struct profiler_track*) data;
@@ -19,7 +20,7 @@ void draw_stats_window(void) {
     const ek_canvas_frame_stats stats = canvas.stats;
     const float drawable_area = ek_app.viewport.width * ek_app.viewport.height;
     ImGui_Text("%ld µs | dc: %u | tri: %u | fill: %d%%",
-                (long) (game_app_state.frame_timer.dt * 1000000.0f),
+                (long) (frame_timer.dt * 1000000.0f),
                 stats.draw_calls,
                 stats.triangles,
                 (int) (100.0f * stats.fill_area / drawable_area)

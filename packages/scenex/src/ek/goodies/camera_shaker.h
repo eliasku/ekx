@@ -2,7 +2,7 @@
 #define EKX_GOODIES_CAMERA_SHAKER_H
 
 #include <ek/math.h>
-#include <ekx/app/time_layers.h>
+#include <sce/util/time_layers.h>
 #include "ecx/ecx.h"
 
 typedef struct camera_shaker {

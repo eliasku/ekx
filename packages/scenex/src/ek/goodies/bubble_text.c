@@ -9,7 +9,7 @@
 #include <ek/scenex/2d/text2d.h>
 
 #include <ek/rnd.h>
-#include <ekx/app/time_layers.h>
+#include <sce/util/time_layers.h>
 #include <ek/math.h>
 
 ECX_DEFINE_TYPE(bubble_text_t);
