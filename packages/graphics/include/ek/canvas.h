@@ -223,6 +223,7 @@ void canvas_quad(float x, float y, float w, float h);
 
 void canvas_quad_rotated(float x, float y, float w, float h);
 
+void canvas_quadr_color(rect_t rc, color_t color);
 void canvas_quad_color(float x, float y, float w, float h, color_t color);
 
 void canvas_quad_color4(float x, float y, float w, float h, color_t c1, color_t c2, color_t c3, color_t c4);

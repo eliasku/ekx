@@ -321,6 +321,10 @@ void canvas_quad(float x, float y, float w, float h) {
     canvas_write_quad_indices();
 }
 
+void canvas_quadr_color(rect_t rc, color_t color) {
+    canvas_quad_color(rc.x, rc.y, rc.w, rc.h, color);
+}
+
 void canvas_quad_color(float x, float y, float w, float h, color_t color) {
     canvas_triangles(4, 6);
 
@@ -501,7 +505,7 @@ static float triangle_area(const ek_vertex2d* vertices, const uint16_t* indices,
 }
 
 static sg_pipeline
-create_pipeline_for_cache(sg_shader shader, bool useRenderTarget, bool depthStencil) {
+create_pipeline_for_cache(sg_shader shader, bool use_render_target, bool depth_stencil) {
     sg_pipeline_desc pip_desc = {0};
     pip_desc.layout = ek_vertex2d_layout_desc();
     pip_desc.shader = shader;
@@ -512,9 +516,9 @@ create_pipeline_for_cache(sg_shader shader, bool useRenderTarget, bool depthSten
     pip_desc.colors[0].blend.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
     pip_desc.sample_count = 1;
     pip_desc.primitive_type = SG_PRIMITIVETYPE_TRIANGLES;
-    if (useRenderTarget) {
+    if (use_render_target) {
         //pip_desc.colors[0].pixel_format = SG_PIXELFORMAT_RGBA8;
-        if (depthStencil) {
+        if (depth_stencil) {
             pip_desc.depth.pixel_format = SG_PIXELFORMAT_DEPTH_STENCIL;
             //            pip_desc.depth.write_enabled = false;
             //            pip_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;

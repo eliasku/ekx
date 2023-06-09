@@ -445,14 +445,14 @@ void auph_stop(int name) {
             auph_voice_obj_stop(obj);
         }
     } else if (type == AUPH_TYPE_BUFFER) {
-        const auph_buffer_obj* bufferObj = auph_get_buffer_obj(name);
-        if (bufferObj) {
-            const auph_buffer_data_source* pDataSource = &bufferObj->data;
+        const auph_buffer_obj* buffer_obj = auph_get_buffer_obj(name);
+        if (buffer_obj) {
+            const auph_buffer_data_source* p_data_source = &buffer_obj->data;
             auph_voice_obj* voices = auph_ctx.voices;
             for (uint32_t i = 1; i < AUPH_VOICES_MAX_COUNT; ++i) {
-                auph_voice_obj* voiceObj = voices + i;
-                if (voiceObj->data == pDataSource) {
-                    auph_voice_obj_stop(voiceObj);
+                auph_voice_obj* voice_obj = voices + i;
+                if (voice_obj->data == p_data_source) {
+                    auph_voice_obj_stop(voice_obj);
                 }
             }
         }
