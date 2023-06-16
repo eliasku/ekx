@@ -135,13 +135,20 @@ typedef union ek_app_event {
     ek_app_wheel_event wheel;
 } ek_app_event;
 
+enum {
+    EK_APP_CONFIG_DEPTH = 1,
+    EK_APP_CONFIG_STENCIL = 2,
+    EK_APP_CONFIG_ANTIALIASING = 4,
+    EK_APP_CONFIG_LOW_DPI = 8,
+};
+
+typedef uint32_t ek_app_config_flags_t;
+
 typedef struct ek_app_config {
     const char* title;                 //
     float width;                       // = 960;
     float height;                      // = 720;
-    bool need_depth;                   // = false;
-    bool web_keep_canvas_aspect_ratio; // = false;
-    bool allow_high_dpi;               // = true;
+    ek_app_config_flags_t flags;
     int sample_count;                  // = 1;
     int swap_interval;                 // = 1;
     uint32_t background_color;         //0x0

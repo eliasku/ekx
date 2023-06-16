@@ -40,15 +40,15 @@ void handleTouches(ek_app_event_type type, UIView* view, NSSet* touches, UIEvent
         return NO;
     }
 
-    const int sampleCount = ek_app.config.sample_count;
-    const int swapInterval = ek_app.config.swap_interval;
+    const int swap_interval = ek_app.config.swap_interval;
+    ek_app.config.sample_count = ((ek_app.config.flags & EK_APP_CONFIG_ANTIALIASING) ? 4 : 1);
 
     self.view = [MetalView new];
-    self.view.preferredFramesPerSecond = 60 / swapInterval;
+    self.view.preferredFramesPerSecond = 60 / swap_interval;
     self.view.device = MTLCreateSystemDefaultDevice();
     self.view.colorPixelFormat = MTLPixelFormatBGRA8Unorm;
     self.view.depthStencilPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
-    self.view.sampleCount = (NSUInteger) sampleCount;
+    self.view.sampleCount = (NSUInteger) ek_app.config.sample_count;
     self.view.userInteractionEnabled = YES;
     self.view.multipleTouchEnabled = YES;
     self.window.rootViewController.modalPresentationStyle = UIModalPresentationFullScreen;

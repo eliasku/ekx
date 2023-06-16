@@ -239,7 +239,7 @@ static void game_app_frame(void) {
     sg_pass_action pass_action = INIT_ZERO;
     pass_action.colors[0].action = game_app_state.started ? SG_ACTION_DONTCARE : SG_ACTION_CLEAR;
     pass_action.colors[0].value = sg_color_rgb(ek_app.config.background_color);
-    if (ek_app.config.need_depth) {
+    if (ek_app.config.flags & EK_APP_CONFIG_DEPTH) {
         pass_action.depth.action = SG_ACTION_CLEAR;
         pass_action.depth.value = 1.0f;
     }

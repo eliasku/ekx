@@ -9,11 +9,11 @@ declare const _ek_app_js__on_wheel: (x: number, y: number) => boolean;
 
 export const AppLib = {
     ek_app_js_set_mouse_cursor: function (cursor: number): void {
-       const PARENT = 0;
-       const ARROW = 1;
-       const BUTTON = 2;
-       const HELP = 3;
-       const map:string[] = [
+        const PARENT = 0;
+        const ARROW = 1;
+        const BUTTON = 2;
+        const HELP = 3;
+        const map: string[] = [
             "auto", // 0
             "default", // 1
             "pointer", // 2
@@ -30,7 +30,7 @@ export const AppLib = {
 
     ek_app_js_init__deps: ['$GL'],
 
-    ek_app_js_init: function(flags: number) {
+    ek_app_js_init: function (flags: number) {
         const BUTTONS: number[] = [0, 2, 1, 2, 2];
 
         const TYPES: Record<string, number> = {
@@ -85,7 +85,7 @@ export const AppLib = {
         wnd.addEventListener("keyup", onKey, true);
 
         const handleResize = () => {
-            const dpr = window.devicePixelRatio;
+            const dpr = (flags & 8) ? 1 : window.devicePixelRatio;
 
             const div = document.getElementById("gamecontainer")!;
             const rc = div.getBoundingClientRect();
@@ -188,14 +188,14 @@ export const AppLib = {
             }
         };
 
-        let nonPassiveOpt:false|{passive: false} = false;
+        let nonPassiveOpt: false | { passive: false } = false;
         try {
             const def = Object.defineProperty({}, 'passive', {
                 get: () => {
-                    nonPassiveOpt = {passive: false};
+                    nonPassiveOpt = { passive: false };
                 },
             }) as AddEventListenerOptions;
-            window.addEventListener("test", ()=>{}, def);
+            window.addEventListener("test", () => { }, def);
         } catch (e) {
         }
         /** {CanvasElement} */
@@ -212,8 +212,8 @@ export const AppLib = {
         const webgl_attributes: EmscriptenGLAttributes = {
             alpha: false,
             depth: !!(flags & 1),
-            stencil: false,
-            antialias: false,
+            stencil: !!(flags & 2),
+            antialias: !!(flags & 4),
         };
         const gl = canvas.getContext("webgl2", webgl_attributes);
         if (!gl) {
@@ -285,7 +285,7 @@ export const AppLib = {
     ek_app_js_close: function (): void {
         window.close();
     },
-    ek_app_js_lang: function(dest: number, maxLength: number): void {
+    ek_app_js_lang: function (dest: number, maxLength: number): void {
         const lang = window.navigator.language;
         if (lang) {
             stringToUTF8(lang, dest, maxLength);
@@ -293,7 +293,7 @@ export const AppLib = {
             HEAPU8[dest] = 0;
         }
     },
-    ek_app_js_navigate: function(pURL: number): number {
+    ek_app_js_navigate: function (pURL: number): number {
         try {
             window.open(UTF8ToString(pURL), "_blank");
             return 0;

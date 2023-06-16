@@ -42,6 +42,8 @@ static void handleQuitRequest() {
     self.view = [MetalView new];
     self.view.device = MTLCreateSystemDefaultDevice();
 
+    ek_app.config.sample_count = ((ek_app.config.flags & EK_APP_CONFIG_ANTIALIASING) ? 4 : 1);
+
     [self.view updateTrackingAreas];
     self.view.preferredFramesPerSecond = 60 / ek_app.config.swap_interval;
     self.view.colorPixelFormat = MTLPixelFormatBGRA8Unorm;

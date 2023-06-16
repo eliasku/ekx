@@ -78,7 +78,7 @@ public class EkActivity extends AppCompatActivity {
         final int flags = EkPlatform.main(getAssets());
 
         // start
-        glView = new EkSurfaceView(this, (flags & 1) != 0);
+        glView = new EkSurfaceView(this, flags);
         mainLayout.addView(glView);
 
         EkPluginManager.instance.onStart();

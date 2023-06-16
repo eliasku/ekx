@@ -514,7 +514,7 @@ create_pipeline_for_cache(sg_shader shader, bool use_render_target, bool depth_s
     pip_desc.colors[0].blend.enabled = true;
     pip_desc.colors[0].blend.src_factor_rgb = SG_BLENDFACTOR_ONE;
     pip_desc.colors[0].blend.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
-    pip_desc.sample_count = 1;
+    //pip_desc.sample_count = 1;
     pip_desc.primitive_type = SG_PRIMITIVETYPE_TRIANGLES;
     if (use_render_target) {
         //pip_desc.colors[0].pixel_format = SG_PIXELFORMAT_RGBA8;

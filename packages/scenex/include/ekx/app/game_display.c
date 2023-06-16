@@ -133,7 +133,7 @@ void game_display_update_simulated(game_display* display) {
 
         display->color_first_clear_flag = true;
 
-        if (ek_app.config.need_depth) {
+        if (ek_app.config.flags & EK_APP_CONFIG_DEPTH) {
             sg_destroy_image(display->depth_stencil);
             display->depth_stencil = game_display_create_image(w, h, false, "game-display-depth");
         }

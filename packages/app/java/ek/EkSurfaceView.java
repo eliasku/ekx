@@ -14,11 +14,13 @@ public class EkSurfaceView extends GLSurfaceView {
 
     public final EkRenderer renderer;
 
-    public EkSurfaceView(Context context, boolean needDepth) {
+    public EkSurfaceView(Context context, int flags) {
         super(context);
 
         setEGLContextClientVersion(3);
-        setEGLConfigChooser(needDepth);
+        // TODO: update config chooser to tune flags:
+        // https://stackoverflow.com/questions/27035893/antialiasing-in-opengl-es-2-0
+        setEGLConfigChooser((flags & 1) != 0);
         setPreserveEGLContextOnPause(true);
 
         renderer = new EkRenderer(this);

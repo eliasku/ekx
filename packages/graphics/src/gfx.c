@@ -39,7 +39,7 @@ void ek_gfx_setup(int max_draw_calls) {
     desc.context.metal.device = ek_app_mtl_device();
     desc.context.metal.renderpass_descriptor_cb = ek_app_mtl_render_pass;
     desc.context.metal.drawable_cb = ek_app_mtl_drawable;
-    desc.context.sample_count = 1;
+    desc.context.sample_count = ek_app.config.sample_count;
     desc.context.color_format = SG_PIXELFORMAT_BGRA8;
     desc.context.depth_format = SG_PIXELFORMAT_DEPTH_STENCIL;
 #endif

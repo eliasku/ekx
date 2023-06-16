@@ -28,7 +28,6 @@ void ek_app__init(void) {
     ek_app.config.title = "";
     ek_app.config.width = 960;
     ek_app.config.height = 720;
-    ek_app.config.allow_high_dpi = true;
     ek_app.config.sample_count = 1;
     ek_app.config.swap_interval = 1;
 }
